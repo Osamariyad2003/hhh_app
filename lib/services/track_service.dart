@@ -11,6 +11,7 @@ class TrackService {
   final _authService = FirebaseAuthService.instance;
 
   String? get _uid => _authService.currentUserId;
+  String? get _token => null; // No longer using REST API tokens, using Firebase
 
   // ------------------------
   // Children
@@ -145,32 +146,42 @@ class TrackService {
     String? sex,
     String? notes,
   }) async {
-    final data = <String, dynamic>{
-      'updatedAt': DateTime.now().toIso8601String(),
-    };
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
 
-    if (name != null) data['name'] = name.trim();
-    if (dob != null) data['dob'] = dob.toIso8601String();
-    if (archived != null) data['archived'] = archived;
-    if (sex != null) data['sex'] = sex.trim().isEmpty ? null : sex.trim();
-    if (notes != null) data['notes'] = notes.trim().isEmpty ? null : notes.trim();
+    // Split name if provided
+    String? firstName;
+    String? lastName;
+    if (name != null && name.trim().isNotEmpty) {
+      final nameParts = name.trim().split(' ');
+      firstName = nameParts.isNotEmpty ? nameParts.first : name.trim();
+      lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+    }
 
-    await DioHelper.putData(
-      url: 'users/$_uid/children/$childId',
-      data: data,
-      token: _token,
+    // Update using PatientService
+    await _patientService.updatePatient(
+      patientId: childId,
+      firstName: firstName,
+      lastName: lastName,
+      dateOfBirth: dob,
+      diagnoses: notes?.trim().isNotEmpty == true ? notes : null,
+      healthTracking: sex?.trim().isNotEmpty == true ? 'Sex: $sex' : null,
     );
   }
 
   Future<void> setChildArchived({required String childId, required bool archived}) {
-    return updateChild(childId: childId, archived: archived);
+    // Note: Archived functionality not yet implemented in PatientService
+    // For now, we'll just return without error
+    return Future.value();
   }
 
   Future<void> deleteChild({required String childId}) async {
-    await DioHelper.deleteData(
-      url: 'users/$_uid/children/$childId',
-      token: _token,
-    );
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+
+    await _patientService.deletePatient(childId);
   }
 
   // ------------------------

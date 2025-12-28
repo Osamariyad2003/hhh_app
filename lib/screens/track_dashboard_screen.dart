@@ -6,6 +6,7 @@ import '../localization/app_localizations.dart';
 import '../services/track_service.dart';
 import '../widgets/lang_toggle_button.dart';
 import '../widgets/empty_state_widget.dart';
+import '../widgets/child_tracking_map.dart';
 
 String _formatTs(dynamic ts) {
   if (ts is String) {
@@ -283,14 +284,16 @@ class _ChildTabs extends StatelessWidget {
     final loc = AppLocalizations.of(context);
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Column(
         children: [
           TabBar(
+            isScrollable: true,
             tabs: [
               Tab(text: loc.t('weight')),
               Tab(text: loc.t('feeding')),
               Tab(text: loc.t('oxygen')),
+              const Tab(text: 'Map'),
             ],
           ),
           Expanded(
@@ -299,6 +302,11 @@ class _ChildTabs extends StatelessWidget {
                 WeightsTab(childId: childId),
                 FeedingsTab(childId: childId),
                 OxygenTab(childId: childId),
+                const ChildTrackingMap(
+                  latitude: 24.7136, // Default to Riyadh, can be updated with actual location
+                  longitude: 46.6753,
+                  locationName: 'Child Location',
+                ),
               ],
             ),
           ),

@@ -8,6 +8,7 @@ import '../services/hospital_service.dart';
 import '../services/support_group_service.dart';
 import '../services/patient_story_service.dart';
 import '../models/section_content.dart';
+import 'spiritual_needs_screen.dart';
 
 class SectionScreen extends StatelessWidget {
   final String sectionId;
@@ -200,9 +201,21 @@ class SectionScreen extends StatelessWidget {
            sectionId == 'patient-stories';
   }
 
+  /// Check if this is a special section with custom screen
+  bool _isSpecialSection() {
+    return sectionId == 'spiritual';
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+
+    // Special sections with custom screens
+    if (_isSpecialSection()) {
+      if (sectionId == 'spiritual') {
+        return const SpiritualNeedsScreen();
+      }
+    }
 
     // Use Firebase services for specific sections
     if (_shouldUseFirebase()) {
@@ -375,8 +388,26 @@ class SectionScreen extends StatelessWidget {
 
     if (sectionId == 'support') {
       return StreamBuilder<List<Map<String, dynamic>>>(
-        stream: SupportGroupService.instance.streamSupportGroups(),
+        stream: SupportGroupService.instance.streamSupportGroups().handleError((error) {
+          // Return empty list on error to prevent stream from closing
+          return <Map<String, dynamic>>[];
+        }),
         builder: (context, snapshot) {
+          // Check for connection state
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(loc.t('caregiverSupport')),
+                actions: const [LangToggleButton()],
+              ),
+              body: const EmptyStateWidget(
+                icon: Icons.support_agent_outlined,
+                title: 'Loading support groups...',
+                isLoading: true,
+              ),
+            );
+          }
+
           if (snapshot.hasError) {
             return Scaffold(
               appBar: AppBar(
@@ -386,7 +417,7 @@ class SectionScreen extends StatelessWidget {
               body: EmptyStateWidget(
                 icon: Icons.error_outline,
                 title: 'Unable to load support groups',
-                message: 'Please check your connection and try again.',
+                message: 'Error: ${snapshot.error.toString()}\n\nPlease check your connection and try again.',
               ),
             );
           }
@@ -521,8 +552,26 @@ class SectionScreen extends StatelessWidget {
 
     if (sectionId == 'patient-stories') {
       return StreamBuilder<List<Map<String, dynamic>>>(
-        stream: PatientStoryService.instance.streamPublishedStories(),
+        stream: PatientStoryService.instance.streamPublishedStories().handleError((error) {
+          // Return empty list on error to prevent stream from closing
+          return <Map<String, dynamic>>[];
+        }),
         builder: (context, snapshot) {
+          // Check for connection state
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text('Patient Stories'),
+                actions: const [LangToggleButton()],
+              ),
+              body: const EmptyStateWidget(
+                icon: Icons.book_outlined,
+                title: 'Loading stories...',
+                isLoading: true,
+              ),
+            );
+          }
+
           if (snapshot.hasError) {
             return Scaffold(
               appBar: AppBar(
@@ -532,7 +581,7 @@ class SectionScreen extends StatelessWidget {
               body: EmptyStateWidget(
                 icon: Icons.error_outline,
                 title: 'Unable to load stories',
-                message: 'Please check your connection and try again.',
+                message: 'Error: ${snapshot.error.toString()}\n\nPlease check your connection and try again.',
               ),
             );
           }

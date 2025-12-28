@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../cubits/auth_cubit.dart';
+import '../cubits/auth_states.dart';
 import '../localization/app_localizations.dart';
 import '../widgets/lang_toggle_button.dart';
 

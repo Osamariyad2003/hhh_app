@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
   static const tiles = <_Tile>[
     _Tile('generalChildcare', Icons.child_care, '/section/childcare'),
     _Tile('tutorials', Icons.play_circle, '/tutorials'),
-    _Tile('spiritualNeeds', Icons.volunteer_activism, '/section/spiritual'),
+    _Tile('spiritualNeeds', Icons.mosque, '/section/spiritual'),
     _Tile('hospitalInfo', Icons.local_hospital, '/section/hospital'),
     _Tile('caregiverSupport', Icons.support_agent, '/section/support'),
     _Tile('trackYourChild', Icons.monitor_heart, '/track'),
