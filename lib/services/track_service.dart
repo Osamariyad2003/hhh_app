@@ -1,7 +1,7 @@
 import 'dart:async';
-import '../core/dio_helper.dart';
 import '../services/firebase_auth_service.dart';
 import '../services/patient_service.dart';
+import 'firebase/firestore_tracking_service.dart';
 
 class TrackService {
   TrackService._();
@@ -9,9 +9,9 @@ class TrackService {
 
   final _patientService = PatientService.instance;
   final _authService = FirebaseAuthService.instance;
+  final _trackingService = FirestoreTrackingService();
 
   String? get _uid => _authService.currentUserId;
-  String? get _token => null; // No longer using REST API tokens, using Firebase
 
   // ------------------------
   // Children
@@ -193,29 +193,13 @@ class TrackService {
     required bool descending,
     int limit = 200,
   }) async {
-    try {
-      final response = await DioHelper.getData(
-        url: 'users/$_uid/children/$childId/weights',
-        query: {
-          'descending': descending,
-          'limit': limit,
-        },
-        token: _token,
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is List) {
-          return data.cast<Map<String, dynamic>>();
-        } else if (data is Map && data.containsKey('weights')) {
-          return (data['weights'] as List).cast<Map<String, dynamic>>();
-        }
-        return [];
-      }
-      return [];
-    } catch (e) {
-      return [];
-    }
+    if (_uid == null) return [];
+    return await _trackingService.getWeights(
+      _uid!,
+      childId,
+      descending: descending,
+      limit: limit,
+    );
   }
 
   Stream<List<Map<String, dynamic>>> weightsStream(
@@ -223,10 +207,15 @@ class TrackService {
     required bool descending,
     int limit = 200,
   }) {
-    return Stream.periodic(
-      const Duration(seconds: 5),
-      (_) => getWeights(childId, descending: descending, limit: limit),
-    ).asyncMap((future) => future);
+    if (_uid == null) {
+      return Stream.value(<Map<String, dynamic>>[]);
+    }
+    return _trackingService.weightsStream(
+      _uid!,
+      childId,
+      descending: descending,
+      limit: limit,
+    );
   }
 
   Future<void> addWeight({
@@ -238,6 +227,10 @@ class TrackService {
     String unit = 'kg',
     String? clothes,
   }) async {
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+
     final when = ts ?? DateTime.now();
     final data = {
       'valueKg': valueKg,
@@ -249,11 +242,7 @@ class TrackService {
       if (clothes != null && clothes.trim().isNotEmpty) 'clothes': clothes.trim(),
     };
 
-    await DioHelper.postData(
-      url: 'users/$_uid/children/$childId/weights',
-      data: data,
-      token: _token,
-    );
+    await _trackingService.addWeight(_uid!, childId, data);
   }
 
   Future<void> updateWeight({
@@ -266,6 +255,10 @@ class TrackService {
     String? unit,
     String? clothes,
   }) async {
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+
     final data = <String, dynamic>{
       'valueKg': valueKg,
     };
@@ -276,18 +269,14 @@ class TrackService {
     if (unit != null) data['unit'] = unit;
     if (clothes != null) data['clothes'] = clothes.trim().isEmpty ? null : clothes.trim();
 
-    await DioHelper.putData(
-      url: 'users/$_uid/children/$childId/weights/$logId',
-      data: data,
-      token: _token,
-    );
+    await _trackingService.updateWeight(_uid!, childId, logId, data);
   }
 
   Future<void> deleteWeight({required String childId, required String logId}) async {
-    await DioHelper.deleteData(
-      url: 'users/$_uid/children/$childId/weights/$logId',
-      token: _token,
-    );
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+    await _trackingService.deleteWeight(_uid!, childId, logId);
   }
 
   // ------------------------
@@ -299,29 +288,13 @@ class TrackService {
     required bool descending,
     int limit = 200,
   }) async {
-    try {
-      final response = await DioHelper.getData(
-        url: 'users/$_uid/children/$childId/feedings',
-        query: {
-          'descending': descending,
-          'limit': limit,
-        },
-        token: _token,
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is List) {
-          return data.cast<Map<String, dynamic>>();
-        } else if (data is Map && data.containsKey('feedings')) {
-          return (data['feedings'] as List).cast<Map<String, dynamic>>();
-        }
-        return [];
-      }
-      return [];
-    } catch (e) {
-      return [];
-    }
+    if (_uid == null) return [];
+    return await _trackingService.getFeedings(
+      _uid!,
+      childId,
+      descending: descending,
+      limit: limit,
+    );
   }
 
   Stream<List<Map<String, dynamic>>> feedingsStream(
@@ -329,10 +302,15 @@ class TrackService {
     required bool descending,
     int limit = 200,
   }) {
-    return Stream.periodic(
-      const Duration(seconds: 5),
-      (_) => getFeedings(childId, descending: descending, limit: limit),
-    ).asyncMap((future) => future);
+    if (_uid == null) {
+      return Stream.value(<Map<String, dynamic>>[]);
+    }
+    return _trackingService.feedingsStream(
+      _uid!,
+      childId,
+      descending: descending,
+      limit: limit,
+    );
   }
 
   Future<void> addFeeding({
@@ -345,6 +323,10 @@ class TrackService {
     String unit = 'ml',
     String? method,
   }) async {
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+
     final when = ts ?? DateTime.now();
     final data = {
       'amountMl': amountMl,
@@ -357,11 +339,7 @@ class TrackService {
       if (method != null && method.trim().isNotEmpty) 'method': method.trim(),
     };
 
-    await DioHelper.postData(
-      url: 'users/$_uid/children/$childId/feedings',
-      data: data,
-      token: _token,
-    );
+    await _trackingService.addFeeding(_uid!, childId, data);
   }
 
   Future<void> updateFeeding({
@@ -375,6 +353,10 @@ class TrackService {
     String? unit,
     String? method,
   }) async {
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+
     final data = <String, dynamic>{
       'amountMl': amountMl,
       'type': type.trim(),
@@ -386,18 +368,14 @@ class TrackService {
     if (unit != null) data['unit'] = unit;
     if (method != null) data['method'] = method.trim().isEmpty ? null : method.trim();
 
-    await DioHelper.putData(
-      url: 'users/$_uid/children/$childId/feedings/$logId',
-      data: data,
-      token: _token,
-    );
+    await _trackingService.updateFeeding(_uid!, childId, logId, data);
   }
 
   Future<void> deleteFeeding({required String childId, required String logId}) async {
-    await DioHelper.deleteData(
-      url: 'users/$_uid/children/$childId/feedings/$logId',
-      token: _token,
-    );
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+    await _trackingService.deleteFeeding(_uid!, childId, logId);
   }
 
   // ------------------------
@@ -409,29 +387,13 @@ class TrackService {
     required bool descending,
     int limit = 200,
   }) async {
-    try {
-      final response = await DioHelper.getData(
-        url: 'users/$_uid/children/$childId/oxygen',
-        query: {
-          'descending': descending,
-          'limit': limit,
-        },
-        token: _token,
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is List) {
-          return data.cast<Map<String, dynamic>>();
-        } else if (data is Map && data.containsKey('oxygen')) {
-          return (data['oxygen'] as List).cast<Map<String, dynamic>>();
-        }
-        return [];
-      }
-      return [];
-    } catch (e) {
-      return [];
-    }
+    if (_uid == null) return [];
+    return await _trackingService.getOxygen(
+      _uid!,
+      childId,
+      descending: descending,
+      limit: limit,
+    );
   }
 
   Stream<List<Map<String, dynamic>>> oxygenStream(
@@ -439,10 +401,15 @@ class TrackService {
     required bool descending,
     int limit = 200,
   }) {
-    return Stream.periodic(
-      const Duration(seconds: 5),
-      (_) => getOxygen(childId, descending: descending, limit: limit),
-    ).asyncMap((future) => future);
+    if (_uid == null) {
+      return Stream.value(<Map<String, dynamic>>[]);
+    }
+    return _trackingService.oxygenStream(
+      _uid!,
+      childId,
+      descending: descending,
+      limit: limit,
+    );
   }
 
   Future<void> addOxygen({
@@ -454,6 +421,10 @@ class TrackService {
     int? pulse,
     String? device,
   }) async {
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+
     final when = ts ?? DateTime.now();
     final data = {
       'spo2': spo2,
@@ -465,11 +436,7 @@ class TrackService {
       if (device != null && device.trim().isNotEmpty) 'device': device.trim(),
     };
 
-    await DioHelper.postData(
-      url: 'users/$_uid/children/$childId/oxygen',
-      data: data,
-      token: _token,
-    );
+    await _trackingService.addOxygen(_uid!, childId, data);
   }
 
   Future<void> updateOxygen({
@@ -482,6 +449,10 @@ class TrackService {
     int? pulse,
     String? device,
   }) async {
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+
     final data = <String, dynamic>{
       'spo2': spo2,
     };
@@ -492,17 +463,13 @@ class TrackService {
     if (pulse != null) data['pulse'] = pulse;
     if (device != null) data['device'] = device.trim().isEmpty ? null : device.trim();
 
-    await DioHelper.putData(
-      url: 'users/$_uid/children/$childId/oxygen/$logId',
-      data: data,
-      token: _token,
-    );
+    await _trackingService.updateOxygen(_uid!, childId, logId, data);
   }
 
   Future<void> deleteOxygen({required String childId, required String logId}) async {
-    await DioHelper.deleteData(
-      url: 'users/$_uid/children/$childId/oxygen/$logId',
-      token: _token,
-    );
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
+    await _trackingService.deleteOxygen(_uid!, childId, logId);
   }
 }
