@@ -44,14 +44,12 @@ class AppTheme {
         secondaryContainer: Color(0xFFF0F7FA), // Even lighter pastel
         tertiary: Color(0xFFF5F8FA), // Warm soft gray
         surface: surfaceColor,
-        surfaceVariant: Color(0xFFF8FAFB), // Subtle surface variation
-        background: backgroundColor,
+        surfaceContainerHighest: Color(0xFFF8FAFB), // Subtle surface variation
         error: errorColor,
         errorContainer: Color(0xFFFFE5E5), // Soft error background
         onPrimary: onPrimary,
         onSecondary: onSurface,
         onSurface: onSurface,
-        onBackground: onBackground,
         onError: Colors.white,
         outline: dividerColor, // Gentle borders
         outlineVariant: Color(0xFFE8ECF0), // Even gentler borders
@@ -81,7 +79,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20), // More rounded - friendly
           side: BorderSide(
-            color: dividerColor.withOpacity(0.5), // Very gentle border
+            color: dividerColor.withValues(alpha: 0.5), // Very gentle border
             width: 1,
           ),
         ),
@@ -112,7 +110,7 @@ class AppTheme {
           foregroundColor: primaryColor,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
           minimumSize: const Size(120, 52),
-          side: BorderSide(color: primaryColor.withOpacity(0.5), width: 1.5),
+          side: BorderSide(color: primaryColor.withValues(alpha: 0.5), width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -149,7 +147,7 @@ class AppTheme {
       ),
       // Icon theme - friendly and approachable
       iconTheme: IconThemeData(
-        color: onSurface.withOpacity(0.7), // Soft icons
+        color: onSurface.withValues(alpha: 0.7), // Soft icons
         size: 24,
       ),
       // Primary icon theme
@@ -163,11 +161,11 @@ class AppTheme {
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20), // Generous padding
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16), // More rounded
-          borderSide: BorderSide(color: dividerColor.withOpacity(0.5), width: 1),
+          borderSide: BorderSide(color: dividerColor.withValues(alpha: 0.5), width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: dividerColor.withOpacity(0.5), width: 1),
+          borderSide: BorderSide(color: dividerColor.withValues(alpha: 0.5), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -175,11 +173,11 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: errorColor.withOpacity(0.6), width: 1.5), // Softer error
+          borderSide: BorderSide(color: errorColor.withValues(alpha: 0.6), width: 1.5), // Softer error
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: errorColor.withOpacity(0.8), width: 2),
+          borderSide: BorderSide(color: errorColor.withValues(alpha: 0.8), width: 2),
         ),
         labelStyle: TextStyle(
           fontSize: 16,
@@ -188,7 +186,7 @@ class AppTheme {
         ),
         hintStyle: TextStyle(
           fontSize: 16,
-          color: textSecondary.withOpacity(0.7), // Softer hint
+          color: textSecondary.withValues(alpha: 0.7), // Softer hint
         ),
       ),
       textTheme: TextTheme(
@@ -298,14 +296,14 @@ class AppTheme {
         labelSmall: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w400,
-          color: textSecondary.withOpacity(0.8),
+          color: textSecondary.withValues(alpha: 0.8),
           letterSpacing: 0.1,
           height: 1.3,
         ),
       ),
       // Divider theme - very subtle
       dividerTheme: DividerThemeData(
-        color: dividerColor.withOpacity(0.3), // Very gentle dividers
+        color: dividerColor.withValues(alpha: 0.3), // Very gentle dividers
         thickness: 1,
         space: 1,
       ),
@@ -315,11 +313,9 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        iconColor: onSurface.withOpacity(0.7),
+        iconColor: onSurface.withValues(alpha: 0.7),
         textColor: onSurface,
       ),
-    );
-  }
     );
   }
 
@@ -339,14 +335,12 @@ class AppTheme {
         secondaryContainer: Color(0xFF2A3441),
         tertiary: Color(0xFF252B38),
         surface: const Color(0xFF1F2532),
-        surfaceVariant: const Color(0xFF252B38),
-        background: const Color(0xFF1A1F2E),
+        surfaceContainerHighest: const Color(0xFF252B38),
         error: errorColor,
         errorContainer: Color(0xFF4A2A2A),
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: const Color(0xFFE8ECF0), // Soft light text
-        onBackground: const Color(0xFFE8ECF0),
         onError: Colors.white,
         outline: const Color(0xFF3A4550),
         outlineVariant: const Color(0xFF2A3441),
@@ -373,7 +367,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
-            color: const Color(0xFF3A4550).withOpacity(0.5),
+            color: const Color(0xFF3A4550).withValues(alpha: 0.5),
             width: 1,
           ),
         ),
@@ -424,7 +418,7 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: errorColor.withOpacity(0.6), width: 1.5),
+          borderSide: BorderSide(color: errorColor.withValues(alpha: 0.6), width: 1.5),
         ),
         labelStyle: const TextStyle(
           fontSize: 16,
@@ -433,7 +427,7 @@ class AppTheme {
         ),
         hintStyle: TextStyle(
           fontSize: 16,
-          color: const Color(0xFFA0AEC0).withOpacity(0.7),
+          color: const Color(0xFFA0AEC0).withValues(alpha: 0.7),
         ),
       ),
       textTheme: const TextTheme(
