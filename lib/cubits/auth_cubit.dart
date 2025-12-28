@@ -33,8 +33,7 @@ class AuthCubit extends Cubit<AuthState> {
           id: userProfile.id,
           email: userProfile.email,
           name: userProfile.username,
-          isAnonymous:
-              userProfile.role == 'hospital' && userProfile.email.isEmpty,
+          isAnonymous: userProfile.role == 'parent' && userProfile.email.isEmpty,
         );
 
         emit(
@@ -101,7 +100,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String email,
     required String password,
     String? name,
-    String role = 'hospital', // Default role
+    String role = 'parent', // Default role - all users are parents
   }) async {
     emit(const AuthLoading());
 

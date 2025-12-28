@@ -3,7 +3,7 @@ class FirebaseUserModel {
   final String id;
   final String username;
   final String email;
-  final String role; // "admin" or "hospital"
+  final String role; // "parent" - all users are parents
   final bool isActive;
   final DateTime? lastLogin;
 

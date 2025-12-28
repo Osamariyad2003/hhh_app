@@ -21,7 +21,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  String _selectedRole = 'hospital'; // 'hospital' or 'admin'
 
   @override
   void dispose() {
@@ -38,7 +37,7 @@ class _SignupScreenState extends State<SignupScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text,
             name: _nameController.text.trim(),
-            role: _selectedRole,
+            role: 'parent', // All users are parents
           );
     }
   }
@@ -132,35 +131,6 @@ class _SignupScreenState extends State<SignupScreen> {
                         return 'Please enter a valid email';
                       }
                       return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Role Selection
-                  DropdownButtonFormField<String>(
-                    value: _selectedRole,
-                    decoration: const InputDecoration(
-                      labelText: 'Role',
-                      hintText: 'Select your role',
-                      prefixIcon: Icon(Icons.work_outlined),
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'hospital',
-                        child: Text('Hospital Staff'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'admin',
-                        child: Text('Administrator'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _selectedRole = value;
-                        });
-                      }
                     },
                   ),
                   const SizedBox(height: 16),

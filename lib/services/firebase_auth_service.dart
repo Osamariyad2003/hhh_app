@@ -65,7 +65,7 @@ class FirebaseAuthService {
     required String email,
     required String password,
     required String username,
-    required String role, // "admin" or "hospital"
+    required String role, // "parent" - all users are parents
   }) async {
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
@@ -111,7 +111,7 @@ class FirebaseAuthService {
         id: credential.user!.uid,
         username: 'Anonymous',
         email: '',
-        role: 'hospital', // Default role for anonymous users
+        role: 'parent', // Default role for anonymous users (parents)
         isActive: true,
         lastLogin: DateTime.now(),
       );
@@ -148,16 +148,22 @@ class FirebaseAuthService {
     await _userService.setUser(user);
   }
 
-  /// Check if user is admin
+  /// Check if user is admin (deprecated - all users are parents now)
   Future<bool> isAdmin() async {
-    final profile = await getCurrentUserProfile();
-    return profile?.role == 'admin';
+    // All users are parents, no admin role
+    return false;
   }
 
-  /// Check if user is hospital
-  Future<bool> isHospital() async {
+  /// Check if user is a parent
+  Future<bool> isParent() async {
     final profile = await getCurrentUserProfile();
-    return profile?.role == 'hospital';
+    return profile?.role == 'parent';
+  }
+
+  /// Check if user is hospital (deprecated - use isParent instead)
+  Future<bool> isHospital() async {
+    // All users are parents now
+    return await isParent();
   }
 
   /// Send password reset email

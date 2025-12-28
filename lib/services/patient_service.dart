@@ -17,30 +17,24 @@ class PatientService {
     String sortOrder = 'desc',
   }) async {
     try {
-      final isAdmin = await _authService.isAdmin();
       final currentUserId = _authService.currentUserId;
       
-      List<PatientModel> patients;
-      
-      if (isAdmin) {
-        // Admins can see all patients
-        patients = await _firestoreService.getAllPatients().first;
-      } else if (currentUserId != null) {
-        // Patients/caregivers can see their own patients
-        // Try by userId first, then by parentPhone
-        try {
-          patients = await _firestoreService.getPatientsByUserId(currentUserId).first;
-          if (patients.isEmpty) {
-            // Fallback: try to get user's phone number and match by parentPhone
-            final userProfile = await _authService.getCurrentUserProfile();
-            // Note: You may need to add phoneNumber to FirebaseUserModel
-            // For now, we'll use userId matching
-          }
-        } catch (e) {
-          patients = [];
-        }
-      } else {
+      if (currentUserId == null) {
         throw Exception('User not authenticated');
+      }
+
+      // All users are parents - they can only see their own patients
+      List<PatientModel> patients;
+      try {
+        patients = await _firestoreService.getPatientsByUserId(currentUserId).first;
+        if (patients.isEmpty) {
+          // Fallback: try to get user's phone number and match by parentPhone
+          final userProfile = await _authService.getCurrentUserProfile();
+          // Note: You may need to add phoneNumber to FirebaseUserModel
+          // For now, we'll use userId matching
+        }
+      } catch (e) {
+        patients = [];
       }
 
       // Sort patients
@@ -122,45 +116,49 @@ class PatientService {
     );
   }
 
-  /// Search patients by parent name
+  /// Search patients by parent name (parents can only search their own patients)
   Future<List<Map<String, dynamic>>> searchPatients(String query) async {
     try {
-      // Check if user is admin
-      final isAdmin = await _authService.isAdmin();
-      if (!isAdmin) {
-        throw Exception('Only admins can access patient data');
+      final currentUserId = _authService.currentUserId;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
       }
 
       if (query.trim().isEmpty) {
         return [];
       }
 
-      // Search patients by parent name
-      final patients = await _firestoreService
-          .searchPatientsByParentName(query.trim())
+      // Parents can only search their own patients
+      final allPatients = await _firestoreService
+          .getPatientsByUserId(currentUserId)
           .first;
 
-      return patients.map((p) => p.toJson()).toList();
+      // Filter by parent name
+      final filtered = allPatients.where((p) {
+        final parentName = p.parentName.toLowerCase();
+        return parentName.contains(query.trim().toLowerCase());
+      }).toList();
+
+      return filtered.map((p) => p.toJson()).toList();
     } catch (e) {
       return [];
     }
   }
 
-  /// Get patient by ID (admins can access any, patients can access their own)
+  /// Get patient by ID (parents can only access their own patients)
   Future<Map<String, dynamic>?> getPatientById(String patientId) async {
     try {
-      final isAdmin = await _authService.isAdmin();
       final currentUserId = _authService.currentUserId;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
       
       final patient = await _firestoreService.getPatient(patientId);
       if (patient == null) return null;
       
-      // Check access: admin or patient owner
-      if (!isAdmin && currentUserId != null) {
-        // Check if patient belongs to current user
-        if (patient.userId != currentUserId) {
-          throw Exception('You can only access your own patient records');
-        }
+      // Check if patient belongs to current user (parent)
+      if (patient.userId != currentUserId) {
+        throw Exception('You can only access your own patient records');
       }
       
       return patient.toJson();
@@ -169,7 +167,7 @@ class PatientService {
     }
   }
 
-  /// Create patient (admins can create any, patients can create their own)
+  /// Create patient (parents can create their own patients)
   Future<String?> createPatient({
     required String firstName,
     required String lastName,
@@ -204,7 +202,7 @@ class PatientService {
     }
   }
 
-  /// Update patient (admins can update any, patients can update their own)
+  /// Update patient (parents can only update their own patients)
   Future<bool> updatePatient({
     required String patientId,
     String? firstName,
@@ -216,19 +214,19 @@ class PatientService {
     String? healthTracking,
   }) async {
     try {
-      final isAdmin = await _authService.isAdmin();
       final currentUserId = _authService.currentUserId;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
       
       final existingPatient = await _firestoreService.getPatient(patientId);
       if (existingPatient == null) {
         throw Exception('Patient not found');
       }
 
-      // Check access: admin or patient owner
-      if (!isAdmin && currentUserId != null) {
-        if (existingPatient.userId != currentUserId) {
-          throw Exception('You can only update your own patient records');
-        }
+      // Check if patient belongs to current user (parent)
+      if (existingPatient.userId != currentUserId) {
+        throw Exception('You can only update your own patient records');
       }
 
       final updatedPatient = existingPatient.copyWith(
@@ -248,13 +246,22 @@ class PatientService {
     }
   }
 
-  /// Delete patient
+  /// Delete patient (parents can delete their own patients)
   Future<bool> deletePatient(String patientId) async {
     try {
-      // Check if user is admin
-      final isAdmin = await _authService.isAdmin();
-      if (!isAdmin) {
-        throw Exception('Only admins can delete patients');
+      final currentUserId = _authService.currentUserId;
+      if (currentUserId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final existingPatient = await _firestoreService.getPatient(patientId);
+      if (existingPatient == null) {
+        throw Exception('Patient not found');
+      }
+
+      // Check if patient belongs to current user (parent)
+      if (existingPatient.userId != currentUserId) {
+        throw Exception('You can only delete your own patient records');
       }
 
       await _firestoreService.deletePatient(patientId);
