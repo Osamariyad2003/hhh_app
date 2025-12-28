@@ -10,12 +10,16 @@ import 'cubits/app_cubit.dart';
 import 'cubits/auth_cubit.dart';
 import 'cubits/prediction_cubit.dart';
 import 'localization/app_localizations.dart';
+import 'services/recipe_remote_datasource.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
   await initializeFirebase();
+
+  // Initialize Generative AI service
+  RecipeRemoteDatasource.instance.initialize();
 
   // Initialize app cubit
   final appCubit = AppCubit();
