@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: Text(loc.t('login')),
         actions: const [LangToggleButton()],
       ),
       body: BlocListener<AuthCubit, AuthState>(
@@ -205,10 +205,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Don't have an account? "),
+                      Text(loc.t('alreadyHaveAccount')),
                       TextButton(
                         onPressed: () => context.go('/signup'),
-                        child: const Text('Sign Up'),
+                        child: Text(loc.t('signUp')),
                       ),
                     ],
                   ),

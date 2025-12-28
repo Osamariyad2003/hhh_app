@@ -48,7 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign Up'),
+        title: Text(loc.t('signUp')),
         actions: const [LangToggleButton()],
       ),
       body: BlocListener<AuthCubit, AuthState>(
@@ -234,7 +234,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       const Text('Already have an account? '),
                       TextButton(
                         onPressed: () => context.go('/login'),
-                        child: const Text('Login'),
+                        child: Text(loc.t('login')),
                       ),
                     ],
                   ),

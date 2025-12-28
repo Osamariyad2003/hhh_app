@@ -78,7 +78,8 @@ Future<bool?> _confirmDeleteDialog(
 
 class ChildDetailScreen extends StatelessWidget {
   final String childId;
-  const ChildDetailScreen({super.key, required this.childId});
+  final String? initialTab;
+  const ChildDetailScreen({super.key, required this.childId, this.initialTab});
 
   Future<void> _deleteChild(BuildContext context) async {
     final loc = AppLocalizations.of(context);
@@ -257,7 +258,13 @@ class ChildDetailScreen extends StatelessWidget {
 
         final notes = (data['notes'] ?? '').toString().trim();
 
+        int initialIndex = 0;
+        if (initialTab == 'weight') initialIndex = 0;
+        if (initialTab == 'feeding') initialIndex = 1;
+        if (initialTab == 'oxygen') initialIndex = 2;
+
         return DefaultTabController(
+          initialIndex: initialIndex,
           length: 3,
           child: Scaffold(
             appBar: AppBar(

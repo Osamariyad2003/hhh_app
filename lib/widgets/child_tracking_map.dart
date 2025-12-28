@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../localization/app_localizations.dart';
 
 class ChildTrackingMap extends StatefulWidget {
   final double? latitude;
@@ -53,10 +54,10 @@ class _ChildTrackingMapState extends State<ChildTrackingMap> {
                         Marker(
                           markerId: const MarkerId('child_location'),
                           position: LatLng(latitude, longitude),
-                          infoWindow: InfoWindow(
-                            title: widget.locationName ?? 'Location',
-                            snippet: 'Child tracking location',
-                          ),
+                    infoWindow: InfoWindow(
+                      title: widget.locationName ?? AppLocalizations.of(context).t('childLocation'),
+                      snippet: AppLocalizations.of(context).t('childLocation'),
+                    ),
                         ),
                       },
                       mapType: MapType.normal,

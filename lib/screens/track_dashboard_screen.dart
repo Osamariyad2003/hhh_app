@@ -162,9 +162,9 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
           if (docs.isEmpty) {
             return EmptyStateWidget(
               icon: Icons.child_care_outlined,
-              title: 'No active children',
-              message: 'Add a child to start tracking their health data, or unarchive one in Manage.',
-              actionLabel: 'Add Child',
+              title: loc.t('noActiveChildren'),
+              message: loc.t('addChildToStart'),
+              actionLabel: loc.t('addChild'),
               onAction: () => context.push('/track/add-child'),
             );
           }
@@ -293,7 +293,7 @@ class _ChildTabs extends StatelessWidget {
               Tab(text: loc.t('weight')),
               Tab(text: loc.t('feeding')),
               Tab(text: loc.t('oxygen')),
-              const Tab(text: 'Map'),
+              Tab(text: loc.t('map')),
             ],
           ),
           Expanded(

@@ -46,7 +46,7 @@ class _AddChildScreenState extends State<AddChildScreen> {
         notes: _notes.text.trim(),
       );
       if (!mounted) return;
-      context.pushReplacement('/track/child/$id');
+      context.pushReplacement('/track/child-info/$id');
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -67,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Profile updated successfully'),
+            content: Text(loc.t('profileUpdated')),
             backgroundColor: Colors.green,
           ),
         );
@@ -76,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to update profile: ${e.toString()}'),
+            content: Text('${loc.t('failedToUpdateProfile')}: ${e.toString()}'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -289,7 +289,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               width: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Save Changes'),
+                          : Text(loc.t('saveChanges')),
                     ),
                   ),
                   const SizedBox(height: 16),

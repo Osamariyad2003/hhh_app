@@ -100,7 +100,7 @@ class TutorialDetailScreen extends StatelessWidget {
                           ElevatedButton.icon(
                             onPressed: () => _openInBrowser(videoUrl!),
                             icon: const Icon(Icons.open_in_new),
-                            label: const Text('Watch on YouTube'),
+                            label: Text(loc.t('watchOnYouTube')),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
                               foregroundColor: Colors.white,
@@ -130,7 +130,7 @@ class TutorialDetailScreen extends StatelessWidget {
                       ElevatedButton.icon(
                         onPressed: () => _openInBrowser(videoUrl!),
                         icon: const Icon(Icons.open_in_new),
-                        label: const Text('Open Video'),
+                        label: Text(loc.t('openVideo')),
                       ),
                     ],
                   ),

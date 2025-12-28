@@ -23,6 +23,7 @@ import 'screens/track_dashboard_screen.dart';
 import 'screens/track_home_screen.dart';
 import 'screens/add_child_screen.dart';
 import 'screens/child_detail_screen.dart';
+import 'screens/child_info_screen.dart';
 import 'screens/heart_prediction_screen.dart';
 import 'screens/ai_suggestion_screen.dart';
 
@@ -158,9 +159,17 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
         builder: (context, state) => const AddChildScreen(),
       ),
       GoRoute(
-        path: '/track/child/:childId',
+        path: '/track/child-info/:childId',
         builder: (context, state) =>
-            ChildDetailScreen(childId: state.pathParameters['childId']!),
+            ChildInfoScreen(childId: state.pathParameters['childId']!),
+      ),
+      GoRoute(
+        path: '/track/child/:childId',
+        builder: (context, state) {
+          final childId = state.pathParameters['childId']!;
+          final tab = state.uri.queryParameters['tab'];
+          return ChildDetailScreen(childId: childId, initialTab: tab);
+        },
       ),
     ],
   );

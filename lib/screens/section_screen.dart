@@ -76,6 +76,7 @@ class SectionScreen extends StatelessWidget {
         );
 
       case 'bullets':
+      case 'ul':
         final items = _pickItems(loc, block);
         if (items.isEmpty) return const SizedBox.shrink();
         return Padding(
@@ -203,7 +204,7 @@ class SectionScreen extends StatelessWidget {
 
   /// Check if this is a special section with custom screen
   bool _isSpecialSection() {
-    return sectionId == 'spiritual';
+    return sectionId == 'spiritual' || sectionId == 'about' || sectionId == 'contacts';
   }
 
   @override
@@ -214,6 +215,12 @@ class SectionScreen extends StatelessWidget {
     if (_isSpecialSection()) {
       if (sectionId == 'spiritual') {
         return const SpiritualNeedsScreen();
+      }
+      if (sectionId == 'about') {
+        return _buildAboutChdSection(context, loc);
+      }
+      if (sectionId == 'contacts') {
+        return _buildContactsSection(context, loc);
       }
     }
 
@@ -240,8 +247,8 @@ class SectionScreen extends StatelessWidget {
               ),
               body: EmptyStateWidget(
                 icon: Icons.error_outline,
-                title: 'Unable to load hospitals',
-                message: 'Please check your connection and try again.',
+                title: loc.t('unableToLoadHospitals'),
+                message: loc.t('checkConnection'),
               ),
             );
           }
@@ -252,9 +259,9 @@ class SectionScreen extends StatelessWidget {
                 title: Text(loc.t('hospitalInfo')),
                 actions: const [LangToggleButton()],
               ),
-              body: const EmptyStateWidget(
+              body: EmptyStateWidget(
                 icon: Icons.local_hospital_outlined,
-                title: 'Loading hospitals...',
+                title: loc.t('loadingHospitals'),
                 isLoading: true,
               ),
             );
@@ -269,8 +276,8 @@ class SectionScreen extends StatelessWidget {
               ),
               body: EmptyStateWidget(
                 icon: Icons.local_hospital_outlined,
-                title: 'No hospitals available',
-                message: 'Hospital information will appear here once available.',
+                title: loc.t('noHospitalsAvailable'),
+                message: loc.t('hospitalInfoWillAppear'),
               ),
             );
           }
@@ -303,7 +310,7 @@ class SectionScreen extends StatelessWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                hospital['name'] ?? 'Hospital',
+                                hospital['name'] ?? loc.t('hospital'),
                                 style: Theme.of(context).textTheme.titleLarge,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -400,9 +407,9 @@ class SectionScreen extends StatelessWidget {
                 title: Text(loc.t('caregiverSupport')),
                 actions: const [LangToggleButton()],
               ),
-              body: const EmptyStateWidget(
+              body: EmptyStateWidget(
                 icon: Icons.support_agent_outlined,
-                title: 'Loading support groups...',
+                title: loc.t('loadingSupportGroups'),
                 isLoading: true,
               ),
             );
@@ -416,8 +423,8 @@ class SectionScreen extends StatelessWidget {
               ),
               body: EmptyStateWidget(
                 icon: Icons.error_outline,
-                title: 'Unable to load support groups',
-                message: 'Error: ${snapshot.error.toString()}\n\nPlease check your connection and try again.',
+                title: loc.t('unableToLoadSupportGroups'),
+                message: '${loc.t('error')}: ${snapshot.error.toString()}\n\n${loc.t('checkConnection')}',
               ),
             );
           }
@@ -428,9 +435,9 @@ class SectionScreen extends StatelessWidget {
                 title: Text(loc.t('caregiverSupport')),
                 actions: const [LangToggleButton()],
               ),
-              body: const EmptyStateWidget(
+              body: EmptyStateWidget(
                 icon: Icons.support_agent_outlined,
-                title: 'Loading support groups...',
+                title: loc.t('loadingSupportGroups'),
                 isLoading: true,
               ),
             );
@@ -445,8 +452,8 @@ class SectionScreen extends StatelessWidget {
               ),
               body: EmptyStateWidget(
                 icon: Icons.support_agent_outlined,
-                title: 'No support groups available',
-                message: 'Support group information will appear here once available.',
+                title: loc.t('noSupportGroupsAvailable'),
+                message: loc.t('supportGroupInfoWillAppear'),
               ),
             );
           }
@@ -478,7 +485,7 @@ class SectionScreen extends StatelessWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                group['name'] ?? 'Support Group',
+                                group['nameEn'] ?? group['name'] ?? loc.t('supportGroup'),
                                 style: Theme.of(context).textTheme.titleLarge,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -486,10 +493,10 @@ class SectionScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        if (group['description'] != null) ...[
+                        if ((group['descriptionEn'] ?? group['description']) != null) ...[
                           const SizedBox(height: 12),
                           Text(
-                            group['description'] ?? '',
+                            group['descriptionEn'] ?? group['description'] ?? '',
                             style: Theme.of(context).textTheme.bodyLarge,
                             maxLines: 5,
                             overflow: TextOverflow.ellipsis,
@@ -561,7 +568,7 @@ class SectionScreen extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(
               appBar: AppBar(
-                title: const Text('Patient Stories'),
+                title: Text(loc.t('patientStories')),
                 actions: const [LangToggleButton()],
               ),
               body: const EmptyStateWidget(
@@ -575,13 +582,13 @@ class SectionScreen extends StatelessWidget {
           if (snapshot.hasError) {
             return Scaffold(
               appBar: AppBar(
-                title: const Text('Patient Stories'),
+                title: Text(loc.t('patientStories')),
                 actions: const [LangToggleButton()],
               ),
               body: EmptyStateWidget(
                 icon: Icons.error_outline,
-                title: 'Unable to load stories',
-                message: 'Error: ${snapshot.error.toString()}\n\nPlease check your connection and try again.',
+                title: loc.t('unableToLoadStories'),
+                message: '${loc.t('error')}: ${snapshot.error.toString()}\n\n${loc.t('checkConnection')}',
               ),
             );
           }
@@ -589,7 +596,7 @@ class SectionScreen extends StatelessWidget {
           if (!snapshot.hasData) {
             return Scaffold(
               appBar: AppBar(
-                title: const Text('Patient Stories'),
+                title: Text(loc.t('patientStories')),
                 actions: const [LangToggleButton()],
               ),
               body: const EmptyStateWidget(
@@ -604,13 +611,13 @@ class SectionScreen extends StatelessWidget {
           if (stories.isEmpty) {
             return Scaffold(
               appBar: AppBar(
-                title: const Text('Patient Stories'),
+                title: Text(loc.t('patientStories')),
                 actions: const [LangToggleButton()],
               ),
               body: EmptyStateWidget(
                 icon: Icons.book_outlined,
-                title: 'No stories available',
-                message: 'Patient stories will appear here once they are published.',
+                title: loc.t('noStoriesAvailable'),
+                message: loc.t('storiesWillAppear'),
               ),
             );
           }
@@ -648,7 +655,7 @@ class SectionScreen extends StatelessWidget {
                           ),
                         if (story['imageUrl'] != null) const SizedBox(height: 16),
                         Text(
-                          story['title'] ?? 'Story',
+                          story['title'] ?? loc.t('story'),
                           style: Theme.of(context).textTheme.headlineSmall,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -656,7 +663,7 @@ class SectionScreen extends StatelessWidget {
                         if (story['author'] != null) ...[
                           const SizedBox(height: 8),
                           Text(
-                            'By ${story['author']}',
+                            '${loc.t('by')} ${story['author']}',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                 ),
@@ -697,11 +704,11 @@ class SectionScreen extends StatelessWidget {
               title: Text(sectionId),
               actions: const [LangToggleButton()],
             ),
-            body: EmptyStateWidget(
-              icon: Icons.error_outline,
-              title: 'Unable to load content',
-              message: 'Please check your connection and try again.',
-            ),
+              body: EmptyStateWidget(
+                icon: Icons.error_outline,
+                title: loc.t('unableToLoadContent'),
+                message: loc.t('checkConnection'),
+              ),
           );
         }
 
@@ -711,11 +718,11 @@ class SectionScreen extends StatelessWidget {
               title: Text(sectionId),
               actions: const [LangToggleButton()],
             ),
-            body: const EmptyStateWidget(
-              icon: Icons.article_outlined,
-              title: 'Loading content...',
-              isLoading: true,
-            ),
+              body: EmptyStateWidget(
+                icon: Icons.article_outlined,
+                title: loc.t('loadingContent'),
+                isLoading: true,
+              ),
           );
         }
 
@@ -726,11 +733,11 @@ class SectionScreen extends StatelessWidget {
               title: Text(sectionId),
               actions: const [LangToggleButton()],
             ),
-            body: EmptyStateWidget(
-              icon: Icons.article_outlined,
-              title: 'No content available',
-              message: 'Content for this section is not available yet.',
-            ),
+              body: EmptyStateWidget(
+                icon: Icons.article_outlined,
+                title: loc.t('noContentAvailable'),
+                message: loc.t('contentNotAvailableYet'),
+              ),
           );
         }
 
@@ -754,11 +761,11 @@ class SectionScreen extends StatelessWidget {
             title: Text((title == null || title.isEmpty) ? sectionId : title),
             actions: const [LangToggleButton()],
           ),
-          body: blocks.isEmpty
+              body: blocks.isEmpty
               ? EmptyStateWidget(
                   icon: Icons.article_outlined,
-                  title: 'No content available',
-                  message: 'This section has no content yet.',
+                  title: loc.t('noContentAvailable'),
+                  message: loc.t('sectionNoContent'),
                 )
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -769,4 +776,434 @@ class SectionScreen extends StatelessWidget {
       },
     );
   }
+
+  /// Build About CHD section with fixed content
+  Widget _buildAboutChdSection(BuildContext context, AppLocalizations loc) {
+    final content = loc.isArabic ? _aboutChdContentAr : _aboutChdContentEn;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(loc.t('aboutChd')),
+        actions: const [LangToggleButton()],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          ...content.map((block) => _renderBlock(context, loc, block)),
+        ],
+      ),
+    );
+  }
+
+  /// Build Contacts section with fixed content
+  Widget _buildContactsSection(BuildContext context, AppLocalizations loc) {
+    final contacts = loc.isArabic ? _contactsContentAr : _contactsContentEn;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(loc.t('contacts')),
+        actions: const [LangToggleButton()],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          ...contacts.map((block) => _renderBlock(context, loc, block)),
+        ],
+      ),
+    );
+  }
+
+  // Fixed content for About CHD (English)
+  static const List<Map<String, dynamic>> _aboutChdContentEn = [
+    {
+      'type': 'h1',
+      'text_en': 'About Congenital Heart Disease (CHD)',
+      'text_ar': '',
+    },
+    {
+      'type': 'p',
+      'text_en':
+          'Congenital Heart Disease (CHD) refers to structural heart defects present at birth. These conditions affect the heart\'s structure and how blood flows through the heart and to the rest of the body.',
+      'text_ar': '',
+    },
+    {
+      'type': 'h2',
+      'text_en': 'Types of CHD',
+      'text_ar': '',
+    },
+    {
+      'type': 'p',
+      'text_en':
+          'CHD can range from simple defects that may not require treatment to complex conditions that need immediate medical intervention. Common types include:',
+      'text_ar': '',
+    },
+    {
+      'type': 'ul',
+      'items_en': [
+        'Atrial Septal Defect (ASD) - Hole in the wall between the heart\'s upper chambers',
+        'Ventricular Septal Defect (VSD) - Hole in the wall between the heart\'s lower chambers',
+        'Tetralogy of Fallot - Combination of four heart defects',
+        'Patent Ductus Arteriosus (PDA) - Abnormal connection between major blood vessels',
+        'Coarctation of the Aorta - Narrowing of the aorta',
+      ],
+      'items_ar': [],
+    },
+    {
+      'type': 'h2',
+      'text_en': 'Causes and Risk Factors',
+      'text_ar': '',
+    },
+    {
+      'type': 'p',
+      'text_en':
+          'The exact cause of CHD is often unknown, but several factors may increase the risk:',
+      'text_ar': '',
+    },
+    {
+      'type': 'ul',
+      'items_en': [
+        'Genetic factors and family history',
+        'Maternal health conditions (diabetes, rubella)',
+        'Medications taken during pregnancy',
+        'Environmental factors',
+        'Chromosomal abnormalities',
+      ],
+      'items_ar': [],
+    },
+    {
+      'type': 'h2',
+      'text_en': 'Symptoms',
+      'text_ar': '',
+    },
+    {
+      'type': 'p',
+      'text_en':
+          'Symptoms vary depending on the type and severity of the defect. Common signs include:',
+      'text_ar': '',
+    },
+    {
+      'type': 'ul',
+      'items_en': [
+        'Rapid breathing or difficulty breathing',
+        'Poor feeding and weight gain',
+        'Bluish tint to skin, lips, and nails (cyanosis)',
+        'Fatigue during feeding',
+        'Swelling in legs, abdomen, or around eyes',
+        'Heart murmur',
+      ],
+      'items_ar': [],
+    },
+    {
+      'type': 'h2',
+      'text_en': 'Treatment Options',
+      'text_ar': '',
+    },
+    {
+      'type': 'p',
+      'text_en':
+          'Treatment depends on the type and severity of the defect. Options may include:',
+      'text_ar': '',
+    },
+    {
+      'type': 'ul',
+      'items_en': [
+        'Medications to help the heart work more efficiently',
+        'Catheter procedures to repair defects',
+        'Open-heart surgery for complex defects',
+        'Heart transplant in severe cases',
+        'Lifelong monitoring and follow-up care',
+      ],
+      'items_ar': [],
+    },
+    {
+      'type': 'h2',
+      'text_en': 'Living with CHD',
+      'text_ar': '',
+    },
+    {
+      'type': 'p',
+      'text_en':
+          'With proper treatment and care, many children with CHD can lead healthy, active lives. Regular medical follow-ups, a healthy lifestyle, and emotional support are essential for managing CHD effectively.',
+      'text_ar': '',
+    },
+    {
+      'type': 'callout',
+      'text_en':
+          'Important: Always consult with your child\'s healthcare provider for personalized medical advice and treatment plans.',
+      'text_ar': '',
+    },
+  ];
+
+  // Fixed content for About CHD (Arabic)
+  static const List<Map<String, dynamic>> _aboutChdContentAr = [
+    {
+      'type': 'h1',
+      'text_en': '',
+      'text_ar': 'عن عيوب القلب الخلقية',
+    },
+    {
+      'type': 'p',
+      'text_en': '',
+      'text_ar':
+          'عيوب القلب الخلقية (CHD) تشير إلى عيوب هيكلية في القلب موجودة عند الولادة. هذه الحالات تؤثر على بنية القلب وكيفية تدفق الدم عبر القلب وإلى باقي أجزاء الجسم.',
+    },
+    {
+      'type': 'h2',
+      'text_en': '',
+      'text_ar': 'أنواع عيوب القلب الخلقية',
+    },
+    {
+      'type': 'p',
+      'text_en': '',
+      'text_ar':
+          'يمكن أن تتراوح عيوب القلب الخلقية من عيوب بسيطة قد لا تحتاج إلى علاج إلى حالات معقدة تحتاج إلى تدخل طبي فوري. الأنواع الشائعة تشمل:',
+    },
+    {
+      'type': 'ul',
+      'items_en': [],
+      'items_ar': [
+        'عيب الحاجز الأذيني (ASD) - ثقب في الجدار بين الحجرات العلوية للقلب',
+        'عيب الحاجز البطيني (VSD) - ثقب في الجدار بين الحجرات السفلية للقلب',
+        'رباعية فالوت - مزيج من أربعة عيوب في القلب',
+        'القناة الشريانية المفتوحة (PDA) - اتصال غير طبيعي بين الأوعية الدموية الرئيسية',
+        'تضيق الأبهر - تضيق في الشريان الأورطي',
+      ],
+    },
+    {
+      'type': 'h2',
+      'text_en': '',
+      'text_ar': 'الأسباب وعوامل الخطر',
+    },
+    {
+      'type': 'p',
+      'text_en': '',
+      'text_ar':
+          'السبب الدقيق لعيوب القلب الخلقية غالباً ما يكون غير معروف، ولكن هناك عدة عوامل قد تزيد من المخاطر:',
+    },
+    {
+      'type': 'ul',
+      'items_en': [],
+      'items_ar': [
+        'العوامل الوراثية والتاريخ العائلي',
+        'حالات صحية للأم (السكري، الحصبة الألمانية)',
+        'الأدوية التي يتم تناولها أثناء الحمل',
+        'العوامل البيئية',
+        'الاضطرابات الكروموسومية',
+      ],
+    },
+    {
+      'type': 'h2',
+      'text_en': '',
+      'text_ar': 'الأعراض',
+    },
+    {
+      'type': 'p',
+      'text_en': '',
+      'text_ar':
+          'تختلف الأعراض حسب نوع وشدة العيب. العلامات الشائعة تشمل:',
+    },
+    {
+      'type': 'ul',
+      'items_en': [],
+      'items_ar': [
+        'التنفس السريع أو صعوبة التنفس',
+        'ضعف التغذية وزيادة الوزن',
+        'اللون الأزرق للجلد والشفتين والأظافر (الزرقة)',
+        'التعب أثناء الرضاعة',
+        'تورم في الساقين أو البطن أو حول العينين',
+        'نفخة قلبية',
+      ],
+    },
+    {
+      'type': 'h2',
+      'text_en': '',
+      'text_ar': 'خيارات العلاج',
+    },
+    {
+      'type': 'p',
+      'text_en': '',
+      'text_ar':
+          'يعتمد العلاج على نوع وشدة العيب. الخيارات قد تشمل:',
+    },
+    {
+      'type': 'ul',
+      'items_en': [],
+      'items_ar': [
+        'الأدوية لمساعدة القلب على العمل بكفاءة أكبر',
+        'إجراءات القسطرة لإصلاح العيوب',
+        'جراحة القلب المفتوح للعيوب المعقدة',
+        'زراعة القلب في الحالات الشديدة',
+        'المراقبة مدى الحياة ورعاية المتابعة',
+      ],
+    },
+    {
+      'type': 'h2',
+      'text_en': '',
+      'text_ar': 'العيش مع عيوب القلب الخلقية',
+    },
+    {
+      'type': 'p',
+      'text_en': '',
+      'text_ar':
+          'مع العلاج والرعاية المناسبة، يمكن للعديد من الأطفال المصابين بعيوب القلب الخلقية أن يعيشوا حياة صحية ونشطة. المتابعة الطبية المنتظمة ونمط الحياة الصحي والدعم العاطفي ضرورية لإدارة عيوب القلب الخلقية بشكل فعال.',
+    },
+    {
+      'type': 'callout',
+      'text_en': '',
+      'text_ar':
+          'مهم: استشر دائماً مقدم الرعاية الصحية لطفلك للحصول على المشورة الطبية المخصصة وخطط العلاج.',
+    },
+  ];
+
+  // Fixed content for Contacts (English)
+  static const List<Map<String, dynamic>> _contactsContentEn = [
+    {
+      'type': 'h1',
+      'text_en': 'Contact Information',
+      'text_ar': '',
+    },
+    {
+      'type': 'p',
+      'text_en':
+          'For medical emergencies, please contact your local emergency services immediately.',
+      'text_ar': '',
+    },
+    {
+      'type': 'h2',
+      'text_en': 'Emergency Contacts',
+      'text_ar': '',
+    },
+    {
+      'type': 'ul',
+      'items_en': [
+        'Emergency Services: 997 (Saudi Arabia)',
+        'Ambulance: 997',
+        'Police: 999',
+        'Civil Defense: 998',
+      ],
+      'items_ar': [],
+    },
+    {
+      'type': 'h2',
+      'text_en': 'Medical Support',
+      'text_ar': '',
+    },
+    {
+      'type': 'p',
+      'text_en':
+          'For non-emergency medical questions and support, please contact:',
+      'text_ar': '',
+    },
+    {
+      'type': 'ul',
+      'items_en': [
+        'Your child\'s primary care physician',
+        'Cardiology department at your local hospital',
+        'Pediatric cardiology specialist',
+      ],
+      'items_ar': [],
+    },
+    {
+      'type': 'h2',
+      'text_en': 'Support Resources',
+      'text_ar': '',
+    },
+    {
+      'type': 'p',
+      'text_en':
+          'For additional support and resources, you can reach out to:',
+      'text_ar': '',
+    },
+    {
+      'type': 'ul',
+      'items_en': [
+        'Local support groups for families with CHD',
+        'National heart associations',
+        'Patient advocacy organizations',
+      ],
+      'items_ar': [],
+    },
+    {
+      'type': 'callout',
+      'text_en':
+          'Note: Always keep your child\'s medical records and emergency contact information easily accessible.',
+      'text_ar': '',
+    },
+  ];
+
+  // Fixed content for Contacts (Arabic)
+  static const List<Map<String, dynamic>> _contactsContentAr = [
+    {
+      'type': 'h1',
+      'text_en': '',
+      'text_ar': 'معلومات الاتصال',
+    },
+    {
+      'type': 'p',
+      'text_en': '',
+      'text_ar':
+          'للطوارئ الطبية، يرجى الاتصال بخدمات الطوارئ المحلية على الفور.',
+    },
+    {
+      'type': 'h2',
+      'text_en': '',
+      'text_ar': 'جهات الاتصال الطارئة',
+    },
+    {
+      'type': 'ul',
+      'items_en': [],
+      'items_ar': [
+        'خدمات الطوارئ: 997 (المملكة العربية السعودية)',
+        'الإسعاف: 997',
+        'الشرطة: 999',
+        'الدفاع المدني: 998',
+      ],
+    },
+    {
+      'type': 'h2',
+      'text_en': '',
+      'text_ar': 'الدعم الطبي',
+    },
+    {
+      'type': 'p',
+      'text_en': '',
+      'text_ar':
+          'للأسئلة الطبية غير الطارئة والدعم، يرجى الاتصال بـ:',
+    },
+    {
+      'type': 'ul',
+      'items_en': [],
+      'items_ar': [
+        'طبيب الرعاية الأولية لطفلك',
+        'قسم أمراض القلب في المستشفى المحلي',
+        'أخصائي أمراض قلب الأطفال',
+      ],
+    },
+    {
+      'type': 'h2',
+      'text_en': '',
+      'text_ar': 'موارد الدعم',
+    },
+    {
+      'type': 'p',
+      'text_en': '',
+      'text_ar':
+          'للحصول على دعم وموارد إضافية، يمكنك التواصل مع:',
+    },
+    {
+      'type': 'ul',
+      'items_en': [],
+      'items_ar': [
+        'مجموعات الدعم المحلية للأسر المصابة بعيوب القلب الخلقية',
+        'جمعيات القلب الوطنية',
+        'منظمات الدفاع عن المرضى',
+      ],
+    },
+    {
+      'type': 'callout',
+      'text_en': '',
+      'text_ar':
+          'ملاحظة: احتفظ دائماً بسجلات طفلك الطبية ومعلومات الاتصال الطارئة في متناول اليد.',
+    },
+  ];
 }

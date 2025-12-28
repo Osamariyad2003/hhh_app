@@ -61,7 +61,7 @@ class SpiritualNeedsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.t('spiritualNeeds')),
+        title: Text(loc.isArabic ? 'ادعية واحاديث' : 'Supplications and Hadiths'),
         actions: const [LangToggleButton()],
       ),
       body: ListView(
@@ -81,7 +81,7 @@ class SpiritualNeedsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    loc.isArabic ? 'الصلاة اليومية' : 'Daily Prayers',
+                    loc.isArabic ? 'ادعية واحاديث' : 'Supplications and Hadiths',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -90,8 +90,8 @@ class SpiritualNeedsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     loc.isArabic
-                        ? 'الصلوات الخمس اليومية مع عدد الركعات'
-                        : 'The five daily prayers with raka\'at count',
+                        ? 'مجموعة من الأدعية والأحاديث النبوية الشريفة'
+                        : 'A collection of supplications and noble hadiths',
                     style: theme.textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
@@ -100,7 +100,58 @@ class SpiritualNeedsScreen extends StatelessWidget {
             ),
           ),
 
-          // Prayer Cards
+          // Content placeholder - can be replaced with actual supplications and hadiths
+          Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.isArabic ? 'أدعية الشفاء' : 'Healing Supplications',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    loc.isArabic
+                        ? 'اللهم رب الناس، أذهب البأس، واشف أنت الشافي، لا شفاء إلا شفاؤك، شفاء لا يغادر سقماً'
+                        : 'O Allah, Lord of the people, remove the affliction and cure. You are the Healer. There is no cure except Your cure, a cure that leaves no illness.',
+                    style: theme.textTheme.bodyLarge,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.isArabic ? 'حديث شريف' : 'Noble Hadith',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    loc.isArabic
+                        ? 'قال رسول الله صلى الله عليه وسلم: "ما من مسلم يصيبه أذى من مرض فما سواه إلا حط الله به سيئاته كما تحط الشجرة ورقها"'
+                        : 'The Messenger of Allah (peace be upon him) said: "No Muslim is afflicted with any harm, whether from illness or otherwise, but Allah will expiate his sins because of it, as a tree sheds its leaves."',
+                    style: theme.textTheme.bodyLarge,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Prayer Cards (keeping for reference but can be removed)
           ...prayers.map((prayer) {
             final name = loc.isArabic ? prayer['nameAr'] : prayer['nameEn'];
             final time = loc.isArabic ? prayer['timeAr'] : prayer['time'];
