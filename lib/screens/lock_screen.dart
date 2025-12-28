@@ -34,7 +34,9 @@ class _LockScreenState extends State<LockScreen> {
       return;
     }
 
-    final ok = await AppLockService.instance.biometricUnlock();
+    final ok = await AppLockService.instance.biometricUnlock(
+      localizedReason: loc.t('unlock'),
+    );
     if (!mounted) return;
 
     if (ok) {
@@ -120,7 +122,7 @@ class _LockScreenState extends State<LockScreen> {
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: _busy ? null : _tryBiometric,
-                child: const Text('Biometric'),
+                child: Text(loc.t('useBiometric')),
               ),
             ),
           ],

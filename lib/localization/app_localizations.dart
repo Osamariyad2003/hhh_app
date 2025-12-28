@@ -104,6 +104,11 @@ class AppLocalizations {
       'unlock': 'Unlock',
       'unlockFailed': 'Unlock failed',
       'biometricUnavailable': 'Biometric not available, use PIN',
+      'biometric': 'Biometric',
+      'useBiometric': 'Use Biometric',
+      'logout': 'Logout',
+      'logoutConfirm': 'Are you sure you want to logout?',
+      'loggingOut': 'Logging out...',
     },
     'ar': {
       'appTitle': 'قلوب صحية في المنزل',
@@ -187,6 +192,11 @@ class AppLocalizations {
       'unlock': 'فتح',
       'unlockFailed': 'فشل الفتح',
       'biometricUnavailable': 'البصمة غير متاحة، استخدم PIN',
+      'biometric': 'البصمة',
+      'useBiometric': 'استخدم البصمة',
+      'logout': 'تسجيل الخروج',
+      'logoutConfirm': 'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+      'loggingOut': 'جارٍ تسجيل الخروج...',
     },
   };
 

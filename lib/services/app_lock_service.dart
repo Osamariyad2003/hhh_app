@@ -47,7 +47,7 @@ class AppLockService {
     }
   }
 
-  Future<bool> biometricUnlock({String localizedReason = 'Unlock the app'}) async {
+  Future<bool> biometricUnlock({String localizedReason = 'Unlock the app to access your child\'s health information'}) async {
     try {
       final ok = await _auth.authenticate(
         localizedReason: localizedReason,
