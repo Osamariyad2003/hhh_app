@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
     _Tile('spiritualNeeds', Icons.mosque, '/section/spiritual'),
     _Tile('hospitalInfo', Icons.local_hospital, '/section/hospital'),
     _Tile('caregiverSupport', Icons.support_agent, '/section/support'),
+    _Tile('patientStories', Icons.book, '/patient-stories'),
     _Tile('trackYourChild', Icons.monitor_heart, '/track'),
     _Tile('heartPrediction', Icons.favorite, '/heart-prediction'),
     _Tile('aiSuggestions', Icons.auto_awesome, '/ai-suggestions'),

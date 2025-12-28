@@ -176,6 +176,9 @@ class AppLocalizations {
       'openVideoLink': 'Open Video Link',
       'watchOnYouTube': 'Watch on YouTube',
       'openVideo': 'Open Video',
+
+      // Patient Stories
+      'readMore': 'Read more',
     },
     'ar': {
       'appTitle': 'قلوب صحية في المنزل',
@@ -331,6 +334,9 @@ class AppLocalizations {
       'openVideoLink': 'فتح رابط الفيديو',
       'watchOnYouTube': 'شاهد على YouTube',
       'openVideo': 'فتح الفيديو',
+
+      // Patient Stories
+      'readMore': 'اقرأ المزيد',
     },
   };
 

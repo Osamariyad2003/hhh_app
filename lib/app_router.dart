@@ -27,6 +27,7 @@ import 'screens/child_info_screen.dart';
 import 'screens/heart_prediction_screen.dart';
 import 'screens/ai_suggestion_screen.dart';
 import 'screens/main_navigation_screen.dart';
+import 'screens/patient_stories_screen.dart';
 
 GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
   return GoRouter(
@@ -138,6 +139,10 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
       GoRoute(
         path: '/tutorials',
         builder: (context, state) => const TutorialsScreen(),
+      ),
+      GoRoute(
+        path: '/patient-stories',
+        builder: (context, state) => const PatientStoriesScreen(),
       ),
       GoRoute(
         path: '/tutorial/:id',

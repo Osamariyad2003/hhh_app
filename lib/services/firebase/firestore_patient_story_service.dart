@@ -2,9 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/patient_story_model.dart';
 
 /// Firestore service for PatientStory entity
+/// Connects to Firebase Firestore collection: 'patient_stories'
 class FirestorePatientStoryService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static const String _collection = 'patient_stories';
+  static const String _collection = 'patient_stories'; // Firebase Firestore collection name
 
   /// Get patient story by ID
   Future<PatientStoryModel?> getPatientStory(String patientStoryId) async {
@@ -61,17 +62,19 @@ class FirestorePatientStoryService {
         );
   }
 
-  /// Get published patient stories
+  /// Get published patient stories from Firebase Firestore
+  /// Queries collection 'patient_stories' where isPublished = true
+  /// Returns real-time stream that updates automatically when data changes
   Stream<List<PatientStoryModel>> getPublishedPatientStories() {
     return _firestore
-        .collection(_collection)
-        .where('isPublished', isEqualTo: true)
-        .snapshots()
+        .collection(_collection) // Firebase collection: 'patient_stories'
+        .where('isPublished', isEqualTo: true) // Filter: only published stories
+        .snapshots() // Real-time stream from Firebase
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => PatientStoryModel.fromJson({
                     'id': doc.id,
-                    ...doc.data(),
+                    ...doc.data(), // Get all fields from Firebase document
                   }))
               .toList(),
         );
