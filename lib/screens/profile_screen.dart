@@ -39,6 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final loc = AppLocalizations.of(context);
+
     setState(() => _isLoading = true);
 
     try {
