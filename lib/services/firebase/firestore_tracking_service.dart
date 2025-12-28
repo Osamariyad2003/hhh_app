@@ -4,6 +4,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirestoreTrackingService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Convert ISO8601 string to Timestamp
+  Timestamp? _parseTimestamp(dynamic ts) {
+    if (ts == null) return null;
+    if (ts is Timestamp) return ts;
+    if (ts is String) {
+      try {
+        final dt = DateTime.parse(ts);
+        return Timestamp.fromDate(dt);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Convert Timestamp to ISO8601 string
+  String _timestampToString(Timestamp ts) {
+    return ts.toDate().toIso8601String();
+  }
+
   // Collection paths
   String _weightsCollection(String userId, String childId) =>
       'users/$userId/children/$childId/weights';
@@ -29,12 +49,42 @@ class FirestoreTrackingService {
       query = query.limit(limit);
 
       final snapshot = await query.get();
-      return snapshot.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data() as Map<String, dynamic>,
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        if (data['ts'] is Timestamp) {
+          data['ts'] = _timestampToString(data['ts'] as Timestamp);
+        }
+        return {
+          'id': doc.id,
+          ...data,
+        };
       }).toList();
     } catch (e) {
-      return [];
+      // If index error, try without orderBy and sort manually
+      try {
+        final snapshot = await _firestore
+            .collection(_weightsCollection(userId, childId))
+            .limit(limit)
+            .get();
+        final docs = snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          if (data['ts'] is Timestamp) {
+            data['ts'] = _timestampToString(data['ts'] as Timestamp);
+          }
+          return {
+            'id': doc.id,
+            ...data,
+          };
+        }).toList();
+        docs.sort((a, b) {
+          final aTs = a['ts'] as String? ?? '';
+          final bTs = b['ts'] as String? ?? '';
+          return descending ? bTs.compareTo(aTs) : aTs.compareTo(bTs);
+        });
+        return docs;
+      } catch (e2) {
+        return [];
+      }
     }
   }
 
@@ -64,9 +114,20 @@ class FirestoreTrackingService {
     Map<String, dynamic> data,
   ) async {
     try {
+      // Convert ts string to Timestamp for proper Firestore ordering
+      final dataCopy = Map<String, dynamic>.from(data);
+      if (dataCopy['ts'] is String) {
+        try {
+          final dt = DateTime.parse(dataCopy['ts'] as String);
+          dataCopy['ts'] = Timestamp.fromDate(dt);
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
+      }
+      
       final docRef = await _firestore
           .collection(_weightsCollection(userId, childId))
-          .add(data);
+          .add(dataCopy);
       return docRef.id;
     } catch (e) {
       throw Exception('Failed to add weight: $e');
@@ -81,10 +142,20 @@ class FirestoreTrackingService {
     Map<String, dynamic> data,
   ) async {
     try {
+      final dataCopy = Map<String, dynamic>.from(data);
+      if (dataCopy['ts'] is String) {
+        try {
+          final dt = DateTime.parse(dataCopy['ts'] as String);
+          dataCopy['ts'] = Timestamp.fromDate(dt);
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
+      }
+      
       await _firestore
           .collection(_weightsCollection(userId, childId))
           .doc(logId)
-          .update(data);
+          .update(dataCopy);
     } catch (e) {
       throw Exception('Failed to update weight: $e');
     }
@@ -123,12 +194,41 @@ class FirestoreTrackingService {
       query = query.limit(limit);
 
       final snapshot = await query.get();
-      return snapshot.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data() as Map<String, dynamic>,
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        if (data['ts'] is Timestamp) {
+          data['ts'] = _timestampToString(data['ts'] as Timestamp);
+        }
+        return {
+          'id': doc.id,
+          ...data,
+        };
       }).toList();
     } catch (e) {
-      return [];
+      try {
+        final snapshot = await _firestore
+            .collection(_feedingsCollection(userId, childId))
+            .limit(limit)
+            .get();
+        final docs = snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          if (data['ts'] is Timestamp) {
+            data['ts'] = _timestampToString(data['ts'] as Timestamp);
+          }
+          return {
+            'id': doc.id,
+            ...data,
+          };
+        }).toList();
+        docs.sort((a, b) {
+          final aTs = a['ts'] as String? ?? '';
+          final bTs = b['ts'] as String? ?? '';
+          return descending ? bTs.compareTo(aTs) : aTs.compareTo(bTs);
+        });
+        return docs;
+      } catch (e2) {
+        return [];
+      }
     }
   }
 
@@ -139,16 +239,52 @@ class FirestoreTrackingService {
     required bool descending,
     int limit = 200,
   }) {
-    Query query = _firestore.collection(_feedingsCollection(userId, childId));
-    query = query.orderBy('ts', descending: descending);
-    query = query.limit(limit);
+    try {
+      Query query = _firestore.collection(_feedingsCollection(userId, childId));
+      query = query.orderBy('ts', descending: descending);
+      query = query.limit(limit);
 
-    return query.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data() as Map<String, dynamic>,
-      }).toList();
-    });
+      return query.snapshots().map((snapshot) {
+        return snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          if (data['ts'] is Timestamp) {
+            data['ts'] = _timestampToString(data['ts'] as Timestamp);
+          }
+          return {
+            'id': doc.id,
+            ...data,
+          };
+        }).toList();
+      }).handleError((error) {
+        if (error.toString().contains('index')) {
+          return _firestore
+              .collection(_feedingsCollection(userId, childId))
+              .limit(limit)
+              .snapshots()
+              .map((snapshot) {
+            final docs = snapshot.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              if (data['ts'] is Timestamp) {
+                data['ts'] = _timestampToString(data['ts'] as Timestamp);
+              }
+              return {
+                'id': doc.id,
+                ...data,
+              };
+            }).toList();
+            docs.sort((a, b) {
+              final aTs = a['ts'] as String? ?? '';
+              final bTs = b['ts'] as String? ?? '';
+              return descending ? bTs.compareTo(aTs) : aTs.compareTo(bTs);
+            });
+            return docs;
+          });
+        }
+        return <Map<String, dynamic>>[];
+      });
+    } catch (e) {
+      return Stream.value(<Map<String, dynamic>>[]);
+    }
   }
 
   /// Add feeding entry
@@ -158,9 +294,19 @@ class FirestoreTrackingService {
     Map<String, dynamic> data,
   ) async {
     try {
+      final dataCopy = Map<String, dynamic>.from(data);
+      if (dataCopy['ts'] is String) {
+        try {
+          final dt = DateTime.parse(dataCopy['ts'] as String);
+          dataCopy['ts'] = Timestamp.fromDate(dt);
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
+      }
+      
       final docRef = await _firestore
           .collection(_feedingsCollection(userId, childId))
-          .add(data);
+          .add(dataCopy);
       return docRef.id;
     } catch (e) {
       throw Exception('Failed to add feeding: $e');
@@ -175,10 +321,20 @@ class FirestoreTrackingService {
     Map<String, dynamic> data,
   ) async {
     try {
+      final dataCopy = Map<String, dynamic>.from(data);
+      if (dataCopy['ts'] is String) {
+        try {
+          final dt = DateTime.parse(dataCopy['ts'] as String);
+          dataCopy['ts'] = Timestamp.fromDate(dt);
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
+      }
+      
       await _firestore
           .collection(_feedingsCollection(userId, childId))
           .doc(logId)
-          .update(data);
+          .update(dataCopy);
     } catch (e) {
       throw Exception('Failed to update feeding: $e');
     }
@@ -217,12 +373,41 @@ class FirestoreTrackingService {
       query = query.limit(limit);
 
       final snapshot = await query.get();
-      return snapshot.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data() as Map<String, dynamic>,
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        if (data['ts'] is Timestamp) {
+          data['ts'] = _timestampToString(data['ts'] as Timestamp);
+        }
+        return {
+          'id': doc.id,
+          ...data,
+        };
       }).toList();
     } catch (e) {
-      return [];
+      try {
+        final snapshot = await _firestore
+            .collection(_oxygenCollection(userId, childId))
+            .limit(limit)
+            .get();
+        final docs = snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          if (data['ts'] is Timestamp) {
+            data['ts'] = _timestampToString(data['ts'] as Timestamp);
+          }
+          return {
+            'id': doc.id,
+            ...data,
+          };
+        }).toList();
+        docs.sort((a, b) {
+          final aTs = a['ts'] as String? ?? '';
+          final bTs = b['ts'] as String? ?? '';
+          return descending ? bTs.compareTo(aTs) : aTs.compareTo(bTs);
+        });
+        return docs;
+      } catch (e2) {
+        return [];
+      }
     }
   }
 
@@ -233,16 +418,52 @@ class FirestoreTrackingService {
     required bool descending,
     int limit = 200,
   }) {
-    Query query = _firestore.collection(_oxygenCollection(userId, childId));
-    query = query.orderBy('ts', descending: descending);
-    query = query.limit(limit);
+    try {
+      Query query = _firestore.collection(_oxygenCollection(userId, childId));
+      query = query.orderBy('ts', descending: descending);
+      query = query.limit(limit);
 
-    return query.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data() as Map<String, dynamic>,
-      }).toList();
-    });
+      return query.snapshots().map((snapshot) {
+        return snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          if (data['ts'] is Timestamp) {
+            data['ts'] = _timestampToString(data['ts'] as Timestamp);
+          }
+          return {
+            'id': doc.id,
+            ...data,
+          };
+        }).toList();
+      }).handleError((error) {
+        if (error.toString().contains('index')) {
+          return _firestore
+              .collection(_oxygenCollection(userId, childId))
+              .limit(limit)
+              .snapshots()
+              .map((snapshot) {
+            final docs = snapshot.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              if (data['ts'] is Timestamp) {
+                data['ts'] = _timestampToString(data['ts'] as Timestamp);
+              }
+              return {
+                'id': doc.id,
+                ...data,
+              };
+            }).toList();
+            docs.sort((a, b) {
+              final aTs = a['ts'] as String? ?? '';
+              final bTs = b['ts'] as String? ?? '';
+              return descending ? bTs.compareTo(aTs) : aTs.compareTo(bTs);
+            });
+            return docs;
+          });
+        }
+        return <Map<String, dynamic>>[];
+      });
+    } catch (e) {
+      return Stream.value(<Map<String, dynamic>>[]);
+    }
   }
 
   /// Add oxygen entry
@@ -252,9 +473,19 @@ class FirestoreTrackingService {
     Map<String, dynamic> data,
   ) async {
     try {
+      final dataCopy = Map<String, dynamic>.from(data);
+      if (dataCopy['ts'] is String) {
+        try {
+          final dt = DateTime.parse(dataCopy['ts'] as String);
+          dataCopy['ts'] = Timestamp.fromDate(dt);
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
+      }
+      
       final docRef = await _firestore
           .collection(_oxygenCollection(userId, childId))
-          .add(data);
+          .add(dataCopy);
       return docRef.id;
     } catch (e) {
       throw Exception('Failed to add oxygen: $e');
@@ -269,10 +500,20 @@ class FirestoreTrackingService {
     Map<String, dynamic> data,
   ) async {
     try {
+      final dataCopy = Map<String, dynamic>.from(data);
+      if (dataCopy['ts'] is String) {
+        try {
+          final dt = DateTime.parse(dataCopy['ts'] as String);
+          dataCopy['ts'] = Timestamp.fromDate(dt);
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
+      }
+      
       await _firestore
           .collection(_oxygenCollection(userId, childId))
           .doc(logId)
-          .update(data);
+          .update(dataCopy);
     } catch (e) {
       throw Exception('Failed to update oxygen: $e');
     }
