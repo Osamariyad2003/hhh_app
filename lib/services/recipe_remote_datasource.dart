@@ -20,12 +20,10 @@ class RecipeRemoteDatasource {
     }
   }
 
-  /// Save suggested heart-healthy meal to Firestore
   Future<void> saveSuggestedMealToFirestore(String userInput) async {
     try {
-      // Get the suggested meal
       final meal = await _suggestionService.getMealSuggestion(userInput);
-      
+
       // Save to Firestore
       await _firestore.collection('heart_healthy_meals').add(meal.toJson());
     } catch (e) {

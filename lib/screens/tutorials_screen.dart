@@ -5,6 +5,7 @@ import '../localization/app_localizations.dart';
 import '../models/tutorial_item.dart';
 import '../services/tutorials_service.dart';
 import '../widgets/lang_toggle_button.dart';
+import '../widgets/empty_state_widget.dart';
 
 class TutorialsScreen extends StatelessWidget {
   const TutorialsScreen({super.key});
@@ -51,31 +52,71 @@ class TutorialsScreen extends StatelessWidget {
         stream: TutorialsService.instance.streamTutorials(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text('Tutorials error:\n${snapshot.error}'),
-              ),
+            return EmptyStateWidget(
+              icon: Icons.error_outline,
+              title: 'Unable to load tutorials',
+              message: 'Please check your connection and try again.',
             );
           }
-          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+          if (!snapshot.hasData) {
+            return const EmptyStateWidget(
+              icon: Icons.play_circle_outline,
+              title: 'Loading tutorials...',
+              isLoading: true,
+            );
+          }
 
           final items = snapshot.data!;
-          if (items.isEmpty) return Center(child: Text(loc.t('tutorialsEmpty')));
+          if (items.isEmpty) {
+            return EmptyStateWidget(
+              icon: Icons.video_library_outlined,
+              title: loc.t('tutorialsEmpty'),
+              message: 'Tutorials will appear here once they are available.',
+            );
+          }
 
           return ListView.separated(
+            padding: const EdgeInsets.all(16),
             itemCount: items.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, i) {
               final item = items[i];
               final title = loc.isArabic ? item.titleAr : item.titleEn;
               final desc = loc.isArabic ? item.descriptionAr : item.descriptionEn;
 
-              return ListTile(
-                title: Text(title.isEmpty ? '(untitled)' : title),
-                subtitle: (desc == null || desc.isEmpty) ? null : Text(desc),
-                trailing: const Icon(Icons.open_in_new),
-                onTap: () => _openTutorial(item),
+              return Card(
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  leading: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                    child: Icon(
+                      Icons.play_circle,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  title: Text(
+                    title.isEmpty ? '(untitled)' : title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  subtitle: (desc == null || desc.isEmpty)
+                      ? null
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            desc,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  onTap: () => _openTutorial(item),
+                ),
               );
             },
           );

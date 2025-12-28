@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../localization/app_localizations.dart';
 import '../services/track_service.dart';
 import '../widgets/lang_toggle_button.dart';
+import '../widgets/empty_state_widget.dart';
 
 String _formatTs(dynamic ts) {
   if (ts is String) {
@@ -140,29 +141,30 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
         stream: TrackService.instance.childrenStream(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('Track error'),
-              ),
+            return EmptyStateWidget(
+              icon: Icons.error_outline,
+              title: 'Unable to load children',
+              message: 'Please check your connection and try again.',
             );
           }
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return const EmptyStateWidget(
+              icon: Icons.child_care,
+              title: 'Loading children...',
+              isLoading: true,
+            );
           }
 
           final allDocs = snapshot.data!;
           final docs = allDocs.where((d) => !_isArchived(d)).toList();
 
           if (docs.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'No active children.\nAdd a child, or unarchive one in Manage.',
-                  textAlign: TextAlign.center,
-                ),
-              ),
+            return EmptyStateWidget(
+              icon: Icons.child_care_outlined,
+              title: 'No active children',
+              message: 'Add a child to start tracking their health data, or unarchive one in Manage.',
+              actionLabel: 'Add Child',
+              onAction: () => context.push('/track/add-child'),
             );
           }
 
@@ -482,12 +484,31 @@ class WeightsTab extends StatelessWidget {
             limit: 200,
           ),
           builder: (context, snapshot) {
-            if (snapshot.hasError) return const Center(child: Text('Error'));
-            if (!snapshot.hasData)
-              return const Center(child: CircularProgressIndicator());
+            if (snapshot.hasError) {
+              return EmptyStateWidget(
+                icon: Icons.error_outline,
+                title: 'Unable to load weight data',
+                message: 'Please try again later.',
+              );
+            }
+            if (!snapshot.hasData) {
+              return const EmptyStateWidget(
+                icon: Icons.monitor_weight_outlined,
+                title: 'Loading weight data...',
+                isLoading: true,
+              );
+            }
 
             final ascDocs = snapshot.data!;
-            if (ascDocs.isEmpty) return const Center(child: Text('No logs'));
+            if (ascDocs.isEmpty) {
+              return EmptyStateWidget(
+                icon: Icons.monitor_weight_outlined,
+                title: 'No weight logs yet',
+                message: 'Start tracking your child\'s weight to see data here.',
+                actionLabel: 'Add Weight',
+                onAction: () => _add(context),
+              );
+            }
 
             final spots = <FlSpot>[];
             for (final d in ascDocs) {
@@ -761,12 +782,31 @@ class FeedingsTab extends StatelessWidget {
             limit: 200,
           ),
           builder: (context, snapshot) {
-            if (snapshot.hasError) return const Center(child: Text('Error'));
-            if (!snapshot.hasData)
-              return const Center(child: CircularProgressIndicator());
+            if (snapshot.hasError) {
+              return EmptyStateWidget(
+                icon: Icons.error_outline,
+                title: 'Unable to load feeding data',
+                message: 'Please try again later.',
+              );
+            }
+            if (!snapshot.hasData) {
+              return const EmptyStateWidget(
+                icon: Icons.restaurant_outlined,
+                title: 'Loading feeding data...',
+                isLoading: true,
+              );
+            }
 
             final docs = snapshot.data!;
-            if (docs.isEmpty) return const Center(child: Text('No logs'));
+            if (docs.isEmpty) {
+              return EmptyStateWidget(
+                icon: Icons.restaurant_outlined,
+                title: 'No feeding logs yet',
+                message: 'Start tracking your child\'s feedings to see data here.',
+                actionLabel: 'Add Feeding',
+                onAction: () => _add(context),
+              );
+            }
 
             return ListView.separated(
               itemCount: docs.length,
@@ -985,11 +1025,31 @@ class OxygenTab extends StatelessWidget {
         StreamBuilder(
           stream: TrackService.instance.oxygenStream(childId, descending: false, limit: 200),
           builder: (context, snapshot) {
-            if (snapshot.hasError) return const Center(child: Text('Error'));
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+            if (snapshot.hasError) {
+              return EmptyStateWidget(
+                icon: Icons.error_outline,
+                title: 'Unable to load oxygen data',
+                message: 'Please try again later.',
+              );
+            }
+            if (!snapshot.hasData) {
+              return const EmptyStateWidget(
+                icon: Icons.air_outlined,
+                title: 'Loading oxygen data...',
+                isLoading: true,
+              );
+            }
 
             final ascDocs = snapshot.data!;
-            if (ascDocs.isEmpty) return const Center(child: Text('No logs'));
+            if (ascDocs.isEmpty) {
+              return EmptyStateWidget(
+                icon: Icons.air_outlined,
+                title: 'No oxygen logs yet',
+                message: 'Start tracking your child\'s oxygen levels to see data here.',
+                actionLabel: 'Add Oxygen Reading',
+                onAction: () => _add(context),
+              );
+            }
 
             final spots = <FlSpot>[];
             for (final d in ascDocs) {

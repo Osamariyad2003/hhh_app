@@ -1,12 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'cubits/app_cubit.dart';
-import 'services/auth_service.dart';
+import 'cubits/auth_cubit.dart';
+import 'cubits/auth_states.dart';
 
 import 'screens/splash_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
 import 'screens/lock_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/section_screen.dart';
@@ -19,34 +23,68 @@ import 'screens/child_detail_screen.dart';
 import 'screens/heart_prediction_screen.dart';
 import 'screens/ai_suggestion_screen.dart';
 
-GoRouter createAppRouter(AppCubit appCubit) {
+GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
   return GoRouter(
     initialLocation: '/splash',
     refreshListenable: Listenable.merge([
-      GoRouterRefreshStream(AuthService.instance.authStateChanges()),
       GoRouterRefreshCubit(appCubit),
+      GoRouterRefreshAuthCubit(authCubit),
     ]),
     redirect: (context, state) {
       final appState = appCubit.state;
 
-      if (!appState.initialized) return '/splash';
-
-      final loggedIn = AuthService.instance.currentUserId != null;
-      final goingToSplash = state.uri.toString() == '/splash';
-
-      if (!loggedIn) {
-        return goingToSplash ? null : '/splash';
+      // Wait for app initialization
+      if (!appState.initialized) {
+        return '/splash';
       }
 
-      final lockEnabled = appState.lockEnabled;
-      final unlocked = appState.unlocked;
-      final goingToLock = state.uri.toString() == '/lock';
+      // Check authentication state
+      final authState = authCubit.state;
+      final isAuthenticated = authState is AuthAuthenticated;
+      final isInitial = authState is AuthInitial;
+      final isUnauthenticated = authState is AuthUnauthenticated;
 
-      if (lockEnabled && !unlocked) {
-        return goingToLock ? null : '/lock';
+      // Get current route
+      final currentPath = state.uri.toString();
+      final isAuthRoute = currentPath == '/login' || currentPath == '/signup';
+      final isSplashRoute = currentPath == '/splash';
+
+      // If still initializing auth (checking Firebase auth state), stay on splash
+      if (isInitial) {
+        if (isSplashRoute) return null; // Allow staying on splash
+        return '/splash'; // Redirect to splash while checking auth
       }
 
-      if (goingToLock) return '/';
+      // If not authenticated, redirect to login
+      if (!isAuthenticated) {
+        if (isAuthRoute) return null; // Allow access to auth screens
+        if (isSplashRoute) {
+          // If on splash and not authenticated, go to login
+          return '/login';
+        }
+        return '/login';
+      }
+
+      // If authenticated, redirect away from auth screens and splash
+      if (isAuthenticated) {
+        if (isAuthRoute || isSplashRoute) {
+          // Redirect authenticated users away from auth screens
+          return '/';
+        }
+
+        // Check lock screen
+        final lockEnabled = appState.lockEnabled;
+        final unlocked = appState.unlocked;
+        final goingToLock = currentPath == '/lock';
+
+        if (lockEnabled && !unlocked) {
+          return goingToLock ? null : '/lock';
+        }
+
+        if (goingToLock && unlocked) {
+          return '/';
+        }
+      }
 
       return null;
     },
@@ -54,6 +92,14 @@ GoRouter createAppRouter(AppCubit appCubit) {
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/signup',
+        builder: (context, state) => const SignupScreen(),
       ),
       GoRoute(path: '/lock', builder: (context, state) => const LockScreen()),
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
@@ -120,6 +166,19 @@ class GoRouterRefreshCubit extends ChangeNotifier {
     _sub = cubit.stream.listen((_) => notifyListeners());
   }
   late final StreamSubscription<AppState> _sub;
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
+
+class GoRouterRefreshAuthCubit extends ChangeNotifier {
+  GoRouterRefreshAuthCubit(AuthCubit cubit) {
+    _sub = cubit.stream.listen((_) => notifyListeners());
+  }
+  late final StreamSubscription<AuthState> _sub;
 
   @override
   void dispose() {

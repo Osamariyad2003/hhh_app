@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'app_router.dart';
 import 'core/app_theme.dart';
 import 'cubits/ai_suggestion_cubit.dart';
 import 'cubits/app_cubit.dart';
@@ -57,10 +58,13 @@ class _CHDAppState extends State<CHDApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    // Create AuthCubit instance to pass to router
+    final authCubit = AuthCubit();
+
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: widget.appCubit),
-        BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider.value(value: authCubit),
         BlocProvider(
           create: (context) => PredictionCubit()..loadAvailableModels(),
         ),
@@ -74,7 +78,7 @@ class _CHDAppState extends State<CHDApp> with WidgetsBindingObserver {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.light,
-            routerConfig: createAppRouter(widget.appCubit),
+            routerConfig: createAppRouter(widget.appCubit, authCubit),
             locale: appState.locale,
             supportedLocales: AppLocalizations.supportedLocales,
             localizationsDelegates: const [
