@@ -61,7 +61,7 @@ class AppLocalizations {
       'feeding': 'Feeding',
       'oxygen': 'Oxygen',
 
-      'addWeight': 'Add weight (kg)',
+      'addWeightKg': 'Add weight (kg)',
       'editWeight': 'Edit weight (kg)',
       'kg': 'kg',
       'noteOptional': 'note (optional)',
@@ -151,6 +151,12 @@ class AppLocalizations {
       'unableToLoadChildren': 'Unable to load children',
       'noActiveChildren': 'No active children',
       'addChildToStart': 'Add a child to start tracking their health data, or unarchive one in Manage.',
+      'lowSaturationLevel': 'Low saturation level',
+      'lastEntries': 'Last 7 Entries',
+      'entries': 'Entries',
+      'history': 'History',
+      'addWeight': 'Add Weight +',
+      'trends': 'Trends',
 
       // Login/Signup
       'login': 'Login',
