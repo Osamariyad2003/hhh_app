@@ -16,6 +16,7 @@ import 'screens/home_screen.dart';
 import 'screens/section_screen.dart';
 import 'screens/tutorials_screen.dart';
 import 'screens/tutorial_detail_screen.dart';
+import 'screens/profile_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/track_dashboard_screen.dart';
 import 'screens/track_home_screen.dart';
@@ -125,6 +126,10 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
           }
           return TutorialDetailScreen(tutorial: tutorial);
         },
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: '/settings',

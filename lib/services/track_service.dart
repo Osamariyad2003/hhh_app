@@ -1,20 +1,16 @@
 import 'dart:async';
 import '../core/dio_helper.dart';
-import '../services/auth_service.dart';
+import '../services/firebase_auth_service.dart';
+import '../services/patient_service.dart';
 
 class TrackService {
   TrackService._();
   static final TrackService instance = TrackService._();
 
-  String get _uid {
-    final uid = AuthService.instance.currentUserId;
-    if (uid == null) {
-      throw StateError('User not signed in');
-    }
-    return uid;
-  }
+  final _patientService = PatientService.instance;
+  final _authService = FirebaseAuthService.instance;
 
-  String? get _token => AuthService.instance.currentToken;
+  String? get _uid => _authService.currentUserId;
 
   // ------------------------
   // Children
@@ -22,48 +18,82 @@ class TrackService {
 
   Future<List<Map<String, dynamic>>> getChildren() async {
     try {
-      final response = await DioHelper.getData(
-        url: 'users/$_uid/children',
-        token: _token,
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is List) {
-          return data.cast<Map<String, dynamic>>();
-        } else if (data is Map && data.containsKey('children')) {
-          return (data['children'] as List).cast<Map<String, dynamic>>();
-        }
-        return [];
-      }
-      return [];
+      final patientsData = await _patientService.getMyPatients();
+      // Convert PatientModel JSON to child format
+      return patientsData.map((p) {
+        final firstName = p['firstName'] ?? '';
+        final lastName = p['lastName'] ?? '';
+        final name = '$firstName $lastName'.trim();
+        final healthTracking = p['healthTracking']?.toString() ?? '';
+        final sex = healthTracking.contains('Sex:') 
+            ? healthTracking.split('Sex:')[1].trim() 
+            : 'unspecified';
+        return {
+          'id': p['id'],
+          'name': name,
+          'dob': p['dateOfBirth'],
+          'sex': sex,
+          'notes': p['diagnoses'],
+          'archived': false,
+        };
+      }).toList();
     } catch (e) {
       return [];
     }
   }
 
   Stream<List<Map<String, dynamic>>> childrenStream() {
-    return Stream.periodic(const Duration(seconds: 5), (_) => getChildren())
-        .asyncMap((future) => future);
+    return _patientService.streamMyPatients().map((patients) {
+      return patients.map((p) {
+        final firstName = p['firstName'] ?? '';
+        final lastName = p['lastName'] ?? '';
+        final name = '$firstName $lastName'.trim();
+        final healthTracking = p['healthTracking']?.toString() ?? '';
+        final sex = healthTracking.contains('Sex:') 
+            ? healthTracking.split('Sex:')[1].trim() 
+            : 'unspecified';
+        return {
+          'id': p['id'],
+          'name': name,
+          'dob': p['dateOfBirth'],
+          'sex': sex,
+          'notes': p['diagnoses'],
+          'archived': false,
+        };
+      }).toList();
+    });
   }
 
   Future<Map<String, dynamic>?> getChild(String childId) async {
     try {
-      final response = await DioHelper.getData(
-        url: 'users/$_uid/children/$childId',
-        token: _token,
-      );
-
-      if (response.statusCode == 200) {
-        return response.data as Map<String, dynamic>?;
-      }
-      return null;
+      final patient = await _patientService.getPatientById(childId);
+      if (patient == null) return null;
+      
+      // Convert PatientModel JSON to child format
+      final firstName = patient['firstName'] ?? '';
+      final lastName = patient['lastName'] ?? '';
+      final name = '$firstName $lastName'.trim();
+      final healthTracking = patient['healthTracking']?.toString() ?? '';
+      final sex = healthTracking.contains('Sex:')
+          ? healthTracking.split('Sex:')[1].trim()
+          : 'unspecified';
+      
+      return {
+        'id': patient['id'],
+        'name': name,
+        'dob': patient['dateOfBirth'],
+        'sex': sex,
+        'notes': patient['diagnoses'],
+        'archived': false,
+      };
     } catch (e) {
       return null;
     }
   }
 
   Stream<Map<String, dynamic>?> childStream(String childId) {
+    // Note: PatientService doesn't have a stream for single patient
+    // So we'll use periodic polling
     return Stream.periodic(const Duration(seconds: 5), (_) => getChild(childId))
         .asyncMap((future) => future);
   }
@@ -75,27 +105,36 @@ class TrackService {
     String? sex,
     String? notes,
   }) async {
-    final data = {
-      'name': name.trim(),
-      'dob': dob.toIso8601String(),
-      'createdAt': DateTime.now().toIso8601String(),
-      'updatedAt': DateTime.now().toIso8601String(),
-      'archived': archived,
-      if (sex != null && sex.trim().isNotEmpty) 'sex': sex.trim(),
-      if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
-    };
+    if (_uid == null) {
+      throw Exception('User not authenticated');
+    }
 
-    final response = await DioHelper.postData(
-      url: 'users/$_uid/children',
-      data: data,
-      token: _token,
+    // Split name into first and last name
+    final nameParts = name.trim().split(' ');
+    final firstName = nameParts.isNotEmpty ? nameParts.first : name.trim();
+    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+
+    // Get parent info from current user
+    final userProfile = await _authService.getCurrentUserProfile();
+    final parentName = userProfile?.username ?? 'Parent';
+    final parentPhone = ''; // Can be added to user profile later
+
+    // Create patient (child) using PatientService
+    final patientId = await _patientService.createPatient(
+      firstName: firstName,
+      lastName: lastName,
+      dateOfBirth: dob,
+      parentName: parentName,
+      parentPhone: parentPhone,
+      diagnoses: notes?.trim().isNotEmpty == true ? notes : null,
+      healthTracking: sex?.trim().isNotEmpty == true ? 'Sex: $sex' : null,
     );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final responseData = response.data as Map<String, dynamic>;
-      return responseData['id'] as String? ?? responseData['_id'] as String? ?? '';
+    if (patientId == null) {
+      throw Exception('Failed to create child');
     }
-    throw Exception('Failed to add child: ${response.statusCode}');
+
+    return patientId;
   }
 
   Future<void> updateChild({
