@@ -51,13 +51,25 @@ class FirestoreSupportGroupService {
 
   /// Get all support groups
   Stream<List<SupportGroupModel>> getAllSupportGroups() {
+    print('DEBUG: Fetching support groups stream...');
     return _firestore.collection(_collection).snapshots().map(
-          (snapshot) => snapshot.docs
-              .map((doc) => SupportGroupModel.fromJson({
-                    'id': doc.id,
-                    ...doc.data(),
-                  }))
-              .toList(),
+          (snapshot) {
+            print('DEBUG: Support groups snapshot received. Docs: ${snapshot.docs.length}');
+            final groups = snapshot.docs.map((doc) {
+              try {
+                return SupportGroupModel.fromJson({
+                  'id': doc.id,
+                  ...doc.data(),
+                });
+              } catch (e) {
+                print('DEBUG: Error parsing support group ${doc.id}: $e');
+                // Return a dummy object or throw? Throwing catches in handleError.
+                rethrow;
+              }
+            }).toList();
+            print('DEBUG: Parsed ${groups.length} support groups.');
+            return groups;
+          },
         );
   }
 }

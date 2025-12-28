@@ -136,6 +136,7 @@ class SectionScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       text,
+                      softWrap: true,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             height: 1.6,
                             color: Theme.of(context).colorScheme.onSurface,
@@ -172,6 +173,9 @@ class SectionScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         label.trim().isEmpty ? url : label,
+                        softWrap: true,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.w600,
@@ -314,6 +318,7 @@ class SectionScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.titleLarge,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
+                                softWrap: true,
                               ),
                             ),
                           ],
@@ -524,28 +529,77 @@ class SectionScreen extends StatelessWidget {
                             ],
                           ),
                         ],
-                        if (group['contactInfo'] != null) ...[
                           const SizedBox(height: 8),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.contact_phone,
-                                size: 20,
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  group['contactInfo'] ?? '',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                          if (group['contactInfo'] != null) ...[
+                            // Organizer
+                            if (group['contactInfo']['organizer'] != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.person,
+                                      size: 20,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'Organizer: ${group['contactInfo']['organizer']}',
+                                        style: Theme.of(context).textTheme.bodyMedium,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
+                            
+                            // Phone
+                            if (group['contactInfo']['phone'] != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.phone,
+                                      size: 20,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        group['contactInfo']['phone'],
+                                        style: Theme.of(context).textTheme.bodyMedium,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                            // Email
+                            if (group['contactInfo']['email'] != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.email,
+                                      size: 20,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        group['contactInfo']['email'],
+                                        style: Theme.of(context).textTheme.bodyMedium,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
                       ],
                     ),
                   ),
@@ -758,7 +812,11 @@ class SectionScreen extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text((title == null || title.isEmpty) ? sectionId : title),
+            title: Text(
+              (title == null || title.isEmpty) ? sectionId : title,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
             actions: const [LangToggleButton()],
           ),
               body: blocks.isEmpty

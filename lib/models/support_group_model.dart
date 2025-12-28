@@ -4,7 +4,7 @@ class SupportGroupModel {
   final String name;
   final String description;
   final String meetingSchedule;
-  final String contactInfo;
+  final SupportGroupContactInfo contactInfo;
   
   // Bilingual fields (prefer English)
   final String? nameEn;
@@ -26,15 +26,19 @@ class SupportGroupModel {
 
   factory SupportGroupModel.fromJson(Map<String, dynamic> json) {
     return SupportGroupModel(
-      id: json['id'] as String,
-      name: json['nameEn'] as String? ?? json['name'] as String? ?? '',
-      description: json['descriptionEn'] as String? ?? json['description'] as String? ?? '',
-      meetingSchedule: json['meetingSchedule'] as String? ?? json['meeting_schedule'] as String? ?? '',
-      contactInfo: json['contactInfo'] as String? ?? json['contact_info'] as String? ?? '',
-      nameEn: json['nameEn'] as String?,
-      nameAr: json['nameAr'] as String?,
-      descriptionEn: json['descriptionEn'] as String?,
-      descriptionAr: json['descriptionAr'] as String?,
+      id: json['id']?.toString() ?? '',
+      name: json['nameEn']?.toString() ?? json['name']?.toString() ?? '',
+      description: json['descriptionEn']?.toString() ?? json['description']?.toString() ?? '',
+      meetingSchedule: json['meetingSchedule']?.toString() ?? json['meeting_schedule']?.toString() ?? '',
+      contactInfo: json['contactInfo'] is Map<String, dynamic> 
+          ? SupportGroupContactInfo.fromJson(json['contactInfo'] as Map<String, dynamic>)
+          : json['contact_info'] is Map<String, dynamic>
+              ? SupportGroupContactInfo.fromJson(json['contact_info'] as Map<String, dynamic>)
+              : SupportGroupContactInfo.parse(json['contactInfo']?.toString() ?? json['contact_info']?.toString() ?? ''),
+      nameEn: json['nameEn']?.toString(),
+      nameAr: json['nameAr']?.toString(),
+      descriptionEn: json['descriptionEn']?.toString(),
+      descriptionAr: json['descriptionAr']?.toString(),
     );
   }
 
@@ -44,7 +48,7 @@ class SupportGroupModel {
       'name': name,
       'description': description,
       'meetingSchedule': meetingSchedule,
-      'contactInfo': contactInfo,
+      'contactInfo': contactInfo.toJson(),
       if (nameEn != null) 'nameEn': nameEn,
       if (nameAr != null) 'nameAr': nameAr,
       if (descriptionEn != null) 'descriptionEn': descriptionEn,
@@ -63,7 +67,7 @@ class SupportGroupModel {
     String? name,
     String? description,
     String? meetingSchedule,
-    String? contactInfo,
+    SupportGroupContactInfo? contactInfo,
     String? nameEn,
     String? nameAr,
     String? descriptionEn,
@@ -80,6 +84,79 @@ class SupportGroupModel {
       descriptionEn: descriptionEn ?? this.descriptionEn,
       descriptionAr: descriptionAr ?? this.descriptionAr,
     );
+  }
+}
+
+class SupportGroupContactInfo {
+  final String? phone;
+  final String? email;
+  final String? organizer;
+  final String? website;
+
+  const SupportGroupContactInfo({
+    this.phone,
+    this.email,
+    this.organizer,
+    this.website,
+  });
+
+  factory SupportGroupContactInfo.fromJson(Map<String, dynamic> json) {
+    return SupportGroupContactInfo(
+      phone: json['phone']?.toString(),
+      email: json['email']?.toString(),
+      organizer: json['organizer']?.toString(),
+      website: json['website']?.toString(),
+    );
+  }
+
+  /// Try to parse from a string if the data appears corrupted/stringified
+  factory SupportGroupContactInfo.parse(String raw) {
+    if (raw.isEmpty) return const SupportGroupContactInfo();
+    
+    // Attempt basic parsing if it looks like {key: val}
+    String? phone;
+    String? email;
+    String? organizer;
+    
+    // Very basic regex scraping as fallback
+    final phoneMatch = RegExp(r'phone:\s*([^,]+)').firstMatch(raw);
+    if (phoneMatch != null) phone = phoneMatch.group(1)?.trim();
+    
+    final emailMatch = RegExp(r'email:\s*([^,]+)').firstMatch(raw);
+    if (emailMatch != null) email = emailMatch.group(1)?.replaceFirst('}', '').trim();
+    
+    final organizerMatch = RegExp(r'organizer:\s*([^,]+)').firstMatch(raw);
+    if (organizerMatch != null) organizer = organizerMatch.group(1)?.trim();
+
+    // If essentially empty, return the raw string as organizer (fallback)
+    if (phone == null && email == null && organizer == null && raw.length > 2) {
+      // If it doesn't look like json, maybe it's just a phone number or name
+      return SupportGroupContactInfo(organizer: raw);
+    }
+
+    return SupportGroupContactInfo(
+      phone: phone,
+      email: email,
+      organizer: organizer,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (phone != null) 'phone': phone,
+      if (email != null) 'email': email,
+      if (organizer != null) 'organizer': organizer,
+      if (website != null) 'website': website,
+    };
+  }
+  
+  @override
+  String toString() {
+    final parts = <String>[];
+    if (organizer != null) parts.add('Organizer: $organizer');
+    if (phone != null) parts.add('Phone: $phone');
+    if (email != null) parts.add('Email: $email');
+    return parts.join('\n');
   }
 }
 
