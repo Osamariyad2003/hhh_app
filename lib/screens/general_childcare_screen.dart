@@ -10,7 +10,7 @@ import 'childcare_detail_screen.dart';
 import '../models/general_childcare_model.dart';
 
 /// General Childcare Information Screen
-/// Displays childcare information from Firestore collection 'general_childcare'
+/// Displays static childcare information
 class GeneralChildcareScreen extends StatefulWidget {
   const GeneralChildcareScreen({super.key});
 

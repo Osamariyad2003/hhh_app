@@ -9,7 +9,7 @@ class StaticChildcareData {
         ..._arabicItems,
       ];
 
-  static List<GeneralChildcareModel> _englishItems = [
+  static final List<GeneralChildcareModel> _englishItems = [
     GeneralChildcareModel(
       id: 'growth_1_en',
       title: 'Monitoring Your Child\'s Growth',
@@ -367,7 +367,7 @@ Talk to your healthcare team if you have concerns about:
     ),
   ];
 
-  static List<GeneralChildcareModel> _arabicItems = [
+  static final List<GeneralChildcareModel> _arabicItems = [
     GeneralChildcareModel(
       id: 'growth_1_ar',
       title: 'مراقبة نمو طفلك',
