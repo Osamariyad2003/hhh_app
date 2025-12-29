@@ -221,6 +221,22 @@ class AppLocalizations {
       'quote3': 'Hope is being able to see that there is light despite all of the darkness.',
       'quote4': 'You are stronger than you know.',
       'quote5': 'Faith is taking the first step even when you don\'t see the whole staircase.',
+
+      // General Childcare
+      'all': 'All',
+      'growth': 'Growth',
+      'nutrition': 'Nutrition',
+      'sleep': 'Sleep',
+      'hygiene': 'Hygiene',
+      'safety': 'Safety',
+      'dailyCare': 'Daily Care',
+      'development': 'Development',
+      'unableToLoadChildcare': 'Unable to load childcare information',
+      'noChildcareAvailable': 'No childcare information available',
+      'childcareWillAppear': 'Childcare information will appear here once available.',
+      'retry': 'Retry',
+      'watchVideo': 'Watch Video',
+      'openLink': 'Open Link',
     },
     'ar': {
       'appTitle': 'قلوب صحية في المنزل',
@@ -421,6 +437,22 @@ class AppLocalizations {
       'quote3': 'الأمل هو القدرة على رؤية النور رغم كل الظلام.',
       'quote4': 'أنت أقوى مما تعرف.',
       'quote5': 'الإيمان هو اتخاذ الخطوة الأولى حتى عندما لا ترى الدرج بالكامل.',
+
+      // General Childcare
+      'all': 'الكل',
+      'growth': 'النمو',
+      'nutrition': 'التغذية',
+      'sleep': 'النوم',
+      'hygiene': 'النظافة',
+      'safety': 'السلامة',
+      'dailyCare': 'الرعاية اليومية',
+      'development': 'التطور',
+      'unableToLoadChildcare': 'تعذر تحميل معلومات رعاية الطفل',
+      'noChildcareAvailable': 'لا توجد معلومات رعاية طفل متاحة',
+      'childcareWillAppear': 'ستظهر معلومات رعاية الطفل هنا بمجرد توفرها.',
+      'retry': 'إعادة المحاولة',
+      'watchVideo': 'شاهد الفيديو',
+      'openLink': 'فتح الرابط',
     },
   };
 
