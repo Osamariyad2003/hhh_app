@@ -13,17 +13,11 @@ class GenerativeAIService {
 
   /// Initialize the service (call this before using)
   void initialize() {
-    _model = GenerativeModel(
-      model: 'gemini-pro',
-      apiKey: _apiKey,
-    );
+    _model = GenerativeModel(model: 'gemini-pro-2.5', apiKey: _apiKey);
   }
 
   GenerativeModel get model {
-    _model ??= GenerativeModel(
-      model: 'gemini-pro',
-      apiKey: _apiKey,
-    );
+    _model ??= GenerativeModel(model: 'gemini-pro-2.5', apiKey: _apiKey);
     return _model!;
   }
 
@@ -31,12 +25,12 @@ class GenerativeAIService {
   Future<HeartHealthyMeal> getMealSuggestion(String userInput) async {
     try {
       final prompt = _buildPrompt(userInput);
-      
+
       final content = [Content.text(prompt)];
       final response = await model.generateContent(content);
-      
+
       final text = response.text ?? '';
-      
+
       // Parse the AI response into a HeartHealthyMeal
       return _parseAIResponse(text, userInput);
     } catch (e) {
@@ -86,7 +80,7 @@ Only return the JSON, no additional text.
     try {
       // Try to extract JSON from the response
       String jsonStr = response.trim();
-      
+
       // Remove markdown code blocks if present
       if (jsonStr.startsWith('```')) {
         final lines = jsonStr.split('\n');
@@ -96,20 +90,22 @@ Only return the JSON, no additional text.
         }
         jsonStr = lines.join('\n');
       }
-      
+
       // Try to parse as JSON using dart:convert
       final jsonData = jsonDecode(jsonStr) as Map<String, dynamic>;
-      
+
       return HeartHealthyMeal(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: jsonData['name']?.toString() ?? 'Heart-Healthy Meal',
-        mealType: jsonData['mealType'] is List 
+        mealType: jsonData['mealType'] is List
             ? (jsonData['mealType'] as List).map((e) => e.toString()).toList()
             : [jsonData['mealType']?.toString() ?? 'lunch'],
         rating: (jsonData['rating'] as num?)?.toDouble() ?? 4.5,
         cookTime: (jsonData['cookTime'] as num?)?.toInt() ?? 30,
         servingSize: (jsonData['servingSize'] as num?)?.toInt() ?? 2,
-        summary: jsonData['summary']?.toString() ?? 'A heart-healthy meal for children with CHD.',
+        summary:
+            jsonData['summary']?.toString() ??
+            'A heart-healthy meal for children with CHD.',
         ingredients: _parseIngredients(jsonData['ingredients']),
         mealSteps: _parseSteps(jsonData['steps']),
         createdAt: DateTime.now(),
@@ -120,12 +116,11 @@ Only return the JSON, no additional text.
     }
   }
 
-
   List<MealIngredient> _parseIngredients(dynamic ingredients) {
     if (ingredients == null) {
       return _getDefaultIngredients();
     }
-    
+
     if (ingredients is List) {
       return ingredients.map((item) {
         if (item is Map) {
@@ -137,23 +132,21 @@ Only return the JSON, no additional text.
         return MealIngredient(name: 'Ingredient', quantity: '1');
       }).toList();
     }
-    
+
     return _getDefaultIngredients();
   }
-
 
   List<String> _parseSteps(dynamic steps) {
     if (steps == null) {
       return _getDefaultSteps();
     }
-    
+
     if (steps is List) {
       return steps.map((step) => step.toString()).toList();
     }
-    
+
     return _getDefaultSteps();
   }
-
 
   List<MealIngredient> _getDefaultIngredients() {
     return [
@@ -189,11 +182,11 @@ Only return the JSON, no additional text.
       rating: 4.5,
       cookTime: 30,
       servingSize: 2,
-      summary: 'A heart-healthy meal suggestion based on your request. This meal is designed for children with congenital heart disease, focusing on low sodium, healthy fats, and essential nutrients.',
+      summary:
+          'A heart-healthy meal suggestion based on your request. This meal is designed for children with congenital heart disease, focusing on low sodium, healthy fats, and essential nutrients.',
       ingredients: _getDefaultIngredients(),
       mealSteps: _getDefaultSteps(),
       createdAt: DateTime.now(),
     );
   }
 }
-
