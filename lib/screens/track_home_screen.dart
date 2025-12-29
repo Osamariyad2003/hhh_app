@@ -59,61 +59,115 @@ class TrackHomeScreen extends StatelessWidget {
           final docs = snapshot.data!;
           if (docs.isEmpty) return Center(child: Text(loc.t('noChildrenYet')));
 
-          return ListView.separated(
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
             itemCount: docs.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (context, i) {
               final data = docs[i];
               final childId = _getChildId(data);
-
               final name = (data['name'] ?? 'Unnamed').toString();
               final archived = _isArchived(data);
-
               final sex = (data['sex'] ?? '').toString().trim();
-              final subtitleParts = <String>[];
-              if (sex.isNotEmpty && sex != 'unspecified') subtitleParts.add('Sex: $sex');
-              if (archived) subtitleParts.add('Archived');
-
-              return ListTile(
-                title: Text(name),
-                subtitle: subtitleParts.isEmpty ? null : Text(subtitleParts.join(' • ')),
-                trailing: PopupMenuButton<String>(
-                  onSelected: (v) async {
-                    if (v == 'open' && childId != null) {
+              
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    if (childId != null) {
                       context.push('/track/child/$childId');
-                      return;
-                    }
-
-                    if (v == 'archive' && childId != null) {
-                      final ok = await _confirmDialog(
-                        context,
-                        'Archive child?',
-                        'This hides the child from the Track screen but keeps all logs.',
-                        loc.t('cancel'),
-                        'Archive',
-                      );
-                      if (ok == true) {
-                        await TrackService.instance.setChildArchived(childId: childId, archived: true);
-                      }
-                      return;
-                    }
-
-                    if (v == 'unarchive' && childId != null) {
-                      await TrackService.instance.setChildArchived(childId: childId, archived: false);
-                      return;
                     }
                   },
-                  itemBuilder: (_) => [
-                    const PopupMenuItem(value: 'open', child: Text('Open')),
-                    if (!archived) const PopupMenuItem(value: 'archive', child: Text('Archive')),
-                    if (archived) const PopupMenuItem(value: 'unarchive', child: Text('Unarchive')),
-                  ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                          child: Text(
+                            name.isNotEmpty ? name[0].toUpperCase() : '?',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (sex.isNotEmpty && sex != 'unspecified')
+                                Text(
+                                  sex,
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              if (archived)
+                                Container(
+                                  margin: const EdgeInsets.only(top: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    'Archived',
+                                    style: Theme.of(context).textTheme.labelSmall,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.more_vert),
+                          onSelected: (v) async {
+                            if (v == 'open' && childId != null) {
+                              context.push('/track/child/$childId');
+                              return;
+                            }
+                            if (v == 'archive' && childId != null) {
+                              final ok = await _confirmDialog(
+                                context,
+                                'Archive child?',
+                                'This hides the child from the Track screen but keeps all logs.',
+                                loc.t('cancel'),
+                                'Archive',
+                              );
+                              if (ok == true) {
+                                await TrackService.instance.setChildArchived(childId: childId, archived: true);
+                              }
+                              return;
+                            }
+                            if (v == 'unarchive' && childId != null) {
+                              await TrackService.instance.setChildArchived(childId: childId, archived: false);
+                              return;
+                            }
+                          },
+                          itemBuilder: (_) => [
+                            const PopupMenuItem(value: 'open', child: Text('Open')),
+                            if (!archived) const PopupMenuItem(value: 'archive', child: Text('Archive')),
+                            if (archived) const PopupMenuItem(value: 'unarchive', child: Text('Unarchive')),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                onTap: () {
-                  if (childId != null) {
-                    context.push('/track/child/$childId');
-                  }
-                },
               );
             },
           );

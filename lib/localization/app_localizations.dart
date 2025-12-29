@@ -28,7 +28,10 @@ class AppLocalizations {
       'starting': 'Starting...',
       'caregiverSupportSubtitle': 'Caregiver support for children with CHD.',
       'home': 'Home',
-
+      'dashboard': 'Dashboard',
+      'quoteOfTheDay': 'Quote of the Day',
+      'welcome': 'Welcome',
+      
       'generalChildcare': 'General Childcare',
       'tutorials': 'Tutorials',
       'spiritualNeeds': 'Spiritual Needs',
@@ -151,12 +154,35 @@ class AppLocalizations {
       'unableToLoadChildren': 'Unable to load children',
       'noActiveChildren': 'No active children',
       'addChildToStart': 'Add a child to start tracking their health data, or unarchive one in Manage.',
-      'lowSaturationLevel': 'Low saturation level',
+      'lowSaturationLevel': 'Low Saturation Level',
       'lastEntries': 'Last 7 Entries',
       'entries': 'Entries',
       'history': 'History',
-      'addWeight': 'Add Weight +',
+      'addWeight': 'Add Weight',
       'trends': 'Trends',
+      
+      'unableToLoadWeightData': 'Unable to load weight data',
+      'loadingWeightData': 'Loading weight data...',
+      'noWeightLogs': 'No weight logs yet',
+      'startTrackingWeight': 'Start tracking your child\'s weight to see data here.',
+      'addWeightAction': 'Add Weight',
+
+      'unableToLoadFeedingData': 'Unable to load feeding data',
+      'loadingFeedingData': 'Loading feeding data...',
+      'noFeedingLogs': 'No feeding logs yet',
+      'startTrackingFeeding': 'Start tracking your child\'s feedings to see data here.',
+      'addFeedingAction': 'Add Feeding',
+
+      'unableToLoadOxygenData': 'Unable to load oxygen data',
+      'loadingOxygenData': 'Loading oxygen data...',
+      'noOxygenLogs': 'No oxygen logs yet',
+      'startTrackingOxygen': 'Start tracking your child\'s oxygen levels to see data here.',
+      'addOxygenAction': 'Add Oxygen Reading',
+
+      'pleaseTryAgainLater': 'Please try again later.',
+      'methodOptional': 'Method (Optional)',
+      'pulseOptional': 'Pulse (Optional)',
+      'deviceOptional': 'Device (Optional)',
 
       // Login/Signup
       'login': 'Login',
@@ -185,6 +211,16 @@ class AppLocalizations {
 
       // Patient Stories
       'readMore': 'Read more',
+
+      // Home Screen
+      'getPersonalizedTips': 'Get personalized health tips',
+      'featuredCHD': 'Featured: Understanding CHD',
+      'watchGuide': 'Watch our latest guide on managing heart health at home.',
+      'quote1': 'Healing takes courage, and we all have courage, even if we have to dig a little to find it.',
+      'quote2': 'Every day is a new beginning. Take a deep breath and start again.',
+      'quote3': 'Hope is being able to see that there is light despite all of the darkness.',
+      'quote4': 'You are stronger than you know.',
+      'quote5': 'Faith is taking the first step even when you don\'t see the whole staircase.',
     },
     'ar': {
       'appTitle': 'قلوب صحية في المنزل',
@@ -192,6 +228,9 @@ class AppLocalizations {
       'starting': 'جارٍ البدء...',
       'caregiverSupportSubtitle': 'دعم مقدمي الرعاية للأطفال المصابين بعيوب القلب الخلقية.',
       'home': 'الرئيسية',
+      'dashboard': 'لوحة التحكم',
+      'quoteOfTheDay': 'حكمة اليوم',
+      'welcome': 'مرحباً',
 
       'generalChildcare': 'رعاية الطفل العامة',
       'tutorials': 'الدروس',
@@ -225,7 +264,7 @@ class AppLocalizations {
       'feeding': 'الرضعات',
       'oxygen': 'الأكسجين',
 
-      'addWeight': 'إضافة وزن (كغ)',
+      'addWeightKg': 'إضافة وزن (كغ)',
       'editWeight': 'تعديل الوزن (كغ)',
       'kg': 'كغ',
       'noteOptional': 'ملاحظة (اختياري)',
@@ -315,6 +354,35 @@ class AppLocalizations {
       'unableToLoadChildren': 'تعذر تحميل الأطفال',
       'noActiveChildren': 'لا يوجد أطفال نشطين',
       'addChildToStart': 'أضف طفلاً لبدء متابعة بيانات صحته، أو قم بإلغاء أرشفة واحد في الإدارة.',
+      'lowSaturationLevel': 'مستوى تشبع منخفض',
+      'lastEntries': 'آخر 7 إدخالات',
+      'entries': 'إدخالات',
+      'history': 'السجل',
+      'addWeight': 'إضافة وزن',
+      'trends': 'اتجاهات',
+      
+      'unableToLoadWeightData': 'تعذر تحميل بيانات الوزن',
+      'loadingWeightData': 'جارٍ تحميل بيانات الوزن...',
+      'noWeightLogs': 'لا توجد سجلات وزن بعد',
+      'startTrackingWeight': 'ابدأ بمتابعة وزن طفلك لرؤية البيانات هنا.',
+      'addWeightAction': 'إضافة وزن',
+
+      'unableToLoadFeedingData': 'تعذر تحميل بيانات الرضاعة',
+      'loadingFeedingData': 'جارٍ تحميل بيانات الرضاعة...',
+      'noFeedingLogs': 'لا توجد سجلات رضاعة بعد',
+      'startTrackingFeeding': 'ابدأ بمتابعة رضعات طفلك لرؤية البيانات هنا.',
+      'addFeedingAction': 'إضافة رضعة',
+
+      'unableToLoadOxygenData': 'تعذر تحميل بيانات الأكسجين',
+      'loadingOxygenData': 'جارٍ تحميل بيانات الأكسجين...',
+      'noOxygenLogs': 'لا توجد سجلات أكسجين بعد',
+      'startTrackingOxygen': 'ابدأ بمتابعة مستويات الأكسجين لطفلك لرؤية البيانات هنا.',
+      'addOxygenAction': 'إضافة قراءة أكسجين',
+
+      'pleaseTryAgainLater': 'يرجى المحاولة مرة أخرى لاحقاً.',
+      'methodOptional': 'الطريقة (اختياري)',
+      'pulseOptional': 'النبض (اختياري)',
+      'deviceOptional': 'الجهاز (اختياري)',
 
       // Login/Signup
       'login': 'تسجيل الدخول',
@@ -343,6 +411,16 @@ class AppLocalizations {
 
       // Patient Stories
       'readMore': 'اقرأ المزيد',
+
+      // Home Screen
+      'getPersonalizedTips': 'احصل على نصائح صحية مخصصة',
+      'featuredCHD': 'مميز: فهم عيوب القلب الخلقية',
+      'watchGuide': 'شاهد أحدث دليل لدينا حول إدارة صحة القلب في المنزل.',
+      'quote1': 'الشفاء يتطلب الشجاعة، ولدينا جميعاً الشجاعة، حتى لو اضطررنا للبحث عنها قليلاً.',
+      'quote2': 'كل يوم هو بداية جديدة. خذ نفساً عميقاً وابدأ من جديد.',
+      'quote3': 'الأمل هو القدرة على رؤية النور رغم كل الظلام.',
+      'quote4': 'أنت أقوى مما تعرف.',
+      'quote5': 'الإيمان هو اتخاذ الخطوة الأولى حتى عندما لا ترى الدرج بالكامل.',
     },
   };
 

@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(loc.t('appTitle')),
         actions: const [LangToggleButton()],
@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
           return EmptyStateWidget(
             icon: Icons.favorite,
             title: loc.t('appTitle'),
-            message: loc.t('caregiverSupportSubtitle') + '\n\nPreparing your app...',
+            message: '${loc.t('caregiverSupportSubtitle')}\n\nPreparing your app...',
             isLoading: true,
           );
         },

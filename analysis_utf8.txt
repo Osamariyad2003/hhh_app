@@ -1,0 +1,53 @@
+﻿Analyzing hhh_app...                                            
+
+warning - The value of the local variable 'isUnauthenticated' isn't used - lib\app_router.dart:51:13 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\app_theme.dart:409:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\app_theme.dart:413:65 - deprecated_member_use
+warning - The declaration '_sn' isn't referenced - lib\models\section_content.dart:19:18 - unused_element
+warning - The value of the local variable 'isDark' isn't used - lib\screens\add_child_screen.dart:70:11 - unused_local_variable
+warning - The value of the local variable 'cubitState' isn't used - lib\screens\ai_suggestion_screen.dart:213:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\ai_suggestion_screen.dart:293:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\child_detail_screen.dart:365:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\child_detail_screen.dart:383:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\child_detail_screen.dart:437:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\child_detail_screen.dart:438:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard_screen.dart:67:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\dashboard_screen.dart:78:60 - deprecated_member_use
+warning - The value of the local variable 'loc' isn't used - lib\screens\heart_prediction_screen.dart:75:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_screen.dart:56:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_screen.dart:76:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_screen.dart:190:61 - deprecated_member_use
+warning - The value of the field '_currentIndex' isn't used - lib\screens\main_navigation_screen.dart:14:7 - unused_field
+   info - Unnecessary use of multiple underscores - lib\screens\patient_stories_screen.dart:127:49 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\patient_stories_screen.dart:127:53 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\patient_stories_screen.dart:272:47 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\patient_stories_screen.dart:272:51 - unnecessary_underscores
+warning - The value of the local variable 'loc' isn't used - lib\screens\profile_screen.dart:42:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\section_screen.dart:124:67 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\section_screen.dart:334:80 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\section_screen.dart:355:80 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\section_screen.dart:376:80 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\section_screen.dart:518:80 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\screens\section_screen.dart:707:49 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\section_screen.dart:707:53 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\section_screen.dart:722:82 - deprecated_member_use
+warning - The declaration '_formatDob' isn't referenced - lib\screens\track_dashboard_screen.dart:35:8 - unused_element
+warning - The declaration '_buildChildDropdown' isn't referenced - lib\screens\track_dashboard_screen.dart:323:8 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\track_dashboard_screen.dart:653:75 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\track_dashboard_screen.dart:707:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\track_dashboard_screen.dart:708:65 - deprecated_member_use
+warning - The declaration '_getYouTubeEmbedUrl' isn't referenced - lib\screens\tutorial_detail_screen.dart:34:10 - unused_element
+warning - The declaration '_resolveUrl' isn't referenced - lib\screens\tutorials_screen.dart:13:11 - unused_element
+   info - Unnecessary use of multiple underscores - lib\screens\tutorials_screen.dart:76:35 - unnecessary_underscores
+   info - Don't invoke 'print' in production code - lib\services\firebase\firestore_support_group_service.dart:54:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\firebase\firestore_support_group_service.dart:57:13 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\firebase\firestore_support_group_service.dart:65:17 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\firebase\firestore_support_group_service.dart:70:13 - avoid_print
+warning - The declaration '_parseTimestamp' isn't referenced - lib\services\firebase\firestore_tracking_service.dart:8:14 - unused_element
+warning - The value of the local variable 'primaryIngredient' isn't used - lib\services\heart_meal_suggestion_service.dart:123:11 - unused_local_variable
+warning - The value of the local variable 'userProfile' isn't used - lib\services\patient_service.dart:32:17 - unused_local_variable
+warning - The value of the field '_googleMapsApiKey' isn't used - lib\widgets\child_tracking_map.dart:23:23 - unused_field
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\empty_state_widget.dart:48:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\empty_state_widget.dart:71:54 - deprecated_member_use
+  error - The name 'MyApp' isn't a class - test\widget_test.dart:16:35 - creation_with_non_type
+

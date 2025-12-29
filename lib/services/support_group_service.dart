@@ -1,4 +1,3 @@
-import '../models/support_group_model.dart';
 import 'firebase/firestore_support_group_service.dart';
 
 class SupportGroupService {

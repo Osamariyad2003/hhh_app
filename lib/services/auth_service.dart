@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../core/dio_helper.dart';
 
 class AuthService {
   AuthService._();

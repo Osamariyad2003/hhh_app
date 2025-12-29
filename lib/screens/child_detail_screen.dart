@@ -41,7 +41,6 @@ String _ageFromDob(dynamic dob) {
   } else {
     return '';
   }
-  if (d == null) return '';
   final now = DateTime.now();
 
   int months = (now.year - d.year) * 12 + (now.month - d.month);
@@ -162,7 +161,7 @@ class ChildDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: sex,
+                  initialValue: sex,
                   decoration: const InputDecoration(labelText: 'Sex'),
                   items: const [
                     DropdownMenuItem(value: 'unspecified', child: Text('Unspecified')),
@@ -354,50 +353,96 @@ class _LineChartCard extends StatelessWidget {
     final minX = spots.first.x;
     final maxX = spots.last.x;
 
-    return SizedBox(
+    return Container(
       height: 220,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: LineChart(
-              LineChartData(
-                minX: minX,
-                maxX: maxX,
-                gridData: const FlGridData(show: true),
-                borderData: FlBorderData(show: true),
-                titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 42)),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 34,
-                      interval: ((maxX - minX) / 3).clamp(1, double.infinity),
-                      getTitlesWidget: (value, meta) {
-                        final dt = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(DateFormat('dd/MM').format(dt), style: const TextStyle(fontSize: 11)),
-                        );
-                      },
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: LineChart(
+        LineChartData(
+          minX: minX,
+          maxX: maxX,
+          minY: spots.map((s) => s.y).reduce((a, b) => a < b ? a : b) - 2,
+          maxY: spots.map((s) => s.y).reduce((a, b) => a > b ? a : b) + 2,
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: 5,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+                strokeWidth: 1,
+              );
+            },
+          ),
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                interval: ((maxX - minX) / 3).clamp(1, double.infinity),
+                getTitlesWidget: (value, meta) {
+                  final dt = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      DateFormat('MM/dd').format(dt),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: spots,
-                    isCurved: true,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: false),
-                    color: theme.colorScheme.primary,
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           ),
+          lineBarsData: [
+            LineChartBarData(
+              spots: spots,
+              isCurved: true,
+              curveSmoothness: 0.35,
+              barWidth: 3,
+              isStrokeCapRound: true,
+              color: theme.colorScheme.primary,
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (spot, percent, barData, index) {
+                  return FlDotCirclePainter(
+                    radius: 4,
+                    color: theme.colorScheme.surface,
+                    strokeWidth: 2,
+                    strokeColor: theme.colorScheme.primary,
+                  );
+                },
+              ),
+              belowBarData: BarAreaData(
+                show: true,
+                gradient: LinearGradient(
+                  colors: [
+                    theme.colorScheme.primary.withOpacity(0.3),
+                    theme.colorScheme.primary.withOpacity(0.0),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -434,7 +479,7 @@ class _WeightsTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: clothes,
+                  initialValue: clothes,
                   decoration: const InputDecoration(labelText: 'Clothes (optional)'),
                   items: const [
                     DropdownMenuItem(value: 'none', child: Text('Not set')),
@@ -505,7 +550,7 @@ class _WeightsTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: clothes,
+                  initialValue: clothes,
                   decoration: const InputDecoration(labelText: 'Clothes (optional)'),
                   items: const [
                     DropdownMenuItem(value: 'none', child: Text('Not set')),
@@ -546,42 +591,61 @@ class _WeightsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final theme = Theme.of(context);
 
-    return Stack(
-      children: [
-        StreamBuilder(
-          stream: TrackService.instance.weightsStream(childId, descending: false, limit: 200),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) return const Center(child: Text('Error'));
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'addWeight',
+        onPressed: () => _add(context),
+        child: const Icon(Icons.add),
+      ),
+      body: StreamBuilder(
+        stream: TrackService.instance.weightsStream(childId, descending: false, limit: 200),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return Center(child: Text(loc.t('error')));
+          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
-            final ascDocs = snapshot.data!;
-            if (ascDocs.isEmpty) return const Center(child: Text('No logs'));
+          final ascDocs = snapshot.data!;
+          if (ascDocs.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.monitor_weight_outlined, size: 64, color: theme.colorScheme.outline),
+                  const SizedBox(height: 16),
+                  Text(loc.t('noContentAvailable'), style: theme.textTheme.bodyLarge),
+                ],
+              ),
+            );
+          }
 
-            final spots = <FlSpot>[];
-            for (final d in ascDocs) {
-              final ts = d['ts'];
-              final kg = d['valueKg'];
-              if (ts is String && kg is num) {
-                try {
-                  final dt = DateTime.parse(ts);
-                  spots.add(FlSpot(dt.millisecondsSinceEpoch.toDouble(), kg.toDouble()));
-                } catch (e) {
-                  // Invalid date, skip
-                }
+          final spots = <FlSpot>[];
+          for (final d in ascDocs) {
+            final ts = d['ts'];
+            final kg = d['valueKg'];
+            if (ts is String && kg is num) {
+              try {
+                final dt = DateTime.parse(ts);
+                spots.add(FlSpot(dt.millisecondsSinceEpoch.toDouble(), kg.toDouble()));
+              } catch (e) {
+                // Invalid date, skip
               }
             }
+          }
 
-            final descDocs = ascDocs.reversed.toList();
+          final descDocs = ascDocs.reversed.toList();
 
-            return Column(
-              children: [
-                if (spots.length >= 2) _LineChartCard(spots: spots),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: descDocs.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (context, i) {
+          return CustomScrollView(
+            slivers: [
+              if (spots.length >= 2)
+                SliverToBoxAdapter(
+                  child: _LineChartCard(spots: spots),
+                ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) {
                       final d = descDocs[i];
                       final logId = d['id'] ?? d['_id'] ?? '';
 
@@ -590,56 +654,95 @@ class _WeightsTab extends StatelessWidget {
                       final clothes = (d['clothes'] ?? '').toString();
                       final whenText = _formatTs(d['ts']);
 
-                      final subtitleParts = <String>[whenText];
-                      if (clothes.trim().isNotEmpty) subtitleParts.add('Clothes: $clothes');
-                      if (note.isNotEmpty) subtitleParts.add(note);
-
-                      return Dismissible(
-                        key: ValueKey(logId),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: Colors.red,
-                          child: const Icon(Icons.delete, color: Colors.white),
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(color: theme.colorScheme.outlineVariant),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        confirmDismiss: (_) => _confirmDeleteDialog(
-                          context,
-                          loc.t('deleteLogTitle'),
-                          loc.t('deleteLogBody'),
-                          loc.t('cancel'),
-                          loc.t('delete'),
-                        ),
-                        onDismissed: (_) => TrackService.instance.deleteWeight(childId: childId, logId: logId),
-                        child: ListTile(
-                          title: Text('$kg ${loc.t('kg')}'),
-                          subtitle: Text(subtitleParts.join('\n')),
-                          isThreeLine: subtitleParts.length >= 3,
-                          onTap: () => _edit(
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                           onTap: () => _edit(
                             context,
                             logId,
                             kg?.toString() ?? '',
                             note,
                             clothes,
                           ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(Icons.monitor_weight, color: theme.colorScheme.primary),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '$kg ${loc.t('kg')}',
+                                        style: theme.textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        whenText,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      if (note.isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Text(note, style: theme.textTheme.bodyMedium),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuButton<String>(
+                                  icon: const Icon(Icons.more_vert),
+                                  onSelected: (v) {
+                                    if (v == 'delete') {
+                                       _confirmDeleteDialog(
+                                        context,
+                                        loc.t('deleteLogTitle'),
+                                        loc.t('deleteLogBody'),
+                                        loc.t('cancel'),
+                                        loc.t('delete'),
+                                      ).then((ok) {
+                                        if (ok == true) {
+                                          TrackService.instance.deleteWeight(childId: childId, logId: logId);
+                                        }
+                                      });
+                                    }
+                                  },
+                                  itemBuilder: (_) => [
+                                    PopupMenuItem(value: 'delete', child: Text(loc.t('delete'))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       );
                     },
+                    childCount: descDocs.length,
                   ),
                 ),
-              ],
-            );
-          },
-        ),
-        Positioned(
-          right: 16,
-          bottom: 16,
-          child: FloatingActionButton(
-            onPressed: () => _add(context),
-            child: const Icon(Icons.add),
-          ),
-        ),
-      ],
+              ),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 80)),
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -679,7 +782,7 @@ class _FeedingsTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: method,
+                  initialValue: method,
                   decoration: const InputDecoration(labelText: 'Method (optional)'),
                   items: const [
                     DropdownMenuItem(value: 'none', child: Text('Not set')),
@@ -759,7 +862,7 @@ class _FeedingsTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: method,
+                  initialValue: method,
                   decoration: const InputDecoration(labelText: 'Method (optional)'),
                   items: const [
                     DropdownMenuItem(value: 'none', child: Text('Not set')),
@@ -803,79 +906,150 @@ class _FeedingsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final theme = Theme.of(context);
 
-    return Stack(
-      children: [
-        StreamBuilder(
-          stream: TrackService.instance.feedingsStream(childId, descending: true, limit: 200),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) return const Center(child: Text('Error'));
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'addFeeding',
+        onPressed: () => _add(context),
+        child: const Icon(Icons.add),
+      ),
+      body: StreamBuilder(
+        stream: TrackService.instance.feedingsStream(childId, descending: true, limit: 200),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return Center(child: Text(loc.t('error')));
+          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
-            final docs = snapshot.data!;
-            if (docs.isEmpty) return const Center(child: Text('No logs'));
-
-            return ListView.separated(
-              itemCount: docs.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (context, i) {
-                final d = docs[i];
-                final logId = d['id'] ?? d['_id'] ?? '';
-
-                final ml = d['amountMl'];
-                final type = (d['type'] ?? '').toString();
-                final note = (d['note'] ?? '').toString();
-                final method = (d['method'] ?? '').toString();
-                final whenText = _formatTs(d['ts']);
-
-                final subtitleParts = <String>[whenText];
-                if (method.trim().isNotEmpty) subtitleParts.add('Method: $method');
-                if (note.isNotEmpty) subtitleParts.add(note);
-
-                return Dismissible(
-                  key: ValueKey(logId),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    color: Colors.red,
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
-                  confirmDismiss: (_) => _confirmDeleteDialog(
-                    context,
-                    loc.t('deleteLogTitle'),
-                    loc.t('deleteLogBody'),
-                    loc.t('cancel'),
-                    loc.t('delete'),
-                  ),
-                  onDismissed: (_) => TrackService.instance.deleteFeeding(childId: childId, logId: logId),
-                  child: ListTile(
-                    title: Text('$ml ml • $type'),
-                    subtitle: Text(subtitleParts.join('\n')),
-                    isThreeLine: subtitleParts.length >= 3,
-                    onTap: () => _edit(
-                      context,
-                      logId,
-                      ml?.toString() ?? '',
-                      type,
-                      note,
-                      method,
-                    ),
-                  ),
-                );
-              },
+          final docs = snapshot.data!;
+          if (docs.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.restaurant_menu, size: 64, color: theme.colorScheme.outline),
+                  const SizedBox(height: 16),
+                  Text(loc.t('noContentAvailable'), style: theme.textTheme.bodyLarge),
+                ],
+              ),
             );
-          },
-        ),
-        Positioned(
-          right: 16,
-          bottom: 16,
-          child: FloatingActionButton(
-            onPressed: () => _add(context),
-            child: const Icon(Icons.add),
-          ),
-        ),
-      ],
+          }
+
+          return CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) {
+                      final d = docs[i];
+                      final logId = d['id'] ?? d['_id'] ?? '';
+
+                      final ml = d['amountMl'];
+                      final type = (d['type'] ?? '').toString();
+                      final note = (d['note'] ?? '').toString();
+                      final method = (d['method'] ?? '').toString();
+                      final whenText = _formatTs(d['ts']);
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(color: theme.colorScheme.outlineVariant),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () => _edit(
+                            context,
+                            logId,
+                            ml?.toString() ?? '',
+                            type,
+                            note,
+                            method,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.secondaryContainer,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(Icons.restaurant, color: theme.colorScheme.secondary),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '$ml ml • $type',
+                                        style: theme.textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        whenText,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      if (method.trim().isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Text(
+                                            'Method: $method',
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                        ),
+                                      if (note.isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Text(note, style: theme.textTheme.bodyMedium),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuButton<String>(
+                                  icon: const Icon(Icons.more_vert),
+                                  onSelected: (v) {
+                                    if (v == 'delete') {
+                                       _confirmDeleteDialog(
+                                        context,
+                                        loc.t('deleteLogTitle'),
+                                        loc.t('deleteLogBody'),
+                                        loc.t('cancel'),
+                                        loc.t('delete'),
+                                      ).then((ok) {
+                                        if (ok == true) {
+                                          TrackService.instance.deleteFeeding(childId: childId, logId: logId);
+                                        }
+                                      });
+                                    }
+                                  },
+                                  itemBuilder: (_) => [
+                                    PopupMenuItem(value: 'delete', child: Text(loc.t('delete'))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: docs.length,
+                  ),
+                ),
+              ),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 80)),
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -1026,42 +1200,61 @@ class _OxygenTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final theme = Theme.of(context);
 
-    return Stack(
-      children: [
-        StreamBuilder(
-          stream: TrackService.instance.oxygenStream(childId, descending: false, limit: 200),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) return const Center(child: Text('Error'));
-            if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'addOxygen',
+        onPressed: () => _add(context),
+        child: const Icon(Icons.add),
+      ),
+      body: StreamBuilder(
+        stream: TrackService.instance.oxygenStream(childId, descending: false, limit: 200),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return Center(child: Text(loc.t('error')));
+          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
-            final ascDocs = snapshot.data!;
-            if (ascDocs.isEmpty) return const Center(child: Text('No logs'));
+          final ascDocs = snapshot.data!;
+          if (ascDocs.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.air, size: 64, color: theme.colorScheme.outline),
+                  const SizedBox(height: 16),
+                  Text(loc.t('noContentAvailable'), style: theme.textTheme.bodyLarge),
+                ],
+              ),
+            );
+          }
 
-            final spots = <FlSpot>[];
-            for (final d in ascDocs) {
-              final ts = d['ts'];
-              final v = d['spo2'];
-              if (ts is String && v is num) {
-                try {
-                  final dt = DateTime.parse(ts);
-                  spots.add(FlSpot(dt.millisecondsSinceEpoch.toDouble(), v.toDouble()));
-                } catch (e) {
-                  // Invalid date, skip
-                }
+          final spots = <FlSpot>[];
+          for (final d in ascDocs) {
+            final ts = d['ts'];
+            final v = d['spo2'];
+            if (ts is String && v is num) {
+              try {
+                final dt = DateTime.parse(ts);
+                spots.add(FlSpot(dt.millisecondsSinceEpoch.toDouble(), v.toDouble()));
+              } catch (e) {
+                // Invalid date, skip
               }
             }
+          }
 
-            final descDocs = ascDocs.reversed.toList();
+          final descDocs = ascDocs.reversed.toList();
 
-            return Column(
-              children: [
-                if (spots.length >= 2) _LineChartCard(spots: spots),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: descDocs.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (context, i) {
+          return CustomScrollView(
+            slivers: [
+              if (spots.length >= 2)
+                SliverToBoxAdapter(
+                  child: _LineChartCard(spots: spots),
+                ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) {
                       final d = descDocs[i];
                       final logId = d['id'] ?? d['_id'] ?? '';
 
@@ -1071,32 +1264,15 @@ class _OxygenTab extends StatelessWidget {
                       final device = (d['device'] ?? '').toString();
                       final whenText = _formatTs(d['ts']);
 
-                      final subtitleParts = <String>[whenText];
-                      if (pulse.trim().isNotEmpty) subtitleParts.add('Pulse: $pulse');
-                      if (device.trim().isNotEmpty) subtitleParts.add('Device: $device');
-                      if (note.isNotEmpty) subtitleParts.add(note);
-
-                      return Dismissible(
-                        key: ValueKey(logId),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          color: Colors.red,
-                          child: const Icon(Icons.delete, color: Colors.white),
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(color: theme.colorScheme.outlineVariant),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        confirmDismiss: (_) => _confirmDeleteDialog(
-                          context,
-                          loc.t('deleteLogTitle'),
-                          loc.t('deleteLogBody'),
-                          loc.t('cancel'),
-                          loc.t('delete'),
-                        ),
-                        onDismissed: (_) => TrackService.instance.deleteOxygen(childId: childId, logId: logId),
-                        child: ListTile(
-                          title: Text('SpO2: $v%'),
-                          subtitle: Text(subtitleParts.join('\n')),
-                          isThreeLine: subtitleParts.length >= 3,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
                           onTap: () => _edit(
                             context,
                             logId,
@@ -1105,24 +1281,89 @@ class _OxygenTab extends StatelessWidget {
                             pulse,
                             device,
                           ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.tertiaryContainer,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(Icons.air, color: theme.colorScheme.tertiary),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'SpO2: $v%',
+                                        style: theme.textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        whenText,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      if (pulse.trim().isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Text('Pulse: $pulse', style: theme.textTheme.bodyMedium),
+                                        ),
+                                      if (device.trim().isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 2),
+                                          child: Text('Device: $device', style: theme.textTheme.bodySmall),
+                                        ),
+                                      if (note.isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Text(note, style: theme.textTheme.bodyMedium),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuButton<String>(
+                                  icon: const Icon(Icons.more_vert),
+                                  onSelected: (v) {
+                                    if (v == 'delete') {
+                                       _confirmDeleteDialog(
+                                        context,
+                                        loc.t('deleteLogTitle'),
+                                        loc.t('deleteLogBody'),
+                                        loc.t('cancel'),
+                                        loc.t('delete'),
+                                      ).then((ok) {
+                                        if (ok == true) {
+                                          TrackService.instance.deleteOxygen(childId: childId, logId: logId);
+                                        }
+                                      });
+                                    }
+                                  },
+                                  itemBuilder: (_) => [
+                                    PopupMenuItem(value: 'delete', child: Text(loc.t('delete'))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       );
                     },
+                    childCount: descDocs.length,
                   ),
                 ),
-              ],
-            );
-          },
-        ),
-        Positioned(
-          right: 16,
-          bottom: 16,
-          child: FloatingActionButton(
-            onPressed: () => _add(context),
-            child: const Icon(Icons.add),
-          ),
-        ),
-      ],
+              ),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 80)),
+            ],
+          );
+        },
+      ),
     );
   }
 }

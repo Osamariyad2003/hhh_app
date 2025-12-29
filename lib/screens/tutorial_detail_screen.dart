@@ -164,7 +164,7 @@ class TutorialDetailScreen extends StatelessWidget {
                   ],
 
                   // Video Info
-                  if (isYouTube && youtubeVideoId != null) ...[
+                  if (isYouTube) ...[
                     Card(
                       color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
                       child: Padding(

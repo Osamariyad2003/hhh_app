@@ -67,7 +67,7 @@ class FirestoreTrackingService {
             .limit(limit)
             .get();
         final docs = snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           if (data['ts'] is Timestamp) {
             data['ts'] = _timestampToString(data['ts'] as Timestamp);
           }
@@ -211,7 +211,7 @@ class FirestoreTrackingService {
             .limit(limit)
             .get();
         final docs = snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           if (data['ts'] is Timestamp) {
             data['ts'] = _timestampToString(data['ts'] as Timestamp);
           }
@@ -263,7 +263,7 @@ class FirestoreTrackingService {
               .snapshots()
               .map((snapshot) {
             final docs = snapshot.docs.map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
+              final data = doc.data();
               if (data['ts'] is Timestamp) {
                 data['ts'] = _timestampToString(data['ts'] as Timestamp);
               }
@@ -390,7 +390,7 @@ class FirestoreTrackingService {
             .limit(limit)
             .get();
         final docs = snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           if (data['ts'] is Timestamp) {
             data['ts'] = _timestampToString(data['ts'] as Timestamp);
           }
@@ -442,7 +442,7 @@ class FirestoreTrackingService {
               .snapshots()
               .map((snapshot) {
             final docs = snapshot.docs.map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
+              final data = doc.data();
               if (data['ts'] is Timestamp) {
                 data['ts'] = _timestampToString(data['ts'] as Timestamp);
               }

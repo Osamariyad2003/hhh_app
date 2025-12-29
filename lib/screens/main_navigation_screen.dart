@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../localization/app_localizations.dart';
-import 'home_screen.dart';
-import 'track_dashboard_screen.dart';
-import 'profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final Widget child;
@@ -26,9 +23,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         context.go('/');
         break;
       case 1:
-        context.go('/track');
+        context.go('/dashboard');
         break;
       case 2:
+        context.go('/track');
+        break;
+      case 3:
         context.go('/profile');
         break;
     }
@@ -42,15 +42,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Determine current index based on path - only for main routes
     int selectedIndex = 0;
     if (currentPath == '/track') {
-      selectedIndex = 1;
-    } else if (currentPath == '/profile') {
       selectedIndex = 2;
+    } else if (currentPath == '/profile') {
+      selectedIndex = 3;
+    } else if (currentPath == '/dashboard') {
+      selectedIndex = 1;
     } else if (currentPath == '/') {
       selectedIndex = 0;
     }
 
     // Only show bottom nav on main routes (exact matches)
     final showBottomNav = currentPath == '/' || 
+                         currentPath == '/dashboard' ||
                          currentPath == '/track' || 
                          currentPath == '/profile';
 
@@ -65,6 +68,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   icon: const Icon(Icons.home_outlined),
                   selectedIcon: const Icon(Icons.home),
                   label: loc.t('home'),
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.grid_view_outlined),
+                  selectedIcon: const Icon(Icons.grid_view),
+                  label: loc.t('dashboard'),
                 ),
                 NavigationDestination(
                   icon: const Icon(Icons.monitor_heart_outlined),

@@ -1,0 +1,5 @@
+{
+    "cmake.ignoreCMakeListsMissing": true,
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.import.gradle.java.home": "C:/Program Files/Eclipse Adoptium/jdk-17.0.17.10-hotspot"
+}

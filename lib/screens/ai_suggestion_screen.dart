@@ -160,7 +160,7 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                (state as AISuggestionError).message,
+                                (state).message,
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.onErrorContainer,
                                 ),

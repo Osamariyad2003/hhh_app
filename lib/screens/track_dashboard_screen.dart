@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -32,17 +33,8 @@ String _formatTsShort(dynamic ts) {
   return '';
 }
 
-String _formatDob(dynamic dob) {
-  if (dob is String) {
-    try {
-      final dt = DateTime.parse(dob);
-      return DateFormat('dd MMM yyyy').format(dt);
-    } catch (e) {
-      return '';
-    }
-  }
-  return '';
-}
+  // Unused methods removed
+
 
 String _ageFromDob(dynamic dob) {
   DateTime? d;
@@ -55,7 +47,6 @@ String _ageFromDob(dynamic dob) {
   } else {
     return '';
   }
-  if (d == null) return '';
 
   final now = DateTime.now();
 
@@ -98,7 +89,8 @@ Future<bool?> _confirmDeleteDialog(
 }
 
 class TrackDashboardScreen extends StatefulWidget {
-  const TrackDashboardScreen({super.key});
+  final String? initialChildId;
+  const TrackDashboardScreen({this.initialChildId, super.key});
 
   @override
   State<TrackDashboardScreen> createState() => _TrackDashboardScreenState();
@@ -131,24 +123,28 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _selectedChildId = widget.initialChildId;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.t('trackYourChild')),
+        centerTitle: false,
         actions: [
           IconButton(
             tooltip: loc.t('manageChildren'),
-            icon: const Icon(Icons.people_alt),
+            icon: const Icon(Icons.people_outlined),
             onPressed: () => context.push('/track/manage'),
           ),
           const LangToggleButton(),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/track/add-child'),
-        child: const Icon(Icons.add),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: TrackService.instance.childrenStream(),
@@ -156,16 +152,12 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
           if (snapshot.hasError) {
             return EmptyStateWidget(
               icon: Icons.error_outline,
-              title: 'Unable to load children',
-              message: 'Please check your connection and try again.',
+              title: loc.t('unableToLoadChildren'),
+              message: loc.t('checkConnection'),
             );
           }
           if (!snapshot.hasData) {
-            return const EmptyStateWidget(
-              icon: Icons.child_care,
-              title: 'Loading children...',
-              isLoading: true,
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           final allDocs = snapshot.data!;
@@ -184,74 +176,174 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
           final firstId = docs.first['id'] ?? docs.first['_id'];
           _selectedChildId ??= firstId;
 
+          // Ensure selected ID is valid in current list
+          if (!docs.any((d) => (d['id'] ?? d['_id']) == _selectedChildId)) {
+             _selectedChildId = firstId;
+          }
+
           final childDoc = _pickChildDoc(docs, _selectedChildId);
           _selectedChildId = childDoc['id'] ?? childDoc['_id'];
 
           final childData = childDoc;
           final dob = childData['dob'];
-          final dobText = _formatDob(dob);
           final ageText = _ageFromDob(dob);
 
-          final rawSex = (childData['sex'] ?? '').toString().trim();
-          final sex = (rawSex.isEmpty || rawSex == 'unspecified') ? '' : rawSex;
-
-          final notes = (childData['notes'] ?? '').toString().trim();
-
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: _selectedChildId,
-                        decoration: InputDecoration(
-                          labelText: loc.t('selectChild'),
+              // Avatar Carousel
+              Container(
+                height: 110,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: docs.length + 1, // +1 for Add Child button
+                  itemBuilder: (context, index) {
+                    if (index == docs.length) {
+                      // Add Child Button
+                      return GestureDetector(
+                        onTap: () => context.push('/track/add-child'),
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 52,
+                                height: 52,
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: theme.colorScheme.outlineVariant,
+                                    width: 1,
+                                    style: BorderStyle.solid,
+                                  ),
+                                ),
+                                child: CircleAvatar(
+                                  radius: 26,
+                                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                                  child: Icon(
+                                    Icons.add,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                loc.t('addChild'),
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                         ),
-                        items: docs.map((d) {
-                          final id = d['id'] ?? d['_id'];
-                          final name = d['name'] ?? '';
-                          return DropdownMenuItem<String>(
-                            value: id,
-                            child: Text(name),
-                          );
-                        }).toList(),
-                        onChanged: (v) {
-                          if (v != null) {
-                            setState(() => _selectedChildId = v);
-                          }
-                        },
+                      );
+                    }
+
+                    final d = docs[index];
+                    final id = d['id'] ?? d['_id'];
+                    final name = d['name'] ?? '';
+                    final isSelected = id == _selectedChildId;
+                    
+                    return GestureDetector(
+                      onTap: () => setState(() => _selectedChildId = id),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+                                  width: 2.5,
+                                ),
+                              ),
+                              child: CircleAvatar(
+                                radius: 26,
+                                backgroundColor: isSelected 
+                                    ? theme.colorScheme.primaryContainer 
+                                    : theme.colorScheme.secondaryContainer,
+                                child: Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected 
+                                        ? theme.colorScheme.primary 
+                                        : theme.colorScheme.onSecondaryContainer,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              name,
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              
+              const Divider(height: 1),
+
+              // Summary Card (Age & Quick Info)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                         Text(
+                          childData['name'] ?? '',
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (ageText.isNotEmpty)
+                          Text(
+                            ageText,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () => context.push('/track/child/$_selectedChildId'),
+                      icon: const Icon(Icons.info_outline, size: 18),
+                      label: Text(loc.t('openDetails')),
+                      style: OutlinedButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              if (dobText.isNotEmpty || ageText.isNotEmpty || sex.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      [
-                        if (dobText.isNotEmpty) '${loc.t('dob')}: $dobText',
-                        if (ageText.isNotEmpty) '${loc.t('age')}: $ageText',
-                        if (sex.isNotEmpty) 'Sex: $sex',
-                      ].join('   •   '),
-                    ),
-                  ),
-                ),
-              if (notes.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      notes,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                ),
+
+              // Tabs content
               Expanded(child: _ChildTabs(childId: _selectedChildId!)),
             ],
           );
@@ -266,26 +358,7 @@ String? _getChildId(Map<String, dynamic> child) {
   return child['id'] ?? child['_id'];
 }
 
-// Helper to build child dropdown (if you still need a separate builder)
-Widget _buildChildDropdown(
-  BuildContext context,
-  List<Map<String, dynamic>> docs,
-  String? selectedId,
-  ValueChanged<String?> onChanged,
-) {
-  return DropdownButtonFormField<String>(
-    value: selectedId,
-    decoration: InputDecoration(
-      labelText: AppLocalizations.of(context).t('selectChild'),
-    ),
-    items: docs.map((d) {
-      final id = _getChildId(d);
-      final name = d['name'] ?? '';
-      return DropdownMenuItem<String>(value: id, child: Text(name));
-    }).toList(),
-    onChanged: onChanged,
-  );
-}
+// Unused _buildChildDropdown removed
 
 class _ChildTabs extends StatelessWidget {
   final String childId;
@@ -358,7 +431,7 @@ class WeightsTab extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: clothes,
+                initialValue: clothes,
                 decoration: const InputDecoration(
                   labelText: 'Clothes (optional)',
                 ),
@@ -440,7 +513,7 @@ class WeightsTab extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: clothes,
+                initialValue: clothes,
                 decoration: const InputDecoration(
                   labelText: 'Clothes (optional)',
                 ),
@@ -496,311 +569,381 @@ class WeightsTab extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    return StreamBuilder(
-      stream: TrackService.instance.weightsStream(
-        childId,
-        descending: false,
-        limit: 200,
-      ),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return EmptyStateWidget(
-            icon: Icons.error_outline,
-            title: 'Unable to load weight data',
-            message: 'Please try again later.',
-          );
-        }
-        if (!snapshot.hasData) {
-          return const EmptyStateWidget(
-            icon: Icons.monitor_weight_outlined,
-            title: 'Loading weight data...',
-            isLoading: true,
-          );
-        }
-
-        final ascDocs = snapshot.data!;
-        if (ascDocs.isEmpty) {
-          return EmptyStateWidget(
-            icon: Icons.monitor_weight_outlined,
-            title: 'No weight logs yet',
-            message: 'Start tracking your child\'s weight to see data here.',
-            actionLabel: 'Add Weight',
-            onAction: () => _add(context),
-          );
-        }
-
-        // Get last 7 entries for graph
-        final last7Docs = ascDocs.length > 7 ? ascDocs.sublist(ascDocs.length - 7) : ascDocs;
-        final spots = <FlSpot>[];
-        for (final d in last7Docs) {
-          final ts = d['ts'];
-          final kg = d['valueKg'];
-          if (ts is String && kg is num) {
-            try {
-              final dt = DateTime.parse(ts);
-              spots.add(
-                FlSpot(dt.millisecondsSinceEpoch.toDouble(), kg.toDouble()),
+    return Stack(
+      children: [
+        StreamBuilder(
+          stream: TrackService.instance.weightsStream(
+            childId,
+            descending: false,
+            limit: 200,
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return EmptyStateWidget(
+                icon: Icons.error_outline,
+                title: loc.t('unableToLoadWeightData'),
+                message: loc.t('pleaseTryAgainLater'),
               );
-            } catch (e) {
-              // Skip invalid timestamps
             }
-          }
-        }
+            if (!snapshot.hasData) {
+              return EmptyStateWidget(
+                icon: Icons.monitor_weight_outlined,
+                title: loc.t('loadingWeightData'),
+                isLoading: true,
+              );
+            }
 
-        final descDocs = ascDocs.reversed.toList();
+            final ascDocs = snapshot.data!;
+            if (ascDocs.isEmpty) {
+              return EmptyStateWidget(
+                icon: Icons.monitor_weight_outlined,
+                title: loc.t('noWeightLogs'),
+                message: loc.t('startTrackingWeight'),
+                actionLabel: loc.t('addWeightAction'),
+                onAction: () => _add(context),
+              );
+            }
 
-        return Column(
-          children: [
-            // Trends section
-            if (spots.length >= 2)
-              Card(
-                margin: const EdgeInsets.all(16),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            loc.t('trends'),
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            loc.t('lastEntries'),
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                          const Icon(Icons.arrow_drop_down, color: Colors.red),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        height: 200,
-                        child: LineChart(
-                          LineChartData(
-                            minX: spots.first.x,
-                            maxX: spots.last.x,
-                            minY: spots.map((s) => s.y).reduce((a, b) => a < b ? a : b) - 5,
-                            maxY: spots.map((s) => s.y).reduce((a, b) => a > b ? a : b) + 5,
-                            gridData: FlGridData(
-                              show: true,
-                              drawVerticalLine: false,
-                              horizontalInterval: 10,
-                            ),
-                            borderData: FlBorderData(show: true),
-                            titlesData: FlTitlesData(
-                              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 42,
-                                  interval: 10,
-                                ),
-                              ),
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 34,
-                                  interval: ((spots.last.x - spots.first.x) / 3).clamp(1, double.infinity),
-                                  getTitlesWidget: (value, meta) {
-                                    final dt = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 8),
-                                      child: Text(
-                                        DateFormat('MM/dd').format(dt),
-                                        style: const TextStyle(fontSize: 11),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                            lineBarsData: [
-                              LineChartBarData(
-                                spots: spots,
-                                isCurved: true,
-                                barWidth: 3,
-                                dotData: FlDotData(
-                                  show: true,
-                                  getDotPainter: (spot, percent, barData, index) =>
-                                      FlDotCirclePainter(radius: 4, color: Colors.red),
-                                ),
-                                color: Colors.red,
-                                belowBarData: BarAreaData(
-                                  show: true,
-                                  color: Colors.red.withValues(alpha: 0.1),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            // History section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${loc.t('entries')} ${descDocs.length}',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  Text(
-                    loc.t('history'),
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
+            // Get last 7 entries for graph
+            final last7Docs = ascDocs.length > 7 ? ascDocs.sublist(ascDocs.length - 7) : ascDocs;
+            final spots = <FlSpot>[];
+
+            for (final d in last7Docs) {
+              final ts = d['ts'];
+              final rawKg = d['valueKg'];
+
+              double? kg;
+              if (rawKg is num) {
+                kg = rawKg.toDouble();
+              } else if (rawKg is String) {
+                kg = double.tryParse(rawKg);
+              }
+
+              if (kg != null) {
+                try {
+                  DateTime? dt;
+                  if (ts is Timestamp) {
+                    dt = ts.toDate();
+                  } else if (ts is String) {
+                    dt = DateTime.tryParse(ts);
+                  }
+
+                  if (dt != null) {
+                    spots.add(
+                      FlSpot(dt.millisecondsSinceEpoch.toDouble(), kg),
+                    );
+                  }
+                } catch (e) {
+                   // Skip invalid
+                }
+              }
+            }
+            spots.sort((a, b) => a.x.compareTo(b.x));
+
+            final descDocs = ascDocs.reversed.toList();
+
+            double minX = 0;
+            double maxX = 0;
+            double minY = 0;
+            double maxY = 10;
+            if (spots.length >= 2) {
+              minX = spots.first.x;
+              final rawMaxX = spots.last.x;
+              maxX = rawMaxX == minX ? minX + 86400000 : rawMaxX;
+              
+              final yValues = spots.map((s) => s.y);
+              minY = yValues.reduce((a, b) => a < b ? a : b);
+              maxY = yValues.reduce((a, b) => a > b ? a : b);
+              
+              if (minY == maxY) {
+                 minY -= 5;
+                 maxY += 5;
+              } else {
+                 minY -= 2;
+                 maxY += 2;
+              }
+            }
+
+            return CustomScrollView(
+              slivers: [
+                // Chart Section
+                 if (spots.length < 2)
+                  SliverToBoxAdapter(
+                    child: Card(
+                       margin: const EdgeInsets.all(16),
+                       child: Padding(
+                         padding: const EdgeInsets.all(16),
+                         child: Text('Debug: Not enough valid data points. Spots: ${spots.length}. Raw Docs: ${ascDocs.length}'),
+                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            // History list
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: descDocs.length,
-                itemBuilder: (context, i) {
-                  final d = descDocs[i];
-                  final logId = d['id'] ?? d['_id'] ?? '';
-                  final kg = d['valueKg'] as num?;
-                  final kgValue = kg?.toStringAsFixed(1) ?? '0.0';
-                  final whenText = _formatTsShort(d['ts']);
 
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: InkWell(
-                      onTap: () => _edit(
-                        context,
-                        logId,
-                        kgValue,
-                        (d['note'] ?? '').toString(),
-                        (d['clothes'] ?? '').toString(),
-                      ),
-                      borderRadius: BorderRadius.circular(16),
+                if (spots.length >= 2)
+                  SliverToBoxAdapter(
+                    child: Card(
+                      margin: const EdgeInsets.all(16),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Three dots menu
-                            PopupMenuButton<String>(
-                              icon: const Icon(Icons.more_vert, color: Colors.grey),
-                              onSelected: (value) {
-                                if (value == 'edit') {
-                                  _edit(
-                                    context,
-                                    logId,
-                                    kgValue,
-                                    (d['note'] ?? '').toString(),
-                                    (d['clothes'] ?? '').toString(),
-                                  );
-                                } else if (value == 'delete') {
-                                  _confirmDeleteDialog(
-                                    context,
-                                    loc.t('deleteLogTitle'),
-                                    loc.t('deleteLogBody'),
-                                    loc.t('cancel'),
-                                    loc.t('delete'),
-                                  ).then((confirmed) {
-                                    if (confirmed == true) {
-                                      TrackService.instance.deleteWeight(
-                                        childId: childId,
-                                        logId: logId,
-                                      );
-                                    }
-                                  });
-                                }
-                              },
-                              itemBuilder: (_) => [
-                                PopupMenuItem(value: 'edit', child: Text(loc.t('edit'))),
-                                PopupMenuItem(value: 'delete', child: Text(loc.t('delete'))),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  loc.t('trends'),
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ],
                             ),
-                            const SizedBox(width: 8),
-                            // Content
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Weight value
-                                  Text(
-                                    'kg $kgValue',
-                                    style: theme.textTheme.titleLarge?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  // Date/time
-                                  Text(
-                                    whenText,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  loc.t('lastEntries'),
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                const Icon(Icons.arrow_drop_down, color: Colors.red),
+                              ],
                             ),
-                            // Small icon
-                            Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.circle,
-                                color: Colors.red,
-                                size: 12,
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              height: 220,
+                              child: LineChart(
+                                LineChartData(
+                                  minX: minX,
+                                  maxX: maxX,
+                                  minY: minY,
+                                  maxY: maxY,
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawVerticalLine: false,
+                                    horizontalInterval: (maxY - minY) / 4,
+                                    getDrawingHorizontalLine: (value) {
+                                      return FlLine(
+                                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                  ),
+                                  borderData: FlBorderData(show: false),
+                                  titlesData: FlTitlesData(
+                                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 30,
+                                        interval: ((maxX - minX) / 3).clamp(1, double.infinity),
+                                        getTitlesWidget: (value, meta) {
+                                          final dt = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                                          return Padding(
+                                            padding: const EdgeInsets.only(top: 8),
+                                            child: Text(
+                                              DateFormat('MM/dd').format(dt),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: theme.colorScheme.onSurfaceVariant,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: spots,
+                                      isCurved: true,
+                                      curveSmoothness: 0.35,
+                                      color: theme.colorScheme.primary,
+                                      barWidth: 3,
+                                      isStrokeCapRound: true,
+                                      dotData: FlDotData(
+                                        show: true,
+                                        getDotPainter: (spot, percent, barData, index) {
+                                          return FlDotCirclePainter(
+                                            radius: 4,
+                                            color: theme.colorScheme.surface,
+                                            strokeWidth: 2,
+                                            strokeColor: theme.colorScheme.primary,
+                                          );
+                                        },
+                                      ),
+                                      belowBarData: BarAreaData(
+                                        show: true,
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            theme.colorScheme.primary.withValues(alpha: 0.3),
+                                            theme.colorScheme.primary.withValues(alpha: 0.0),
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
-            // Add Weight button
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => _add(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  ),
+
+                // History Header
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${loc.t('entries')} ${descDocs.length}',
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                        Text(
+                          loc.t('history'),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Text(
-                    loc.t('addWeight'),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                
+                const SliverToBoxAdapter(child: SizedBox(height: 8)),
+
+                // History List
+                SliverPadding(
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 80), // Padding for FAB
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) {
+                        final d = descDocs[i];
+                        final logId = d['id'] ?? d['_id'] ?? '';
+                        final kg = d['valueKg'] as num?;
+                        final kgValue = kg?.toStringAsFixed(1) ?? '0.0';
+                        final whenText = _formatTsShort(d['ts']);
+
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          child: InkWell(
+                            onTap: () => _edit(
+                              context,
+                              logId,
+                              kgValue,
+                              (d['note'] ?? '').toString(),
+                              (d['clothes'] ?? '').toString(),
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  // Three dots menu
+                                  PopupMenuButton<String>(
+                                    icon: const Icon(Icons.more_vert, color: Colors.grey),
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        _edit(
+                                          context,
+                                          logId,
+                                          kgValue,
+                                          (d['note'] ?? '').toString(),
+                                          (d['clothes'] ?? '').toString(),
+                                        );
+                                      } else if (value == 'delete') {
+                                        _confirmDeleteDialog(
+                                          context,
+                                          loc.t('deleteLogTitle'),
+                                          loc.t('deleteLogBody'),
+                                          loc.t('cancel'),
+                                          loc.t('delete'),
+                                        ).then((confirmed) {
+                                          if (confirmed == true) {
+                                            TrackService.instance.deleteWeight(
+                                              childId: childId,
+                                              logId: logId,
+                                            );
+                                          }
+                                        });
+                                      }
+                                    },
+                                    itemBuilder: (_) => [
+                                      PopupMenuItem(value: 'edit', child: Text(loc.t('edit'))),
+                                      PopupMenuItem(value: 'delete', child: Text(loc.t('delete'))),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // Content
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Weight value
+                                        Text(
+                                          'kg $kgValue',
+                                          style: theme.textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        // Date/time
+                                        Text(
+                                          whenText,
+                                          style: theme.textTheme.bodyMedium?.copyWith(
+                                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // Small icon
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.shade50,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(
+                                      Icons.circle,
+                                      color: Colors.red,
+                                      size: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      childCount: descDocs.length,
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ],
-        );
-      },
+              ],
+            );
+          },
+        ),
+        Positioned(
+          left: 16,
+          bottom: 16,
+          child: FloatingActionButton(
+            heroTag: 'addWeightFab',
+            backgroundColor: Colors.red.shade100,
+            onPressed: () => _add(context),
+            child: const Icon(Icons.add, color: Colors.red),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -839,9 +982,9 @@ class FeedingsTab extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: method,
-                decoration: const InputDecoration(
-                  labelText: 'Method (optional)',
+                initialValue: method,
+                decoration: InputDecoration(
+                  labelText: loc.t('methodOptional'),
                 ),
                 items: const [
                   DropdownMenuItem(value: 'none', child: Text('Not set')),
@@ -924,9 +1067,9 @@ class FeedingsTab extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: method,
-                decoration: const InputDecoration(
-                  labelText: 'Method (optional)',
+                initialValue: method,
+                decoration: InputDecoration(
+                  labelText: loc.t('methodOptional'),
                 ),
                 items: const [
                   DropdownMenuItem(value: 'none', child: Text('Not set')),
@@ -989,14 +1132,14 @@ class FeedingsTab extends StatelessWidget {
             if (snapshot.hasError) {
               return EmptyStateWidget(
                 icon: Icons.error_outline,
-                title: 'Unable to load feeding data',
-                message: 'Please try again later.',
+                title: loc.t('unableToLoadFeedingData'),
+                message: loc.t('pleaseTryAgainLater'),
               );
             }
             if (!snapshot.hasData) {
-              return const EmptyStateWidget(
+              return EmptyStateWidget(
                 icon: Icons.restaurant_outlined,
-                title: 'Loading feeding data...',
+                title: loc.t('loadingFeedingData'),
                 isLoading: true,
               );
             }
@@ -1005,124 +1148,313 @@ class FeedingsTab extends StatelessWidget {
             if (docs.isEmpty) {
               return EmptyStateWidget(
                 icon: Icons.restaurant_outlined,
-                title: 'No feeding logs yet',
-                message: 'Start tracking your child\'s feedings to see data here.',
-                actionLabel: 'Add Feeding',
+                title: loc.t('noFeedingLogs'),
+                message: loc.t('startTrackingFeeding'),
+                actionLabel: loc.t('addFeedingAction'),
                 onAction: () => _add(context),
               );
             }
 
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: docs.length,
-              itemBuilder: (context, i) {
-                final d = docs[i];
-                final logId = d['id'] ?? d['_id'] ?? '';
-                final ml = d['amountMl'] as num?;
-                final mlValue = ml?.toInt() ?? 0;
-                final type = (d['type'] ?? '').toString();
-                final method = (d['method'] ?? 'bottle').toString();
-                final whenText = _formatTs(d['ts']);
-                final bottleText = loc.isArabic ? 'زجاجة' : loc.t('bottle');
+            final ascDocs = docs.reversed.toList();
+            final last7Docs = ascDocs.length > 7 ? ascDocs.sublist(ascDocs.length - 7) : ascDocs;
+            final spots = <FlSpot>[];
+            for (final d in last7Docs) {
+              final ts = d['ts'];
+              final rawMl = d['amountMl']; // Could be String or num
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  color: Colors.grey.shade100,
-                  child: InkWell(
-                    onTap: () => _edit(
-                      context,
-                      logId,
-                      mlValue.toString(),
-                      type,
-                      (d['note'] ?? '').toString(),
-                      method,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          // Three dots menu
-                          PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert, color: Colors.grey),
-                            onSelected: (value) {
-                              if (value == 'edit') {
-                                _edit(
-                                  context,
-                                  logId,
-                                  mlValue.toString(),
-                                  type,
-                                  (d['note'] ?? '').toString(),
-                                  method,
-                                );
-                              } else if (value == 'delete') {
-                                _confirmDeleteDialog(
-                                  context,
-                                  loc.t('deleteLogTitle'),
-                                  loc.t('deleteLogBody'),
-                                  loc.t('cancel'),
-                                  loc.t('delete'),
-                                ).then((confirmed) {
-                                  if (confirmed == true) {
-                                    TrackService.instance.deleteFeeding(
-                                      childId: childId,
-                                      logId: logId,
-                                    );
-                                  }
-                                });
-                              }
-                            },
-                            itemBuilder: (_) => [
-                              PopupMenuItem(value: 'edit', child: Text(loc.t('edit'))),
-                              PopupMenuItem(value: 'delete', child: Text(loc.t('delete'))),
-                            ],
-                          ),
-                          const SizedBox(width: 8),
-                          // Content
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+              double? ml;
+              if (rawMl is num) {
+                ml = rawMl.toDouble();
+              } else if (rawMl is String) {
+                ml = double.tryParse(rawMl);
+              }
+
+              if (ml != null) {
+                try {
+                  DateTime? dt;
+                  if (ts is Timestamp) {
+                    dt = ts.toDate();
+                  } else if (ts is String) {
+                    dt = DateTime.tryParse(ts);
+                  }
+
+                  if (dt != null) {
+                    spots.add(
+                      FlSpot(dt.millisecondsSinceEpoch.toDouble(), ml),
+                    );
+                  }
+                } catch (e) {
+                   // Skip invalid
+                }
+              }
+            }
+            spots.sort((a, b) => a.x.compareTo(b.x));
+
+            double minX = 0;
+            double maxX = 0;
+            if (spots.length >= 2) {
+              minX = spots.first.x;
+              final rawMaxX = spots.last.x;
+              maxX = rawMaxX == minX ? minX + 86400000 : rawMaxX;
+            }
+
+            return CustomScrollView(
+              slivers: [
+                // Chart Section
+                if (spots.length >= 2)
+                  SliverToBoxAdapter(
+                    child: Card(
+                      margin: const EdgeInsets.all(16),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // ml - bottle format
                                 Text(
-                                  loc.isArabic 
-                                    ? 'ml $mlValue - $bottleText'
-                                    : 'ml $mlValue - $bottleText',
+                                  loc.t('trends'),
                                   style: theme.textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                // Date/time
-                                Text(
-                                  whenText,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                          // Fork/knife icon
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade100,
-                              shape: BoxShape.circle,
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  loc.t('lastEntries'),
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                const Icon(Icons.arrow_drop_down, color: Colors.green),
+                              ],
                             ),
-                            child: const Icon(
-                              Icons.restaurant,
-                              color: Colors.green,
-                              size: 24,
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              height: 220,
+                              child: LineChart(
+                                LineChartData(
+                                  minX: minX,
+                                  maxX: maxX,
+                                  minY: 0,
+                                  maxY: (spots.map((s) => s.y).reduce((a, b) => a > b ? a : b) * 1.2).roundToDouble(),
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawVerticalLine: false,
+                                    horizontalInterval: 20,
+                                    getDrawingHorizontalLine: (value) {
+                                      return FlLine(
+                                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                  ),
+                                  borderData: FlBorderData(show: false),
+                                  titlesData: FlTitlesData(
+                                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 30,
+                                        interval: ((maxX - minX) / 3).clamp(1, double.infinity),
+                                        getTitlesWidget: (value, meta) {
+                                          final dt = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                                          return Padding(
+                                            padding: const EdgeInsets.only(top: 8),
+                                            child: Text(
+                                              DateFormat('MM/dd').format(dt),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: theme.colorScheme.onSurfaceVariant,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: spots,
+                                      isCurved: true,
+                                      curveSmoothness: 0.35,
+                                      color: Colors.green, // Feeding color
+                                      barWidth: 3,
+                                      isStrokeCapRound: true,
+                                      dotData: FlDotData(
+                                        show: true,
+                                        getDotPainter: (spot, percent, barData, index) {
+                                          return FlDotCirclePainter(
+                                            radius: 4,
+                                            color: theme.colorScheme.surface,
+                                            strokeWidth: 2,
+                                            strokeColor: Colors.green,
+                                          );
+                                        },
+                                      ),
+                                      belowBarData: BarAreaData(
+                                        show: true,
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.green.withValues(alpha: 0.3),
+                                            Colors.green.withValues(alpha: 0.0),
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                );
-              },
+
+                // History Header
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${loc.t('entries')} ${docs.length}',
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                        Text(
+                          loc.t('history'),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                const SliverToBoxAdapter(child: SizedBox(height: 8)),
+
+                SliverPadding(
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 80),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) {
+                        final d = docs[i];
+                        final logId = d['id'] ?? d['_id'] ?? '';
+                        final ml = d['amountMl'] as num?;
+                        final mlValue = ml?.toInt() ?? 0;
+                        final type = (d['type'] ?? '').toString();
+                        final method = (d['method'] ?? 'bottle').toString();
+                        final whenText = _formatTs(d['ts']);
+                        final bottleText = loc.isArabic ? 'زجاجة' : loc.t('bottle');
+
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          color: Colors.grey.shade50,
+                          child: InkWell(
+                            onTap: () => _edit(
+                              context,
+                              logId,
+                              mlValue.toString(),
+                              type,
+                              (d['note'] ?? '').toString(),
+                              method,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  PopupMenuButton<String>(
+                                    icon: const Icon(Icons.more_vert, color: Colors.grey),
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        _edit(
+                                          context,
+                                          logId,
+                                          mlValue.toString(),
+                                          type,
+                                          (d['note'] ?? '').toString(),
+                                          method,
+                                        );
+                                      } else if (value == 'delete') {
+                                        _confirmDeleteDialog(
+                                          context,
+                                          loc.t('deleteLogTitle'),
+                                          loc.t('deleteLogBody'),
+                                          loc.t('cancel'),
+                                          loc.t('delete'),
+                                        ).then((confirmed) {
+                                          if (confirmed == true) {
+                                            TrackService.instance.deleteFeeding(
+                                              childId: childId,
+                                              logId: logId,
+                                            );
+                                          }
+                                        });
+                                      }
+                                    },
+                                    itemBuilder: (_) => [
+                                      PopupMenuItem(value: 'edit', child: Text(loc.t('edit'))),
+                                      PopupMenuItem(value: 'delete', child: Text(loc.t('delete'))),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          loc.isArabic 
+                                            ? 'ml $mlValue - $bottleText'
+                                            : 'ml $mlValue - $bottleText',
+                                          style: theme.textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          whenText,
+                                          style: theme.textTheme.bodyMedium?.copyWith(
+                                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.shade100,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.restaurant,
+                                      color: Colors.green,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      childCount: docs.length,
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         ),
@@ -1167,11 +1499,11 @@ class OxygenTab extends StatelessWidget {
             TextField(
               controller: pulse,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Pulse (optional)'),
+              decoration: InputDecoration(labelText: loc.t('pulseOptional')),
             ),
             TextField(
               controller: device,
-              decoration: const InputDecoration(labelText: 'Device (optional)'),
+              decoration: InputDecoration(labelText: loc.t('deviceOptional')),
             ),
             TextField(
               controller: note,
@@ -1293,14 +1625,14 @@ class OxygenTab extends StatelessWidget {
             if (snapshot.hasError) {
               return EmptyStateWidget(
                 icon: Icons.error_outline,
-                title: 'Unable to load oxygen data',
-                message: 'Please try again later.',
+                title: loc.t('unableToLoadOxygenData'),
+                message: loc.t('pleaseTryAgainLater'),
               );
             }
             if (!snapshot.hasData) {
-              return const EmptyStateWidget(
+              return EmptyStateWidget(
                 icon: Icons.air_outlined,
-                title: 'Loading oxygen data...',
+                title: loc.t('loadingOxygenData'),
                 isLoading: true,
               );
             }
@@ -1309,9 +1641,9 @@ class OxygenTab extends StatelessWidget {
             if (docs.isEmpty) {
               return EmptyStateWidget(
                 icon: Icons.air_outlined,
-                title: 'No oxygen logs yet',
-                message: 'Start tracking your child\'s oxygen levels to see data here.',
-                actionLabel: 'Add Oxygen Reading',
+                title: loc.t('noOxygenLogs'),
+                message: loc.t('startTrackingOxygen'),
+                actionLabel: loc.t('addOxygenAction'),
                 onAction: () => _add(context),
               );
             }
@@ -1452,66 +1784,6 @@ class OxygenTab extends StatelessWidget {
   }
 }
 
-class LineChartCard extends StatelessWidget {
-  final List<FlSpot> spots;
-  const LineChartCard({required this.spots, super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final minX = spots.first.x;
-    final maxX = spots.last.x;
-
-    return SizedBox(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: LineChart(
-              LineChartData(
-                minX: minX,
-                maxX: maxX,
-                gridData: const FlGridData(show: true),
-                borderData: FlBorderData(show: true),
-                titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 42)),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 34,
-                      interval: ((maxX - minX) / 3).clamp(1, double.infinity),
-                      getTitlesWidget: (value, meta) {
-                        final dt = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(
-                            DateFormat('dd/MM').format(dt),
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: spots,
-                    isCurved: true,
-                    barWidth: 3,
-                    dotData: const FlDotData(show: false),
-                    color: theme.colorScheme.primary,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // exactly as you had them; they compile as-is once the helpers above are fixed.

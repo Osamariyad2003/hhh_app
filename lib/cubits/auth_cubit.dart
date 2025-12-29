@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/firebase_auth_service.dart';
 import '../models/user_model.dart';
-import '../models/firebase_user_model.dart';
 import 'auth_states.dart';
 
 class AuthCubit extends Cubit<AuthState> {

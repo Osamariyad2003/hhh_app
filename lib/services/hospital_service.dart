@@ -1,4 +1,3 @@
-import '../models/hospital_model.dart';
 import 'firebase/firestore_hospital_service.dart';
 
 class HospitalService {

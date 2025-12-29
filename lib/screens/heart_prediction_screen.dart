@@ -130,7 +130,7 @@ class _HeartPredictionScreenState extends State<HeartPredictionScreen> {
 
                   // Sex
                   DropdownButtonFormField<int>(
-                    value: _sexController.text.isEmpty ? null : int.tryParse(_sexController.text),
+                    initialValue: _sexController.text.isEmpty ? null : int.tryParse(_sexController.text),
                     decoration: const InputDecoration(
                       labelText: 'Sex',
                       hintText: 'Select sex',
@@ -148,7 +148,7 @@ class _HeartPredictionScreenState extends State<HeartPredictionScreen> {
 
                   // Chest Pain Type
                   DropdownButtonFormField<int>(
-                    value: _cpController.text.isEmpty ? null : int.tryParse(_cpController.text),
+                    initialValue: _cpController.text.isEmpty ? null : int.tryParse(_cpController.text),
                     decoration: const InputDecoration(
                       labelText: 'Chest Pain Type (cp)',
                       hintText: 'Select type',
@@ -206,7 +206,7 @@ class _HeartPredictionScreenState extends State<HeartPredictionScreen> {
 
                   // Fasting Blood Sugar
                   DropdownButtonFormField<int>(
-                    value: _fbsController.text.isEmpty ? null : int.tryParse(_fbsController.text),
+                    initialValue: _fbsController.text.isEmpty ? null : int.tryParse(_fbsController.text),
                     decoration: const InputDecoration(
                       labelText: 'Fasting Blood Sugar > 120 mg/dl',
                       hintText: 'Select',
@@ -224,7 +224,7 @@ class _HeartPredictionScreenState extends State<HeartPredictionScreen> {
 
                   // Resting ECG
                   DropdownButtonFormField<int>(
-                    value: _restecgController.text.isEmpty ? null : int.tryParse(_restecgController.text),
+                    initialValue: _restecgController.text.isEmpty ? null : int.tryParse(_restecgController.text),
                     decoration: const InputDecoration(
                       labelText: 'Resting ECG',
                       hintText: 'Select',
@@ -262,7 +262,7 @@ class _HeartPredictionScreenState extends State<HeartPredictionScreen> {
 
                   // Exercise Induced Angina
                   DropdownButtonFormField<int>(
-                    value: _exangController.text.isEmpty ? null : int.tryParse(_exangController.text),
+                    initialValue: _exangController.text.isEmpty ? null : int.tryParse(_exangController.text),
                     decoration: const InputDecoration(
                       labelText: 'Exercise Induced Angina',
                       hintText: 'Select',
@@ -299,7 +299,7 @@ class _HeartPredictionScreenState extends State<HeartPredictionScreen> {
 
                   // Slope
                   DropdownButtonFormField<int>(
-                    value: _slopeController.text.isEmpty ? null : int.tryParse(_slopeController.text),
+                    initialValue: _slopeController.text.isEmpty ? null : int.tryParse(_slopeController.text),
                     decoration: const InputDecoration(
                       labelText: 'Slope of Peak Exercise ST Segment',
                       hintText: 'Select',
@@ -318,7 +318,7 @@ class _HeartPredictionScreenState extends State<HeartPredictionScreen> {
 
                   // Number of Major Vessels
                   DropdownButtonFormField<int>(
-                    value: _caController.text.isEmpty ? null : int.tryParse(_caController.text),
+                    initialValue: _caController.text.isEmpty ? null : int.tryParse(_caController.text),
                     decoration: const InputDecoration(
                       labelText: 'Number of Major Vessels (0-3)',
                       hintText: 'Select',
@@ -338,7 +338,7 @@ class _HeartPredictionScreenState extends State<HeartPredictionScreen> {
 
                   // Thalassemia
                   DropdownButtonFormField<int>(
-                    value: _thalController.text.isEmpty ? null : int.tryParse(_thalController.text),
+                    initialValue: _thalController.text.isEmpty ? null : int.tryParse(_thalController.text),
                     decoration: const InputDecoration(
                       labelText: 'Thalassemia',
                       hintText: 'Select',

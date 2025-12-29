@@ -6,7 +6,6 @@ import '../models/tutorial_item.dart';
 import '../services/tutorials_service.dart';
 import '../widgets/lang_toggle_button.dart';
 import '../widgets/empty_state_widget.dart';
-import 'tutorial_detail_screen.dart';
 
 class TutorialsScreen extends StatelessWidget {
   const TutorialsScreen({super.key});

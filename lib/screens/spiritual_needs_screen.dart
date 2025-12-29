@@ -163,7 +163,7 @@ class SpiritualNeedsScreen extends StatelessWidget {
                 ),
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

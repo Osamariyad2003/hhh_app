@@ -2,6 +2,7 @@ import 'package:chd_app_new/services/firebase/firebase_init.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 import 'app_router.dart';
 import 'core/app_theme.dart';
@@ -38,15 +39,22 @@ class CHDApp extends StatefulWidget {
 }
 
 class _CHDAppState extends State<CHDApp> with WidgetsBindingObserver {
+  late final AuthCubit _authCubit;
+  late final GoRouter _router;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _authCubit = AuthCubit();
+    // Initialize router once to prevent recreation on rebuilds
+    _router = createAppRouter(widget.appCubit, _authCubit);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _authCubit.close();
     super.dispose();
   }
 
@@ -62,13 +70,10 @@ class _CHDAppState extends State<CHDApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    // Create AuthCubit instance to pass to router
-    final authCubit = AuthCubit();
-
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: widget.appCubit),
-        BlocProvider.value(value: authCubit),
+        BlocProvider.value(value: _authCubit),
         BlocProvider(
           create: (context) => PredictionCubit()..loadAvailableModels(),
         ),
@@ -82,7 +87,7 @@ class _CHDAppState extends State<CHDApp> with WidgetsBindingObserver {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.light,
-            routerConfig: createAppRouter(widget.appCubit, authCubit),
+            routerConfig: _router,
             locale: appState.locale,
             supportedLocales: AppLocalizations.supportedLocales,
             localizationsDelegates: const [

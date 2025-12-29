@@ -813,7 +813,7 @@ class SectionScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              (title == null || title.isEmpty) ? sectionId : title,
+              (title.isEmpty) ? sectionId : title,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),

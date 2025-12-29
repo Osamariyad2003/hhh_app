@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'cubits/app_cubit.dart';
@@ -28,6 +27,7 @@ import 'screens/heart_prediction_screen.dart';
 import 'screens/ai_suggestion_screen.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/patient_stories_screen.dart';
+import 'screens/dashboard_screen.dart';
 
 GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
   return GoRouter(
@@ -117,10 +117,19 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
         ),
       ),
       GoRoute(
-        path: '/track',
+        path: '/dashboard',
         builder: (context, state) => const MainNavigationScreen(
-          child: TrackDashboardScreen(),
+          child: DashboardScreen(),
         ),
+      ),
+      GoRoute(
+        path: '/track',
+        builder: (context, state) {
+          final childId = state.uri.queryParameters['childId'];
+          return MainNavigationScreen(
+            child: TrackDashboardScreen(initialChildId: childId),
+          );
+        },
       ),
       GoRoute(
         path: '/profile',
