@@ -1,13 +1,11 @@
-import 'package:flutter/foundation.dart';
-import 'firebase/firestore_general_childcare_service.dart';
+import 'dart:async';
+import '../data/static_childcare_data.dart';
 
 /// Service for General Childcare Information
-/// Provides access to childcare information from Firestore
+/// Provides access to static childcare information
 class GeneralChildcareService {
   GeneralChildcareService._();
   static final GeneralChildcareService instance = GeneralChildcareService._();
-
-  final _firestoreService = FirestoreGeneralChildcareService();
 
   /// Stream all active childcare items, filtered by language and category
   /// Returns a stream of maps for easy consumption in UI
@@ -15,20 +13,21 @@ class GeneralChildcareService {
     String? language,
     String? category,
   }) {
-    return _firestoreService
-        .getChildcareItems(language: language, category: category)
-        .map((items) => items.map((item) => item.toJson()).toList())
-        .handleError((error) {
-      // Return empty list on error to prevent stream from closing
-      debugPrint('Error in streamChildcareItems: $error');
-      return <Map<String, dynamic>>[];
-    });
+    // Return static data as a stream
+    final items = StaticChildcareData.getItems(
+      language: language,
+      category: category,
+    );
+    
+    return Stream.value(
+      items.map((item) => item.toJson()).toList(),
+    );
   }
 
   /// Get childcare item by ID
   Future<Map<String, dynamic>?> getChildcareItem(String itemId) async {
     try {
-      final item = await _firestoreService.getChildcareItem(itemId);
+      final item = StaticChildcareData.getItemById(itemId);
       return item?.toJson();
     } catch (e) {
       return null;
@@ -41,7 +40,7 @@ class GeneralChildcareService {
     String? category,
   }) async {
     try {
-      final items = await _firestoreService.getChildcareItemsOnce(
+      final items = StaticChildcareData.getItems(
         language: language,
         category: category,
       );

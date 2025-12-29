@@ -6,7 +6,6 @@ import '../widgets/lang_toggle_button.dart';
 import '../widgets/empty_state_widget.dart';
 import '../localization/app_localizations.dart';
 import '../cubits/app_cubit.dart';
-import '../services/general_childcare_service.dart';
 import 'childcare_detail_screen.dart';
 import '../models/general_childcare_model.dart';
 
@@ -49,33 +48,6 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
       language: language,
       category: _selectedCategory == 'all' ? null : _selectedCategory,
     );
-    
-    // Fallback: if no data after 5 seconds, try fetching once
-    Future.delayed(const Duration(seconds: 5), () {
-      if (mounted && cubit.state is GeneralChildcareLoading) {
-        // Try fallback fetch
-        _tryFallbackFetch(language);
-      }
-    });
-  }
-
-  Future<void> _tryFallbackFetch(String language) async {
-    try {
-      await GeneralChildcareService.instance.getChildcareItemsOnce(
-        language: language,
-        category: _selectedCategory == 'all' ? null : _selectedCategory,
-      );
-      if (mounted) {
-        final cubit = context.read<GeneralChildcareCubit>();
-        if (cubit.state is GeneralChildcareLoading) {
-          // Reload with the same filters to trigger state update
-          cubit.reload();
-        }
-      }
-    } catch (e) {
-      debugPrint('Fallback fetch error: $e');
-      // Error will be handled by the stream error handler
-    }
   }
 
   IconData _getCategoryIcon(String category) {
