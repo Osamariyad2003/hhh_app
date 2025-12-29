@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import '../data/static_childcare_data.dart';
 
 /// Service for General Childcare Information
@@ -13,8 +14,7 @@ class GeneralChildcareService {
     String? language,
     String? category,
   }) {
-    
-    // Get items immediately
+    // Load data from static_childcare_data.dart
     final items = StaticChildcareData.getItems(
       language: language,
       category: category,
@@ -22,7 +22,9 @@ class GeneralChildcareService {
     
     final jsonItems = items.map((item) => item.toJson()).toList();
     
-    print('DEBUG: Returning ${jsonItems.length} childcare items');
+    if (kDebugMode) {
+      debugPrint('Loaded ${jsonItems.length} childcare items from static data (language: $language, category: $category)');
+    }
     
     // Return as immediate stream
     return Stream.value(jsonItems);
