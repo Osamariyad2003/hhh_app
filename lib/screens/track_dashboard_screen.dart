@@ -8,6 +8,7 @@ import '../services/track_service.dart';
 import '../widgets/lang_toggle_button.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/child_tracking_map.dart';
+import '../core/app_theme.dart';
 
 String _formatTs(dynamic ts) {
   if (ts is String) {
@@ -372,14 +373,23 @@ class _ChildTabs extends StatelessWidget {
       length: 4,
       child: Column(
         children: [
-          TabBar(
-            isScrollable: true,
-            tabs: [
-              Tab(text: loc.t('weight')),
-              Tab(text: loc.t('feeding')),
-              Tab(text: loc.t('oxygen')),
-              Tab(text: loc.t('map')),
-            ],
+          Theme(
+            data: ThemeData(
+              tabBarTheme: const TabBarThemeData(
+                labelColor: Colors.white,
+                unselectedLabelColor: Color(0x99FFFFFF), // White with 60% opacity
+                indicatorColor: Colors.white,
+              ),
+            ),
+            child: TabBar(
+              isScrollable: true,
+              tabs: [
+                Tab(text: loc.t('weight')),
+                Tab(text: loc.t('feeding')),
+                Tab(text: loc.t('oxygen')),
+                Tab(text: loc.t('map')),
+              ],
+            ),
           ),
           Expanded(
             child: TabBarView(
@@ -760,7 +770,7 @@ class WeightsTab extends StatelessWidget {
                                       spots: spots,
                                       isCurved: true,
                                       curveSmoothness: 0.35,
-                                      color: theme.colorScheme.primary,
+                                      color: theme.colorScheme.tertiary,
                                       barWidth: 3,
                                       isStrokeCapRound: true,
                                       dotData: FlDotData(
@@ -770,7 +780,7 @@ class WeightsTab extends StatelessWidget {
                                             radius: 4,
                                             color: theme.colorScheme.surface,
                                             strokeWidth: 2,
-                                            strokeColor: theme.colorScheme.primary,
+                                            strokeColor: theme.colorScheme.tertiary,
                                           );
                                         },
                                       ),
@@ -778,8 +788,8 @@ class WeightsTab extends StatelessWidget {
                                         show: true,
                                         gradient: LinearGradient(
                                           colors: [
-                                            theme.colorScheme.primary.withValues(alpha: 0.3),
-                                            theme.colorScheme.primary.withValues(alpha: 0.0),
+                                            theme.colorScheme.tertiary.withValues(alpha: 0.3),
+                                            theme.colorScheme.tertiary.withValues(alpha: 0.0),
                                           ],
                                           begin: Alignment.topCenter,
                                           end: Alignment.bottomCenter,
@@ -1229,7 +1239,7 @@ class FeedingsTab extends StatelessWidget {
                                   loc.t('lastEntries'),
                                   style: theme.textTheme.bodyMedium,
                                 ),
-                                const Icon(Icons.arrow_drop_down, color: Colors.green),
+                                const Icon(Icons.arrow_drop_down, color: AppTheme.chartLineColor2),
                               ],
                             ),
                             const SizedBox(height: 16),
@@ -1283,7 +1293,7 @@ class FeedingsTab extends StatelessWidget {
                                       spots: spots,
                                       isCurved: true,
                                       curveSmoothness: 0.35,
-                                      color: Colors.green, // Feeding color
+                                      color: AppTheme.chartLineColor2, // Feeding color
                                       barWidth: 3,
                                       isStrokeCapRound: true,
                                       dotData: FlDotData(
@@ -1293,7 +1303,7 @@ class FeedingsTab extends StatelessWidget {
                                             radius: 4,
                                             color: theme.colorScheme.surface,
                                             strokeWidth: 2,
-                                            strokeColor: Colors.green,
+                                            strokeColor: AppTheme.chartLineColor2,
                                           );
                                         },
                                       ),
@@ -1301,8 +1311,8 @@ class FeedingsTab extends StatelessWidget {
                                         show: true,
                                         gradient: LinearGradient(
                                           colors: [
-                                            Colors.green.withValues(alpha: 0.3),
-                                            Colors.green.withValues(alpha: 0.0),
+                                            AppTheme.chartLineColor2.withValues(alpha: 0.3),
+                                            AppTheme.chartLineColor2.withValues(alpha: 0.0),
                                           ],
                                           begin: Alignment.topCenter,
                                           end: Alignment.bottomCenter,
@@ -1637,6 +1647,7 @@ class OxygenTab extends StatelessWidget {
               );
             }
 
+
             final docs = snapshot.data!;
             if (docs.isEmpty) {
               return EmptyStateWidget(
@@ -1648,124 +1659,315 @@ class OxygenTab extends StatelessWidget {
               );
             }
 
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: docs.length,
-              itemBuilder: (context, i) {
-                final d = docs[i];
-                final logId = d['id'] ?? d['_id'] ?? '';
-                final v = d['spo2'] as num?;
-                final spo2Value = v?.toInt() ?? 0;
-                final whenText = _formatTs(d['ts']);
-                final isLow = spo2Value < 90;
+            // Prepare chart data (last 7 entries)
+            final ascDocs = docs.reversed.toList();
+            final last7Docs = ascDocs.length > 7 ? ascDocs.sublist(ascDocs.length - 7) : ascDocs;
+            final spots = <FlSpot>[];
+            
+            for (final d in last7Docs) {
+              final ts = d['ts'];
+              final rawSpo2 = d['spo2'];
+              
+              double? spo2;
+              if (rawSpo2 is num) {
+                spo2 = rawSpo2.toDouble();
+              } else if (rawSpo2 is String) {
+                spo2 = double.tryParse(rawSpo2);
+              }
+              
+              if (spo2 != null) {
+                try {
+                  DateTime? dt;
+                  if (ts is Timestamp) {
+                    dt = ts.toDate();
+                  } else if (ts is String) {
+                    dt = DateTime.tryParse(ts);
+                  }
+                  
+                  if (dt != null) {
+                    spots.add(FlSpot(dt.millisecondsSinceEpoch.toDouble(), spo2));
+                  }
+                } catch (e) {
+                  // Skip invalid
+                }
+              }
+            }
+            spots.sort((a, b) => a.x.compareTo(b.x));
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  color: Colors.red.shade50,
-                  child: InkWell(
-                    onTap: () => _edit(
-                      context,
-                      logId,
-                      spo2Value.toString(),
-                      (d['note'] ?? '').toString(),
-                      (d['pulse'] ?? '').toString(),
-                      (d['device'] ?? '').toString(),
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          // Three dots menu
-                          PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert, color: Colors.grey),
-                            onSelected: (value) {
-                              if (value == 'edit') {
-                                _edit(
-                                  context,
-                                  logId,
-                                  spo2Value.toString(),
-                                  (d['note'] ?? '').toString(),
-                                  (d['pulse'] ?? '').toString(),
-                                  (d['device'] ?? '').toString(),
-                                );
-                              } else if (value == 'delete') {
-                                _confirmDeleteDialog(
-                                  context,
-                                  loc.t('deleteLogTitle'),
-                                  loc.t('deleteLogBody'),
-                                  loc.t('cancel'),
-                                  loc.t('delete'),
-                                ).then((confirmed) {
-                                  if (confirmed == true) {
-                                    TrackService.instance.deleteOxygen(
-                                      childId: childId,
-                                      logId: logId,
-                                    );
-                                  }
-                                });
-                              }
-                            },
-                            itemBuilder: (_) => [
-                              PopupMenuItem(value: 'edit', child: Text(loc.t('edit'))),
-                              PopupMenuItem(value: 'delete', child: Text(loc.t('delete'))),
-                            ],
-                          ),
-                          const SizedBox(width: 8),
-                          // Content
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+            double minX = 0;
+            double maxX = 0;
+            double minY = 80; // Typical SpO2 range starts around 80
+            double maxY = 100; // SpO2 max is 100%
+            
+            if (spots.length >= 2) {
+              minX = spots.first.x;
+              final rawMaxX = spots.last.x;
+              maxX = rawMaxX == minX ? minX + 86400000 : rawMaxX;
+              
+              final yValues = spots.map((s) => s.y);
+              final actualMinY = yValues.reduce((a, b) => a < b ? a : b);
+              final actualMaxY = yValues.reduce((a, b) => a > b ? a : b);
+              
+              minY = (actualMinY - 5).clamp(0, 100);
+              maxY = (actualMaxY + 5).clamp(0, 100);
+            }
+
+            return CustomScrollView(
+              slivers: [
+                // Chart Section
+                if (spots.length >= 2)
+                  SliverToBoxAdapter(
+                    child: Card(
+                      margin: const EdgeInsets.all(16),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Percentage value
                                 Text(
-                                  '$spo2Value%',
-                                  style: theme.textTheme.headlineLarge?.copyWith(
-                                    color: Colors.red,
+                                  loc.t('trends'),
+                                  style: theme.textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                // Date/time
-                                Text(
-                                  whenText,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                // Low saturation warning
-                                if (isLow)
-                                  Text(
-                                    loc.t('lowSaturationLevel'),
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
                               ],
                             ),
-                          ),
-                          // Heart icon
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.red.shade100,
-                              shape: BoxShape.circle,
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  loc.t('lastEntries'),
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                const Icon(Icons.arrow_drop_down, color: AppTheme.chartLineColor3),
+                              ],
                             ),
-                            child: const Icon(
-                              Icons.favorite,
-                              color: Colors.red,
-                              size: 24,
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              height: 220,
+                              child: LineChart(
+                                LineChartData(
+                                  minX: minX,
+                                  maxX: maxX,
+                                  minY: minY,
+                                  maxY: maxY,
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawVerticalLine: false,
+                                    horizontalInterval: 5,
+                                    getDrawingHorizontalLine: (value) {
+                                      return FlLine(
+                                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                  ),
+                                  borderData: FlBorderData(show: false),
+                                  titlesData: FlTitlesData(
+                                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 30,
+                                        interval: ((maxX - minX) / 3).clamp(1, double.infinity),
+                                        getTitlesWidget: (value, meta) {
+                                          final dt = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                                          return Padding(
+                                            padding: const EdgeInsets.only(top: 8),
+                                            child: Text(
+                                              DateFormat('MM/dd').format(dt),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: theme.colorScheme.onSurfaceVariant,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: spots,
+                                      isCurved: true,
+                                      curveSmoothness: 0.35,
+                                      color: AppTheme.chartLineColor3, // Indigo for Oxygen
+                                      barWidth: 3,
+                                      isStrokeCapRound: true,
+                                      dotData: FlDotData(
+                                        show: true,
+                                        getDotPainter: (spot, percent, barData, index) {
+                                          return FlDotCirclePainter(
+                                            radius: 4,
+                                            color: theme.colorScheme.surface,
+                                            strokeWidth: 2,
+                                            strokeColor: AppTheme.chartLineColor3,
+                                          );
+                                        },
+                                      ),
+                                      belowBarData: BarAreaData(
+                                        show: true,
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            AppTheme.chartLineColor3.withValues(alpha: 0.3),
+                                            AppTheme.chartLineColor3.withValues(alpha: 0.0),
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                );
-              },
+
+                // History Header
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Text(
+                      loc.t('history'),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // History List
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) {
+                      final d = docs[i];
+                      final logId = d['id'] ?? d['_id'] ?? '';
+                      final v = d['spo2'] as num?;
+                      final spo2Value = v?.toInt() ?? 0;
+                      final whenText = _formatTs(d['ts']);
+                      final isLow = spo2Value < 90;
+
+                      return Card(
+                        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        color: Colors.red.shade50,
+                        child: InkWell(
+                          onTap: () => _edit(
+                            context,
+                            logId,
+                            spo2Value.toString(),
+                            (d['note'] ?? '').toString(),
+                            (d['pulse'] ?? '').toString(),
+                            (d['device'] ?? '').toString(),
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                // Three dots menu
+                                PopupMenuButton<String>(
+                                  icon: const Icon(Icons.more_vert, color: Colors.grey),
+                                  onSelected: (value) {
+                                    if (value == 'edit') {
+                                      _edit(
+                                        context,
+                                        logId,
+                                        spo2Value.toString(),
+                                        (d['note'] ?? '').toString(),
+                                        (d['pulse'] ?? '').toString(),
+                                        (d['device'] ?? '').toString(),
+                                      );
+                                    } else if (value == 'delete') {
+                                      _confirmDeleteDialog(
+                                        context,
+                                        loc.t('deleteLogTitle'),
+                                        loc.t('deleteLogBody'),
+                                        loc.t('cancel'),
+                                        loc.t('delete'),
+                                      ).then((confirmed) {
+                                        if (confirmed == true) {
+                                          TrackService.instance.deleteOxygen(
+                                            childId: childId,
+                                            logId: logId,
+                                          );
+                                        }
+                                      });
+                                    }
+                                  },
+                                  itemBuilder: (_) => [
+                                    PopupMenuItem(value: 'edit', child: Text(loc.t('edit'))),
+                                    PopupMenuItem(value: 'delete', child: Text(loc.t('delete'))),
+                                  ],
+                                ),
+                                const SizedBox(width: 8),
+                                // Content
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Percentage value
+                                      Text(
+                                        '$spo2Value%',
+                                        style: theme.textTheme.headlineLarge?.copyWith(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      // Date/time
+                                      Text(
+                                        whenText,
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      // Low saturation warning
+                                      if (isLow)
+                                        Text(
+                                          loc.t('lowSaturationLevel'),
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                // Heart icon
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade100,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.favorite,
+                                    color: Colors.red,
+                                    size: 24,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: docs.length,
+                  ),
+                ),
+              ],
             );
           },
         ),
