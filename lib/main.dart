@@ -10,6 +10,7 @@ import 'core/app_bloc_observer.dart';
 import 'cubits/ai_suggestion_cubit.dart';
 import 'cubits/app_cubit.dart';
 import 'cubits/auth_cubit.dart';
+import 'cubits/general_childcare_cubit.dart';
 
 import 'localization/app_localizations.dart';
 import 'services/recipe_remote_datasource.dart';
@@ -75,6 +76,7 @@ class _CHDAppState extends State<CHDApp> with WidgetsBindingObserver {
         BlocProvider.value(value: _authCubit),
 
         BlocProvider(create: (context) => AISuggestionCubit()),
+        BlocProvider(create: (context) => GeneralChildcareCubit()),
       ],
       child: BlocBuilder<AppCubit, AppState>(
         builder: (context, appState) {

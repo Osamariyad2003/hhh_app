@@ -14,7 +14,7 @@ class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   static const tiles = <_Tile>[
-    _Tile('generalChildcare', Icons.child_care, '/section/childcare'),
+    _Tile('generalChildcare', Icons.child_care, '/general-childcare'),
     _Tile('tutorials', Icons.play_circle, '/tutorials'),
     _Tile('spiritualNeeds', Icons.mosque, '/section/spiritual'),
     _Tile('hospitalInfo', Icons.local_hospital, '/section/hospital'),

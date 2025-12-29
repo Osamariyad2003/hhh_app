@@ -29,8 +29,7 @@ import 'screens/ai_suggestion_screen.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/patient_stories_screen.dart';
 import 'screens/dashboard_screen.dart';
-import 'screens/general_childcare_screen.dart';
-import 'cubits/general_childcare_cubit.dart';
+import 'screens/general_childcare_screen_simple.dart';
 
 GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
   return GoRouter(
@@ -165,10 +164,7 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
       ),
       GoRoute(
         path: '/general-childcare',
-        builder: (context, state) => BlocProvider(
-          create: (context) => GeneralChildcareCubit(),
-          child: const GeneralChildcareScreen(),
-        ),
+        builder: (context, state) => const GeneralChildcareScreenSimple(),
       ),
       GoRoute(
         path: '/track/manage',

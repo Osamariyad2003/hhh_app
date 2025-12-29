@@ -13,47 +13,43 @@ class GeneralChildcareCubit extends Cubit<GeneralChildcareState> {
   String? _currentLanguage;
   String? _currentCategory;
 
-  GeneralChildcareCubit() : super(const GeneralChildcareInitial());
+  GeneralChildcareCubit() : super(const GeneralChildcareInitial()) {
+    // Auto-load all items immediately
+    debugPrint('DEBUG Cubit: Constructor - auto-loading data');
+    loadChildcareItems();
+  }
 
   /// Load childcare items with filters
-  void loadChildcareItems({String? language, String? category}) {
+  Future<void> loadChildcareItems({String? language, String? category}) async {
     _currentLanguage = language;
     _currentCategory = category;
 
+    debugPrint('DEBUG Cubit: Loading childcare items - lang: $language, cat: $category');
     emit(const GeneralChildcareLoading());
 
     // Cancel previous subscription
     _subscription?.cancel();
 
-    // Subscribe to stream (static data returns immediately)
-    _subscription = _service
-        .streamChildcareItems(
-          language: language,
-          category: category,
-        )
-        .listen(
-      (data) {
-        try {
-          final items = data
-              .map((json) => GeneralChildcareModel.fromJson(json))
-              .toList();
-          emit(GeneralChildcareSuccess(items));
-        } catch (e) {
-          debugPrint('Error parsing childcare items: $e');
-          emit(GeneralChildcareError('Failed to parse childcare items: $e'));
-        }
-      },
-      onError: (error) {
-        debugPrint('Error loading childcare items: $error');
-        emit(GeneralChildcareError('Failed to load childcare items: $error'));
-      },
-      onDone: () {
-        // If stream completes without data, emit empty success
-        if (state is GeneralChildcareLoading) {
-          emit(const GeneralChildcareSuccess([]));
-        }
-      },
-    );
+    try {
+      // Get data synchronously from static source
+      final data = await _service.getChildcareItemsOnce(
+        language: language,
+        category: category,
+      );
+      
+      debugPrint('DEBUG Cubit: Received ${data.length} items from service');
+      
+      final items = data
+          .map((json) => GeneralChildcareModel.fromJson(json))
+          .toList();
+          
+      debugPrint('DEBUG Cubit: Parsed ${items.length} childcare models');
+      emit(GeneralChildcareSuccess(items));
+    } catch (e, stackTrace) {
+      debugPrint('ERROR Cubit: Failed to load childcare items: $e');
+      debugPrint('Stack trace: $stackTrace');
+      emit(GeneralChildcareError('Failed to load childcare items: $e'));
+    }
   }
 
   /// Reload childcare items with current filters
