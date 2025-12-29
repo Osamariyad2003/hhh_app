@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../cubits/app_cubit.dart';
 import '../cubits/auth_cubit.dart';
 import '../localization/app_localizations.dart';
 import '../widgets/lang_toggle_button.dart';
@@ -80,22 +81,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         actions: const [LangToggleButton()],
       ),
-      body: ListView(
-        children: [
-          ListTile(
-            title: Text(
-              loc.t('logout'),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
+      body: BlocBuilder<AppCubit, AppState>(
+        builder: (context, appState) {
+          return ListView(
+            children: [
+              SwitchListTile(
+                title: const Text('Dark Mode'),
+                subtitle: const Text('Enable dark theme'),
+                value: appState.themeMode == ThemeMode.dark,
+                onChanged: (v) async {
+                  setState(() => _busy = true);
+                  await context.read<AppCubit>().toggleThemeMode();
+                  setState(() => _busy = false);
+                },
               ),
-            ),
-            leading: Icon(
-              Icons.logout,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            onTap: _busy ? null : _logout,
-          ),
-        ],
+              const Divider(),
+              ListTile(
+                title: Text(
+                  loc.t('logout'),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+                leading: Icon(
+                  Icons.logout,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                onTap: _busy ? null : _logout,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
