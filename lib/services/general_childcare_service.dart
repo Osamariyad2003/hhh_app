@@ -13,15 +13,19 @@ class GeneralChildcareService {
     String? language,
     String? category,
   }) {
-    // Return static data as a stream
+    
+    // Get items immediately
     final items = StaticChildcareData.getItems(
       language: language,
       category: category,
     );
     
-    return Stream.value(
-      items.map((item) => item.toJson()).toList(),
-    );
+    final jsonItems = items.map((item) => item.toJson()).toList();
+    
+    print('DEBUG: Returning ${jsonItems.length} childcare items');
+    
+    // Return as immediate stream
+    return Stream.value(jsonItems);
   }
 
   /// Get childcare item by ID

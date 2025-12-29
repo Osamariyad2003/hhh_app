@@ -79,7 +79,7 @@ class _CHDAppState extends State<CHDApp> with WidgetsBindingObserver {
             title: 'Health Hearts at Home',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.light,
+            themeMode: appState.themeMode,
             routerConfig: _router,
             locale: appState.locale,
             supportedLocales: AppLocalizations.supportedLocales,
