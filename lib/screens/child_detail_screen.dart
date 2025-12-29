@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../localization/app_localizations.dart';
 import '../services/track_service.dart';
 import '../widgets/lang_toggle_button.dart';
+import 'track_dashboard_screen.dart'; // For WeightsTab, FeedingsTab, OxygenTab
 
 String _formatTs(dynamic ts) {
   if (ts is String) {
@@ -281,7 +282,7 @@ class ChildDetailScreen extends StatelessWidget {
                 IconButton(
                   tooltip: loc.t('settings'),
                   icon: const Icon(Icons.settings),
-                  onPressed: () => context.go('/settings'),
+                  onPressed: () => context.push('/settings'),
                 ),
                 PopupMenuButton<String>(
                   onSelected: (v) {
@@ -294,6 +295,9 @@ class ChildDetailScreen extends StatelessWidget {
                 const LangToggleButton(),
               ],
               bottom: TabBar(
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white.withOpacity(0.6),
+                indicatorColor: Colors.white,
                 tabs: [
                   Tab(text: loc.t('weight')),
                   Tab(text: loc.t('feeding')),
@@ -328,9 +332,9 @@ class ChildDetailScreen extends StatelessWidget {
                 Expanded(
                   child: TabBarView(
                     children: [
-                      _WeightsTab(childId: childId),
-                      _FeedingsTab(childId: childId),
-                      _OxygenTab(childId: childId),
+                      WeightsTab(childId: childId),
+                      FeedingsTab(childId: childId),
+                      OxygenTab(childId: childId),
                     ],
                   ),
                 ),

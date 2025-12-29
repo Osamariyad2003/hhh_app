@@ -47,7 +47,7 @@ class FirestoreGeneralChildcareService {
         (snapshot) => snapshot.docs
             .map((doc) => GeneralChildcareModel.fromJson({
                   'id': doc.id,
-                  ...doc.data(),
+                  ...doc.data() as Map<String, dynamic>,
                 }))
             .toList(),
       );
@@ -84,7 +84,7 @@ class FirestoreGeneralChildcareService {
       return snapshot.docs
           .map((doc) => GeneralChildcareModel.fromJson({
                 'id': doc.id,
-                ...doc.data(),
+                ...doc.data() as Map<String, dynamic>,
               }))
           .toList();
     } catch (e) {
@@ -98,7 +98,7 @@ class FirestoreGeneralChildcareService {
         var items = snapshot.docs
             .map((doc) => GeneralChildcareModel.fromJson({
                   'id': doc.id,
-                  ...doc.data(),
+                  ...doc.data() as Map<String, dynamic>,
                 }))
             .toList();
 
