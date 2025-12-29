@@ -373,23 +373,14 @@ class _ChildTabs extends StatelessWidget {
       length: 4,
       child: Column(
         children: [
-          Theme(
-            data: ThemeData(
-              tabBarTheme: const TabBarThemeData(
-                labelColor: Colors.white,
-                unselectedLabelColor: Color(0x99FFFFFF), // White with 60% opacity
-                indicatorColor: Colors.white,
-              ),
-            ),
-            child: TabBar(
-              isScrollable: true,
-              tabs: [
-                Tab(text: loc.t('weight')),
-                Tab(text: loc.t('feeding')),
-                Tab(text: loc.t('oxygen')),
-                Tab(text: loc.t('map')),
-              ],
-            ),
+          TabBar(
+            isScrollable: true,
+            tabs: [
+              Tab(text: loc.t('weight')),
+              Tab(text: loc.t('feeding')),
+              Tab(text: loc.t('oxygen')),
+              Tab(text: loc.t('map')),
+            ],
           ),
           Expanded(
             child: TabBarView(
