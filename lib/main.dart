@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import 'app_router.dart';
 import 'core/app_theme.dart';
+import 'core/app_bloc_observer.dart';
 import 'cubits/ai_suggestion_cubit.dart';
 import 'cubits/app_cubit.dart';
 import 'cubits/auth_cubit.dart';
@@ -15,6 +16,9 @@ import 'services/recipe_remote_datasource.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Set up BLoC Observer for debugging
+  Bloc.observer = AppBlocObserver();
 
   // Initialize Firebase
   await initializeFirebase();
