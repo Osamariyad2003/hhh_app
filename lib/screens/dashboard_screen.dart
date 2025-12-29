@@ -21,7 +21,7 @@ class DashboardScreen extends StatelessWidget {
     _Tile('caregiverSupport', Icons.support_agent, '/section/support'),
     _Tile('patientStories', Icons.book, '/patient-stories'),
     _Tile('trackYourChild', Icons.monitor_heart, '/track'),
-    _Tile('heartPrediction', Icons.favorite, '/heart-prediction'),
+
     _Tile('aiSuggestions', Icons.auto_awesome, '/ai-suggestions'),
     _Tile('aboutChd', Icons.info, '/section/about'),
     _Tile('contacts', Icons.contacts, '/section/contacts'),

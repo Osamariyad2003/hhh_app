@@ -9,20 +9,20 @@ class GenerativeAIService {
   GenerativeAIService._();
   static final GenerativeAIService instance = GenerativeAIService._();
 
-  static const String _apiKey = 'AIzaSyCfzjaV9YBI7-D-e9ZooGq8vopJTHKRGFo';
+  static const String _apiKey = 'AIzaSyDhugogohGxLtF7W6o8mebhwRwCARfT73c';
   GenerativeModel? _model;
 
   /// Initialize the service (call this before using)
   void initialize() {
     _model = GenerativeModel(
-      model: 'gemini-1.5-flash-001',
+      model: 'gemini-2.0-flash',
       apiKey: _apiKey,
     );
   }
 
   GenerativeModel get model {
     _model ??= GenerativeModel(
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash',
       apiKey: _apiKey,
     );
     return _model!;

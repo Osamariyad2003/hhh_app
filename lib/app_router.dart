@@ -11,7 +11,7 @@ import 'cubits/auth_states.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
-import 'screens/lock_screen.dart';
+
 import 'screens/home_screen.dart';
 import 'screens/section_screen.dart';
 import 'screens/tutorials_screen.dart';
@@ -24,7 +24,7 @@ import 'screens/track_home_screen.dart';
 import 'screens/add_child_screen.dart';
 import 'screens/child_detail_screen.dart';
 import 'screens/child_info_screen.dart';
-import 'screens/heart_prediction_screen.dart';
+
 import 'screens/ai_suggestion_screen.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/patient_stories_screen.dart';
@@ -81,18 +81,6 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
           return '/';
         }
 
-        // Check lock screen
-        final lockEnabled = appState.lockEnabled;
-        final unlocked = appState.unlocked;
-        final goingToLock = currentPath == '/lock';
-
-        if (lockEnabled && !unlocked) {
-          return goingToLock ? null : '/lock';
-        }
-
-        if (goingToLock && unlocked) {
-          return '/';
-        }
       }
 
       return null;
@@ -110,8 +98,7 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
         path: '/signup',
         builder: (context, state) => const SignupScreen(),
       ),
-      GoRoute(path: '/lock', builder: (context, state) => const LockScreen()),
-      
+
       // Main navigation routes with bottom bar
       GoRoute(
         path: '/',
@@ -171,10 +158,7 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),
       ),
-      GoRoute(
-        path: '/heart-prediction',
-        builder: (context, state) => const HeartPredictionScreen(),
-      ),
+
       GoRoute(
         path: '/ai-suggestions',
         builder: (context, state) => const AISuggestionScreen(),
