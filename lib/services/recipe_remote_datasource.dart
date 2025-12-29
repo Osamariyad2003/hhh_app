@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/heart_healthy_meal.dart';
-import 'heart_meal_suggestion_service.dart';
 import 'generative_ai/generative_ai_service.dart';
 
 /// Recipe/Meal suggestion service for children with heart disease
@@ -10,7 +9,6 @@ class RecipeRemoteDatasource {
   static final RecipeRemoteDatasource instance = RecipeRemoteDatasource._();
 
   final _generativeAI = GenerativeAIService.instance;
-  final _fallbackService = HeartMealSuggestionService.instance;
   final _firestore = FirebaseFirestore.instance;
 
   /// Initialize the Generative AI service
@@ -26,11 +24,8 @@ class RecipeRemoteDatasource {
       return await _generativeAI.getMealSuggestion(userInput);
     } catch (e) {
       // Fallback to template-based suggestions if AI fails
-      try {
-        return await _fallbackService.getMealSuggestion(userInput);
-      } catch (fallbackError) {
-        throw Exception('Error generating meal suggestion: $e');
-      }
+
+      throw Exception('Error generating meal suggestion: $e');
     }
   }
 
