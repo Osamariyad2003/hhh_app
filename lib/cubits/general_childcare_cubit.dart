@@ -25,18 +25,11 @@ class GeneralChildcareCubit extends Cubit<GeneralChildcareState> {
     // Cancel previous subscription
     _subscription?.cancel();
 
-    // Subscribe to stream with timeout
+    // Subscribe to stream (static data returns immediately)
     _subscription = _service
         .streamChildcareItems(
           language: language,
           category: category,
-        )
-        .timeout(
-          const Duration(seconds: 10),
-          onTimeout: (sink) {
-            sink.add(<Map<String, dynamic>>[]);
-            sink.close();
-          },
         )
         .listen(
       (data) {

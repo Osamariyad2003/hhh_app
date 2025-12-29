@@ -1,5 +1,5 @@
 /// Model for General Childcare Information
-/// Represents a document from the 'general_childcare' Firestore collection
+/// Used for static childcare data and JSON serialization
 class GeneralChildcareModel {
   final String id;
   final String title;
@@ -27,7 +27,7 @@ class GeneralChildcareModel {
     required this.isActive,
   });
 
-  /// Create from Firestore document
+  /// Create from JSON data
   factory GeneralChildcareModel.fromJson(Map<String, dynamic> json) {
     return GeneralChildcareModel(
       id: json['id'] as String? ?? '',
@@ -44,7 +44,7 @@ class GeneralChildcareModel {
     );
   }
 
-  /// Convert to JSON for Firestore
+  /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
