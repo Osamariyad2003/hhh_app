@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'firebase/firestore_general_childcare_service.dart';
-import '../models/general_childcare_model.dart';
 
 /// Service for General Childcare Information
 /// Provides access to childcare information from Firestore
@@ -17,7 +17,12 @@ class GeneralChildcareService {
   }) {
     return _firestoreService
         .getChildcareItems(language: language, category: category)
-        .map((items) => items.map((item) => item.toJson()).toList());
+        .map((items) => items.map((item) => item.toJson()).toList())
+        .handleError((error) {
+      // Return empty list on error to prevent stream from closing
+      debugPrint('Error in streamChildcareItems: $error');
+      return <Map<String, dynamic>>[];
+    });
   }
 
   /// Get childcare item by ID

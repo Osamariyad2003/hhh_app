@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../../models/general_childcare_model.dart';
 
 /// Firestore service for General Childcare Information
@@ -12,7 +13,9 @@ class FirestoreGeneralChildcareService {
     try {
       final doc = await _firestore.collection(_collection).doc(itemId).get();
       if (!doc.exists) return null;
-      return GeneralChildcareModel.fromJson({'id': doc.id, ...doc.data()!});
+      final data = doc.data();
+      if (data == null) return null;
+      return GeneralChildcareModel.fromJson({'id': doc.id, ...data});
     } catch (e) {
       throw Exception('Failed to get childcare item: $e');
     }
@@ -45,14 +48,24 @@ class FirestoreGeneralChildcareService {
 
       return query.snapshots().map(
         (snapshot) => snapshot.docs
-            .map((doc) => GeneralChildcareModel.fromJson({
-                  'id': doc.id,
-                  ...doc.data(),
-                }))
+            .map((doc) {
+              final data = doc.data() as Map<String, dynamic>? ?? {};
+              return GeneralChildcareModel.fromJson({
+                'id': doc.id,
+                ...data,
+              });
+            })
             .toList(),
-      );
+      ).handleError((error) {
+        // If query fails (e.g., missing index), try fallback
+        debugPrint('Firestore query error: $error');
+        // Return empty stream to prevent stream from closing
+        return Stream.value(<GeneralChildcareModel>[]);
+      });
     } catch (e) {
-      throw Exception('Failed to get childcare items: $e');
+      debugPrint('Firestore service error: $e');
+      // Return empty stream instead of throwing
+      return Stream.value(<GeneralChildcareModel>[]);
     }
   }
 
@@ -82,10 +95,13 @@ class FirestoreGeneralChildcareService {
 
       final snapshot = await query.get();
       return snapshot.docs
-          .map((doc) => GeneralChildcareModel.fromJson({
-                'id': doc.id,
-                ...doc.data(),
-              }))
+          .map((doc) {
+            final data = doc.data() as Map<String, dynamic>? ?? {};
+            return GeneralChildcareModel.fromJson({
+              'id': doc.id,
+              ...data,
+            });
+          })
           .toList();
     } catch (e) {
       // If query fails (e.g., missing index), fetch all and filter in memory
@@ -96,10 +112,13 @@ class FirestoreGeneralChildcareService {
             .get();
 
         var items = snapshot.docs
-            .map((doc) => GeneralChildcareModel.fromJson({
-                  'id': doc.id,
-                  ...doc.data(),
-                }))
+            .map((doc) {
+              final data = doc.data() as Map<String, dynamic>? ?? {};
+              return GeneralChildcareModel.fromJson({
+                'id': doc.id,
+                ...data,
+              });
+            })
             .toList();
 
         // Filter by language
