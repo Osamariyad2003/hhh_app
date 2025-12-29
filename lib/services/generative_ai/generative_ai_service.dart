@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../../models/heart_healthy_meal.dart';
 
@@ -13,11 +14,17 @@ class GenerativeAIService {
 
   /// Initialize the service (call this before using)
   void initialize() {
-    _model = GenerativeModel(model: 'gemini-pro-2.5', apiKey: _apiKey);
+    _model = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: _apiKey,
+    );
   }
 
   GenerativeModel get model {
-    _model ??= GenerativeModel(model: 'gemini-pro-2.5', apiKey: _apiKey);
+    _model ??= GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: _apiKey,
+    );
     return _model!;
   }
 
@@ -27,52 +34,81 @@ class GenerativeAIService {
       final prompt = _buildPrompt(userInput);
 
       final content = [Content.text(prompt)];
-      final response = await model.generateContent(content);
+      final response = await model.generateContent(
+        content,
+        generationConfig: GenerationConfig(
+          temperature: 0.8,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 3000,
+        ),
+      );
 
       final text = response.text ?? '';
+
+      if (text.isEmpty) {
+        throw Exception('AI returned empty response');
+      }
 
       // Parse the AI response into a HeartHealthyMeal
       return _parseAIResponse(text, userInput);
     } catch (e) {
-      throw Exception('Failed to get AI suggestion: $e');
+      debugPrint('GenerativeAI Error: $e');
+      rethrow;
     }
   }
 
   /// Build the prompt for the AI
   String _buildPrompt(String userInput) {
-    return '''
-You are a nutritionist specializing in heart-healthy meals for children with congenital heart disease (CHD).
+    return '''You are a certified pediatric nutritionist and registered dietitian specializing in congenital heart disease (CHD) nutrition for children. You have extensive experience creating medically appropriate, heart-healthy meal plans for children with various types of CHD.
 
-User request: "$userInput"
+USER REQUEST: "$userInput"
 
-Please provide a detailed, heart-healthy meal suggestion for a child with CHD. The meal should:
-1. Be low in sodium (less than 200mg per serving)
-2. Contain healthy fats (omega-3, monounsaturated)
-3. Be rich in lean protein
-4. Include whole grains and vegetables
-5. Be appropriate for children (easy to chew, appealing)
-6. Support cardiovascular health
+TASK: Create a comprehensive, medically sound, heart-healthy meal suggestion specifically designed for a child with congenital heart disease. This meal must be safe, nutritious, and appropriate for pediatric cardiac patients.
 
-Format your response as JSON with the following structure:
+CRITICAL NUTRITIONAL REQUIREMENTS FOR CHD CHILDREN:
+1. SODIUM RESTRICTION: Maximum 150-200mg sodium per serving. Use NO added salt, avoid processed foods, canned goods, and high-sodium ingredients. Use herbs, spices, lemon, and natural flavorings instead.
+
+2. HEART-HEALTHY FATS: Include omega-3 fatty acids (salmon, tuna, walnuts, flaxseeds) and monounsaturated fats (olive oil, avocado). Avoid trans fats and limit saturated fats.
+
+3. LEAN PROTEIN: Provide 15-20% of calories from high-quality lean protein sources: skinless poultry, fish (especially fatty fish), legumes, eggs, low-fat dairy. Avoid processed meats.
+
+4. COMPLEX CARBOHYDRATES: Use whole grains (brown rice, quinoa, oats, whole wheat), sweet potatoes, and starchy vegetables. Avoid refined sugars and white flour.
+
+5. FRUITS & VEGETABLES: Include 3-5 servings of colorful, nutrient-dense fruits and vegetables rich in antioxidants, vitamins, and fiber. Fresh or frozen (no added salt) preferred.
+
+6. CHILD-FRIENDLY: Soft texture, easy to chew, colorful and appealing, age-appropriate portions, safe serving temperature.
+
+7. COOKING METHODS: Use heart-healthy methods: baking, steaming, grilling, poaching, or sautéing with minimal oil. Avoid deep-frying.
+
+RESPONSE FORMAT - Return ONLY valid JSON (no markdown, no code blocks, no explanations):
 {
-  "name": "Meal name",
-  "mealType": ["breakfast" or "lunch" or "dinner"],
-  "summary": "Brief description (2-3 sentences)",
+  "name": "Creative, descriptive meal name that sounds appealing to children",
+  "mealType": ["breakfast" OR "lunch" OR "dinner" - choose ONE based on user request or time of day],
+  "summary": "A detailed 3-4 sentence description explaining: (1) why this meal is beneficial for children with CHD, (2) key nutritional benefits, (3) how it supports heart health and growth, (4) approximate calorie range per serving",
   "ingredients": [
-    {"name": "Ingredient name", "quantity": "Amount"}
+    {"name": "Specific ingredient name", "quantity": "Precise amount with units (e.g., '150g', '1/2 cup', '2 tablespoons')"},
+    ... (include 5-8 ingredients)
   ],
   "steps": [
-    "Step 1",
-    "Step 2",
-    ...
+    "Detailed step 1 with specific instructions and safety notes",
+    "Detailed step 2 with cooking times and temperatures",
+    ... (include 6-10 detailed steps)
   ],
-  "cookTime": 30,
-  "servingSize": 2,
-  "rating": 4.5
+  "cookTime": [number in minutes, typically 20-60],
+  "servingSize": [number of servings, typically 1-4],
+  "rating": [number between 4.0 and 5.0, representing nutritional quality]
 }
 
-Only return the JSON, no additional text.
-''';
+CRITICAL: 
+- Return ONLY the JSON object, nothing else
+- Ensure all JSON is valid and properly formatted
+- Use double quotes for all strings
+- Include all required fields
+- Make the meal creative, nutritious, and appealing to children
+- Base meal type on user input or infer from context (breakfast for morning, lunch for midday, dinner for evening)
+
+Generate the meal suggestion now:''';
   }
 
   /// Parse AI response into HeartHealthyMeal
@@ -89,6 +125,13 @@ Only return the JSON, no additional text.
           lines.removeLast(); // Remove last line (```)
         }
         jsonStr = lines.join('\n');
+      }
+
+      // Try to find JSON object in the response
+      final jsonStart = jsonStr.indexOf('{');
+      final jsonEnd = jsonStr.lastIndexOf('}');
+      if (jsonStart != -1 && jsonEnd != -1 && jsonEnd > jsonStart) {
+        jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
       }
 
       // Try to parse as JSON using dart:convert
@@ -111,6 +154,9 @@ Only return the JSON, no additional text.
         createdAt: DateTime.now(),
       );
     } catch (e) {
+      // Log error for debugging
+      debugPrint('Error parsing AI response: $e');
+      debugPrint('Response was: $response');
       // Fallback to template-based meal if parsing fails
       return _createFallbackMeal(userInput);
     }
