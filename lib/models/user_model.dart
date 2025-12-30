@@ -21,7 +21,6 @@ class UserModel {
     this.metadata,
   });
 
-  /// Create UserModel from JSON
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id']?.toString() ?? json['_id']?.toString() ?? json['userId']?.toString() ?? '',
@@ -36,7 +35,6 @@ class UserModel {
     );
   }
 
-  /// Convert UserModel to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -51,7 +49,6 @@ class UserModel {
     };
   }
 
-  /// Create a copy with updated fields
   UserModel copyWith({
     String? id,
     String? email,
@@ -76,7 +73,6 @@ class UserModel {
     );
   }
 
-  /// Helper method to parse DateTime from various formats
   static DateTime? _parseDateTime(dynamic value) {
     if (value == null) return null;
     if (value is DateTime) return value;
@@ -90,10 +86,8 @@ class UserModel {
     return null;
   }
 
-  /// Check if user is authenticated (not anonymous)
   bool get isAuthenticated => !isAnonymous && id.isNotEmpty;
 
-  /// Get display name (name, email, or "Anonymous")
   String get displayName {
     if (name != null && name!.isNotEmpty) return name!;
     if (email != null && email!.isNotEmpty) return email!;

@@ -51,6 +51,7 @@ dependencies:
   firebase_storage: ^12.3.2
   google_maps_flutter: ^2.5.0
   google_generative_ai: ^0.4.6
+  flutter_secure_storage: ^10.0.0
 
 dev_dependencies:
   flutter_test:
