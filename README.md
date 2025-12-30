@@ -87,4 +87,22 @@ This project was built by the **Apex Team**:
 * **Laith Abu-Abbas:** UI/UX & Software Engineer 
 
 
+
+
+## 💡 Technical Highlights & Development Process
+
+* **Robust Testing Strategy:**
+    To ensure a reliable experience for caregivers, the team implemented a comprehensive testing strategy[cite: 48]. [cite_start]This included **Widget Testing** to verify the UI components and **Unit Testing** to validate the underlying business logic.
+
+* **Optimized Content Delivery:**
+    Balancing high-quality video tutorials with app performance was a significant challenge[cite: 61]. [cite_start]We resolved this by optimizing the Firebase backend for efficient content streaming, leveraging external platforms instead of embedding large media files directly, which kept the app lightweight and fast.
+
+* **Advanced Localization Logic:**
+    A core technical requirement was full bilingual support[cite: 56]. [cite_start]We utilized advanced state management to handle text direction changes (LTR to RTL) instantly, allowing users to switch between English and Arabic without needing to restart the application.
+
+* **Incremental Prototyping:**
+    The project followed an incremental prototyping methodology[cite: 43]. [cite_start]We established the Firestore database structure and Authentication early [cite: 45][cite_start], allowing us to focus on perfecting the UI and feature integration in distinct phases.
+
+* **User-Centric Data Entry:**
+    Recognizing the stress caregivers face, we designed complex forms with intuitive interfaces[cite: 66]. [cite_start]This included robust validation for sensitive medical data inputs—such as Oxygen Saturation and blood pressure—to ensure accuracy and ease of use.
 *Developed for the support of CHD children and their families.*
