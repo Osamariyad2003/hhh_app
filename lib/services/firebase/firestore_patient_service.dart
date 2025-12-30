@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/patient_model.dart';
 
-/// Firestore service for Patient entity
 class FirestorePatientService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String _collection = 'patients';
 
-  /// Get patient by ID
   Future<PatientModel?> getPatient(String patientId) async {
     try {
       final doc = await _firestore.collection(_collection).doc(patientId).get();
@@ -17,7 +15,6 @@ class FirestorePatientService {
     }
   }
 
-  /// Create patient
   Future<String> createPatient(PatientModel patient) async {
     try {
       final docRef = await _firestore.collection(_collection).add(
@@ -29,7 +26,6 @@ class FirestorePatientService {
     }
   }
 
-  /// Update patient
   Future<void> updatePatient(String patientId, PatientModel patient) async {
     try {
       await _firestore.collection(_collection).doc(patientId).update(
@@ -40,7 +36,6 @@ class FirestorePatientService {
     }
   }
 
-  /// Delete patient
   Future<void> deletePatient(String patientId) async {
     try {
       await _firestore.collection(_collection).doc(patientId).delete();
@@ -49,7 +44,6 @@ class FirestorePatientService {
     }
   }
 
-  /// Get all patients
   Stream<List<PatientModel>> getAllPatients() {
     return _firestore.collection(_collection).snapshots().map(
           (snapshot) => snapshot.docs
@@ -61,7 +55,6 @@ class FirestorePatientService {
         );
   }
 
-  /// Search patients by parent name
   Stream<List<PatientModel>> searchPatientsByParentName(String parentName) {
     return _firestore
         .collection(_collection)
@@ -78,7 +71,6 @@ class FirestorePatientService {
         );
   }
 
-  /// Get patients by user ID (for patients/caregivers to see their own patients)
   Stream<List<PatientModel>> getPatientsByUserId(String userId) {
     return _firestore
         .collection(_collection)
@@ -94,7 +86,6 @@ class FirestorePatientService {
         );
   }
 
-  /// Get patients by parent phone (alternative way to link patients to users)
   Stream<List<PatientModel>> getPatientsByParentPhone(String parentPhone) {
     return _firestore
         .collection(_collection)

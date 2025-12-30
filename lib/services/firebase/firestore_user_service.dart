@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/firebase_user_model.dart';
 
-/// Firestore service for User entity
 class FirestoreUserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String _collection = 'users';
 
-  /// Get user by ID
   Future<FirebaseUserModel?> getUser(String userId) async {
     try {
       final doc = await _firestore.collection(_collection).doc(userId).get();
@@ -17,7 +15,6 @@ class FirestoreUserService {
     }
   }
 
-  /// Create or update user
   Future<void> setUser(FirebaseUserModel user) async {
     try {
       await _firestore.collection(_collection).doc(user.id).set(
@@ -29,7 +26,6 @@ class FirestoreUserService {
     }
   }
 
-  /// Update user
   Future<void> updateUser(String userId, Map<String, dynamic> updates) async {
     try {
       await _firestore.collection(_collection).doc(userId).update(updates);
@@ -38,7 +34,6 @@ class FirestoreUserService {
     }
   }
 
-  /// Delete user
   Future<void> deleteUser(String userId) async {
     try {
       await _firestore.collection(_collection).doc(userId).delete();
@@ -47,7 +42,6 @@ class FirestoreUserService {
     }
   }
 
-  /// Get all users
   Stream<List<FirebaseUserModel>> getAllUsers() {
     return _firestore.collection(_collection).snapshots().map(
           (snapshot) => snapshot.docs
@@ -59,7 +53,6 @@ class FirestoreUserService {
         );
   }
 
-  /// Get users by role
   Stream<List<FirebaseUserModel>> getUsersByRole(String role) {
     return _firestore
         .collection(_collection)
@@ -75,7 +68,6 @@ class FirestoreUserService {
         );
   }
 
-  /// Update last login timestamp
   Future<void> updateLastLogin(String userId) async {
     await updateUser(userId, {'lastLogin': DateTime.now().toIso8601String()});
   }

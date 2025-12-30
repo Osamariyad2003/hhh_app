@@ -8,9 +8,7 @@ class TutorialsService {
 
   final _firestoreService = FirestoreTutorialService();
 
-  /// Convert TutorialModel to TutorialItem for UI compatibility
   TutorialItem _convertToTutorialItem(TutorialModel model) {
-    // Determine type based on available URLs
     String type = 'url';
     String? url;
     String? r2Key;
@@ -30,7 +28,7 @@ class TutorialsService {
       id: model.id,
       type: type,
       titleEn: model.title,
-      titleAr: model.title, // Use same title if Arabic not available
+      titleAr: model.title, 
       descriptionEn: model.contentEnglish,
       descriptionAr: model.contentArabic,
       url: url,
@@ -44,13 +42,10 @@ class TutorialsService {
 
   Future<List<TutorialItem>> getTutorials() async {
     try {
-      // Get all tutorials from Firestore
       final tutorials = await _firestoreService.getAllTutorials().first;
       
-      // Convert to TutorialItem list
       final items = tutorials.map(_convertToTutorialItem).toList();
       
-      // Filter enabled items and sort
       final enabledOnly = items.where((t) => t.enabled).toList();
       enabledOnly.sort(
         (a, b) => (a.order ?? 999999).compareTo(b.order ?? 999999),

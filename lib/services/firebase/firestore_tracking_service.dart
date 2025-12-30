@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Firestore service for tracking data (weights, feedings, oxygen)
 class FirestoreTrackingService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Convert ISO8601 string to Timestamp
   Timestamp? _parseTimestamp(dynamic ts) {
     if (ts == null) return null;
     if (ts is Timestamp) return ts;
@@ -19,12 +17,10 @@ class FirestoreTrackingService {
     return null;
   }
 
-  /// Convert Timestamp to ISO8601 string
   String _timestampToString(Timestamp ts) {
     return ts.toDate().toIso8601String();
   }
 
-  // Collection paths
   String _weightsCollection(String userId, String childId) =>
       'users/$userId/children/$childId/weights';
   String _feedingsCollection(String userId, String childId) =>
@@ -36,7 +32,6 @@ class FirestoreTrackingService {
   // Weights
   // ------------------------
 
-  /// Get weights for a child
   Future<List<Map<String, dynamic>>> getWeights(
     String userId,
     String childId, {
@@ -60,7 +55,6 @@ class FirestoreTrackingService {
         };
       }).toList();
     } catch (e) {
-      // If index error, try without orderBy and sort manually
       try {
         final snapshot = await _firestore
             .collection(_weightsCollection(userId, childId))
@@ -88,7 +82,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Stream weights for a child
   Stream<List<Map<String, dynamic>>> weightsStream(
     String userId,
     String childId, {
@@ -107,21 +100,18 @@ class FirestoreTrackingService {
     });
   }
 
-  /// Add weight entry
   Future<String> addWeight(
     String userId,
     String childId,
     Map<String, dynamic> data,
   ) async {
     try {
-      // Convert ts string to Timestamp for proper Firestore ordering
       final dataCopy = Map<String, dynamic>.from(data);
       if (dataCopy['ts'] is String) {
         try {
           final dt = DateTime.parse(dataCopy['ts'] as String);
           dataCopy['ts'] = Timestamp.fromDate(dt);
         } catch (e) {
-          // Keep as string if parsing fails
         }
       }
       
@@ -134,7 +124,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Update weight entry
   Future<void> updateWeight(
     String userId,
     String childId,
@@ -148,7 +137,6 @@ class FirestoreTrackingService {
           final dt = DateTime.parse(dataCopy['ts'] as String);
           dataCopy['ts'] = Timestamp.fromDate(dt);
         } catch (e) {
-          // Keep as string if parsing fails
         }
       }
       
@@ -161,7 +149,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Delete weight entry
   Future<void> deleteWeight(
     String userId,
     String childId,
@@ -181,7 +168,6 @@ class FirestoreTrackingService {
   // Feedings
   // ------------------------
 
-  /// Get feedings for a child
   Future<List<Map<String, dynamic>>> getFeedings(
     String userId,
     String childId, {
@@ -232,7 +218,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Stream feedings for a child
   Stream<List<Map<String, dynamic>>> feedingsStream(
     String userId,
     String childId, {
@@ -287,7 +272,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Add feeding entry
   Future<String> addFeeding(
     String userId,
     String childId,
@@ -300,7 +284,6 @@ class FirestoreTrackingService {
           final dt = DateTime.parse(dataCopy['ts'] as String);
           dataCopy['ts'] = Timestamp.fromDate(dt);
         } catch (e) {
-          // Keep as string if parsing fails
         }
       }
       
@@ -313,7 +296,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Update feeding entry
   Future<void> updateFeeding(
     String userId,
     String childId,
@@ -327,7 +309,6 @@ class FirestoreTrackingService {
           final dt = DateTime.parse(dataCopy['ts'] as String);
           dataCopy['ts'] = Timestamp.fromDate(dt);
         } catch (e) {
-          // Keep as string if parsing fails
         }
       }
       
@@ -340,7 +321,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Delete feeding entry
   Future<void> deleteFeeding(
     String userId,
     String childId,
@@ -360,7 +340,6 @@ class FirestoreTrackingService {
   // Oxygen
   // ------------------------
 
-  /// Get oxygen readings for a child
   Future<List<Map<String, dynamic>>> getOxygen(
     String userId,
     String childId, {
@@ -411,7 +390,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Stream oxygen readings for a child
   Stream<List<Map<String, dynamic>>> oxygenStream(
     String userId,
     String childId, {
@@ -466,7 +444,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Add oxygen entry
   Future<String> addOxygen(
     String userId,
     String childId,
@@ -479,7 +456,6 @@ class FirestoreTrackingService {
           final dt = DateTime.parse(dataCopy['ts'] as String);
           dataCopy['ts'] = Timestamp.fromDate(dt);
         } catch (e) {
-          // Keep as string if parsing fails
         }
       }
       
@@ -492,7 +468,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Update oxygen entry
   Future<void> updateOxygen(
     String userId,
     String childId,
@@ -506,7 +481,6 @@ class FirestoreTrackingService {
           final dt = DateTime.parse(dataCopy['ts'] as String);
           dataCopy['ts'] = Timestamp.fromDate(dt);
         } catch (e) {
-          // Keep as string if parsing fails
         }
       }
       
@@ -519,7 +493,6 @@ class FirestoreTrackingService {
     }
   }
 
-  /// Delete oxygen entry
   Future<void> deleteOxygen(
     String userId,
     String childId,

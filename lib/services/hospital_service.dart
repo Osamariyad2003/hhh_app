@@ -6,7 +6,6 @@ class HospitalService {
 
   final _firestoreService = FirestoreHospitalService();
 
-  /// Get all hospitals
   Future<List<Map<String, dynamic>>> getHospitals() async {
     try {
       final hospitals = await _firestoreService.getAllHospitals().first;
@@ -16,14 +15,12 @@ class HospitalService {
     }
   }
 
-  /// Stream all hospitals
   Stream<List<Map<String, dynamic>>> streamHospitals() {
     return _firestoreService.getAllHospitals().map(
       (hospitals) => hospitals.map((h) => h.toJson()).toList(),
     );
   }
 
-  /// Get hospital by ID
   Future<Map<String, dynamic>?> getHospital(String hospitalId) async {
     try {
       final hospital = await _firestoreService.getHospital(hospitalId);

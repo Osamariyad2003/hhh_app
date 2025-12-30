@@ -1,13 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/patient_story_model.dart';
 
-/// Firestore service for PatientStory entity
-/// Connects to Firebase Firestore collection: 'patient_stories'
 class FirestorePatientStoryService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static const String _collection = 'patient_stories'; // Firebase Firestore collection name
+  static const String _collection = 'patient_stories';
 
-  /// Get patient story by ID
   Future<PatientStoryModel?> getPatientStory(String patientStoryId) async {
     try {
       final doc = await _firestore.collection(_collection).doc(patientStoryId).get();
@@ -18,7 +15,6 @@ class FirestorePatientStoryService {
     }
   }
 
-  /// Create patient story
   Future<String> createPatientStory(PatientStoryModel story) async {
     try {
       final docRef = await _firestore.collection(_collection).add(
@@ -30,7 +26,6 @@ class FirestorePatientStoryService {
     }
   }
 
-  /// Update patient story
   Future<void> updatePatientStory(String patientStoryId, PatientStoryModel story) async {
     try {
       await _firestore.collection(_collection).doc(patientStoryId).update(
@@ -41,7 +36,6 @@ class FirestorePatientStoryService {
     }
   }
 
-  /// Delete patient story
   Future<void> deletePatientStory(String patientStoryId) async {
     try {
       await _firestore.collection(_collection).doc(patientStoryId).delete();
@@ -50,7 +44,6 @@ class FirestorePatientStoryService {
     }
   }
 
-  /// Get all patient stories
   Stream<List<PatientStoryModel>> getAllPatientStories() {
     return _firestore.collection(_collection).snapshots().map(
           (snapshot) => snapshot.docs
@@ -62,25 +55,21 @@ class FirestorePatientStoryService {
         );
   }
 
-  /// Get published patient stories from Firebase Firestore
-  /// Queries collection 'patient_stories' where isPublished = true
-  /// Returns real-time stream that updates automatically when data changes
   Stream<List<PatientStoryModel>> getPublishedPatientStories() {
     return _firestore
-        .collection(_collection) // Firebase collection: 'patient_stories'
-        .where('isPublished', isEqualTo: true) // Filter: only published stories
-        .snapshots() // Real-time stream from Firebase
+        .collection(_collection) 
+        .where('isPublished', isEqualTo: true) 
+        .snapshots() 
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => PatientStoryModel.fromJson({
                     'id': doc.id,
-                    ...doc.data(), // Get all fields from Firebase document
+                    ...doc.data(),
                   }))
               .toList(),
         );
   }
 
-  /// Get featured patient stories
   Stream<List<PatientStoryModel>> getFeaturedPatientStories() {
     return _firestore
         .collection(_collection)
@@ -97,7 +86,6 @@ class FirestorePatientStoryService {
         );
   }
 
-  /// Publish/unpublish patient story
   Future<void> setPublished(String patientStoryId, bool isPublished) async {
     try {
       await _firestore.collection(_collection).doc(patientStoryId).update({
@@ -108,7 +96,6 @@ class FirestorePatientStoryService {
     }
   }
 
-  /// Feature/unfeature patient story
   Future<void> setFeatured(String patientStoryId, bool isFeatured) async {
     try {
       await _firestore.collection(_collection).doc(patientStoryId).update({

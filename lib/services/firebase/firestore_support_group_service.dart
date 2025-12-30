@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/support_group_model.dart';
 
-/// Firestore service for SupportGroup entity
 class FirestoreSupportGroupService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String _collection = 'support_groups';
 
-  /// Get support group by ID
   Future<SupportGroupModel?> getSupportGroup(String supportGroupId) async {
     try {
       final doc = await _firestore.collection(_collection).doc(supportGroupId).get();
@@ -17,7 +15,6 @@ class FirestoreSupportGroupService {
     }
   }
 
-  /// Create support group
   Future<String> createSupportGroup(SupportGroupModel supportGroup) async {
     try {
       final docRef = await _firestore.collection(_collection).add(
@@ -29,7 +26,6 @@ class FirestoreSupportGroupService {
     }
   }
 
-  /// Update support group
   Future<void> updateSupportGroup(String supportGroupId, SupportGroupModel supportGroup) async {
     try {
       await _firestore.collection(_collection).doc(supportGroupId).update(
@@ -40,7 +36,6 @@ class FirestoreSupportGroupService {
     }
   }
 
-  /// Delete support group
   Future<void> deleteSupportGroup(String supportGroupId) async {
     try {
       await _firestore.collection(_collection).doc(supportGroupId).delete();
@@ -49,7 +44,6 @@ class FirestoreSupportGroupService {
     }
   }
 
-  /// Get all support groups
   Stream<List<SupportGroupModel>> getAllSupportGroups() {
     print('DEBUG: Fetching support groups stream...');
     return _firestore.collection(_collection).snapshots().map(
@@ -63,7 +57,6 @@ class FirestoreSupportGroupService {
                 });
               } catch (e) {
                 print('DEBUG: Error parsing support group ${doc.id}: $e');
-                // Return a dummy object or throw? Throwing catches in handleError.
                 rethrow;
               }
             }).toList();

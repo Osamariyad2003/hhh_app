@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/hospital_model.dart';
 
-/// Firestore service for Hospital entity
 class FirestoreHospitalService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String _collection = 'hospitals';
 
-  /// Get hospital by ID
   Future<HospitalModel?> getHospital(String hospitalId) async {
     try {
       final doc = await _firestore.collection(_collection).doc(hospitalId).get();
@@ -17,7 +15,6 @@ class FirestoreHospitalService {
     }
   }
 
-  /// Create hospital
   Future<String> createHospital(HospitalModel hospital) async {
     try {
       final docRef = await _firestore.collection(_collection).add(
@@ -29,7 +26,6 @@ class FirestoreHospitalService {
     }
   }
 
-  /// Update hospital
   Future<void> updateHospital(String hospitalId, HospitalModel hospital) async {
     try {
       await _firestore.collection(_collection).doc(hospitalId).update(
@@ -40,7 +36,6 @@ class FirestoreHospitalService {
     }
   }
 
-  /// Delete hospital
   Future<void> deleteHospital(String hospitalId) async {
     try {
       await _firestore.collection(_collection).doc(hospitalId).delete();
@@ -49,7 +44,6 @@ class FirestoreHospitalService {
     }
   }
 
-  /// Get all hospitals
   Stream<List<HospitalModel>> getAllHospitals() {
     return _firestore.collection(_collection).snapshots().map(
           (snapshot) => snapshot.docs

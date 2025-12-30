@@ -20,14 +20,11 @@ class AuthService {
 
   Future<void> signInAnonymously() async {
     try {
-      // Note: Anonymous sign in endpoint not in API docs
-      // Creating a local anonymous user as fallback
       _currentUserId = 'anonymous_${DateTime.now().millisecondsSinceEpoch}';
       _currentToken = null;
       await _storage.write(key: _kUserIdKey, value: _currentUserId);
       _authStateController.add(_currentUserId);
     } catch (e) {
-      // If storage fails, create a local anonymous user
       _currentUserId = 'anonymous_${DateTime.now().millisecondsSinceEpoch}';
       _currentToken = null;
       await _storage.write(key: _kUserIdKey, value: _currentUserId);
@@ -35,7 +32,6 @@ class AuthService {
     }
   }
 
-  /// Store token and user ID
   Future<void> storeAuth(String token, String userId) async {
     _currentToken = token;
     _currentUserId = userId;

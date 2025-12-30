@@ -20,7 +20,6 @@ class TrackService {
   Future<List<Map<String, dynamic>>> getChildren() async {
     try {
       final patientsData = await _patientService.getMyPatients();
-      // Convert PatientModel JSON to child format
       return patientsData.map((p) {
         final firstName = p['firstName'] ?? '';
         final lastName = p['lastName'] ?? '';
@@ -70,7 +69,6 @@ class TrackService {
       final patient = await _patientService.getPatientById(childId);
       if (patient == null) return null;
       
-      // Convert PatientModel JSON to child format
       final firstName = patient['firstName'] ?? '';
       final lastName = patient['lastName'] ?? '';
       final name = '$firstName $lastName'.trim();
@@ -93,8 +91,6 @@ class TrackService {
   }
 
   Stream<Map<String, dynamic>?> childStream(String childId) {
-    // Note: PatientService doesn't have a stream for single patient
-    // So we'll use periodic polling
     return Stream.periodic(const Duration(seconds: 5), (_) => getChild(childId))
         .asyncMap((future) => future);
   }
@@ -110,17 +106,14 @@ class TrackService {
       throw Exception('User not authenticated');
     }
 
-    // Split name into first and last name
     final nameParts = name.trim().split(' ');
     final firstName = nameParts.isNotEmpty ? nameParts.first : name.trim();
     final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
-    // Get parent info from current user
     final userProfile = await _authService.getCurrentUserProfile();
     final parentName = userProfile?.username ?? 'Parent';
-    final parentPhone = ''; // Can be added to user profile later
+    final parentPhone = '';
 
-    // Create patient (child) using PatientService
     final patientId = await _patientService.createPatient(
       firstName: firstName,
       lastName: lastName,
@@ -150,7 +143,6 @@ class TrackService {
       throw Exception('User not authenticated');
     }
 
-    // Split name if provided
     String? firstName;
     String? lastName;
     if (name != null && name.trim().isNotEmpty) {
@@ -159,7 +151,6 @@ class TrackService {
       lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
     }
 
-    // Update using PatientService
     await _patientService.updatePatient(
       patientId: childId,
       firstName: firstName,
@@ -171,8 +162,6 @@ class TrackService {
   }
 
   Future<void> setChildArchived({required String childId, required bool archived}) {
-    // Note: Archived functionality not yet implemented in PatientService
-    // For now, we'll just return without error
     return Future.value();
   }
 

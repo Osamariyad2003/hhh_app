@@ -3,8 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../../models/heart_healthy_meal.dart';
 
-/// Generative AI Service using Google's Gemini API
-/// Provides AI-powered meal suggestions for children with heart disease
 class GenerativeAIService {
   GenerativeAIService._();
   static final GenerativeAIService instance = GenerativeAIService._();
@@ -12,7 +10,6 @@ class GenerativeAIService {
   static const String _apiKey = 'AIzaSyDhugogohGxLtF7W6o8mebhwRwCARfT73c';
   GenerativeModel? _model;
 
-  /// Initialize the service (call this before using)
   void initialize() {
     _model = GenerativeModel(
       model: 'gemini-2.0-flash',
@@ -28,7 +25,6 @@ class GenerativeAIService {
     return _model!;
   }
 
-  /// Get AI-powered meal suggestion based on user input
   Future<HeartHealthyMeal> getMealSuggestion(String userInput) async {
     try {
       final prompt = _buildPrompt(userInput);
@@ -50,7 +46,6 @@ class GenerativeAIService {
         throw Exception('AI returned empty response');
       }
 
-      // Parse the AI response into a HeartHealthyMeal
       return _parseAIResponse(text, userInput);
     } catch (e) {
       debugPrint('GenerativeAI Error: $e');
@@ -58,7 +53,6 @@ class GenerativeAIService {
     }
   }
 
-  /// Build the prompt for the AI
   String _buildPrompt(String userInput) {
     return '''You are a certified pediatric nutritionist and registered dietitian specializing in congenital heart disease (CHD) nutrition for children. You have extensive experience creating medically appropriate, heart-healthy meal plans for children with various types of CHD.
 
@@ -111,30 +105,25 @@ CRITICAL:
 Generate the meal suggestion now:''';
   }
 
-  /// Parse AI response into HeartHealthyMeal
   HeartHealthyMeal _parseAIResponse(String response, String userInput) {
     try {
-      // Try to extract JSON from the response
       String jsonStr = response.trim();
 
-      // Remove markdown code blocks if present
       if (jsonStr.startsWith('```')) {
         final lines = jsonStr.split('\n');
-        lines.removeAt(0); // Remove first line (```json or ```)
+        lines.removeAt(0); 
         if (lines.isNotEmpty && lines.last.trim() == '```') {
-          lines.removeLast(); // Remove last line (```)
+          lines.removeLast(); 
         }
         jsonStr = lines.join('\n');
       }
 
-      // Try to find JSON object in the response
       final jsonStart = jsonStr.indexOf('{');
       final jsonEnd = jsonStr.lastIndexOf('}');
       if (jsonStart != -1 && jsonEnd != -1 && jsonEnd > jsonStart) {
         jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
       }
 
-      // Try to parse as JSON using dart:convert
       final jsonData = jsonDecode(jsonStr) as Map<String, dynamic>;
 
       return HeartHealthyMeal(
@@ -154,10 +143,8 @@ Generate the meal suggestion now:''';
         createdAt: DateTime.now(),
       );
     } catch (e) {
-      // Log error for debugging
       debugPrint('Error parsing AI response: $e');
       debugPrint('Response was: $response');
-      // Fallback to template-based meal if parsing fails
       return _createFallbackMeal(userInput);
     }
   }
