@@ -2,25 +2,33 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../../models/heart_healthy_meal.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class GenerativeAIService {
   GenerativeAIService._();
   static final GenerativeAIService instance = GenerativeAIService._();
 
-  static const String _apiKey = 'AIzaSyDhugogohGxLtF7W6o8mebhwRwCARfT73c';
+  String? _apiKey;
   GenerativeModel? _model;
 
   void initialize() {
+    if (_apiKey != null) {
+      return;
+    }
+    _apiKey = dotenv.env['gemini-api-key'] ?? '';
     _model = GenerativeModel(
       model: 'gemini-2.0-flash',
-      apiKey: _apiKey,
+      apiKey: _apiKey!,
     );
   }
 
   GenerativeModel get model {
+    if (_apiKey == null) {
+      throw Exception('GenerativeAIService not initialized. Call initialize() first.');
+    }
     _model ??= GenerativeModel(
       model: 'gemini-2.0-flash',
-      apiKey: _apiKey,
+      apiKey: _apiKey!,
     );
     return _model!;
   }

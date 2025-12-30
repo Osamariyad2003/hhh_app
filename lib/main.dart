@@ -1,6 +1,8 @@
 import 'package:chd_app_new/services/firebase/firebase_init.dart';
+import 'package:chd_app_new/services/generative_ai/generative_ai_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,6 +18,8 @@ import 'localization/app_localizations.dart';
 import 'services/recipe_remote_datasource.dart';
 
 Future<void> main() async {
+  await dotenv.load();
+  GenerativeAIService.instance.initialize();
   WidgetsFlutterBinding.ensureInitialized();
 
   Bloc.observer = AppBlocObserver();
