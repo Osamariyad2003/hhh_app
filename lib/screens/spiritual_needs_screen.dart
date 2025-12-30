@@ -10,7 +10,6 @@ class SpiritualNeedsScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    // Supplications (ادعية)
     final supplications = [
       {
         'titleAr': 'دعاء الشفاء',
@@ -70,7 +69,6 @@ class SpiritualNeedsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // Header Card
           Card(
             margin: const EdgeInsets.only(bottom: 24),
             child: Padding(
@@ -103,7 +101,6 @@ class SpiritualNeedsScreen extends StatelessWidget {
             ),
           ),
 
-          // Supplication Cards
           ...supplications.map((supplication) {
             final title = loc.isArabic ? supplication['titleAr'] : supplication['titleEn'];
             final text = loc.isArabic ? supplication['textAr'] : supplication['textEn'];
@@ -115,7 +112,6 @@ class SpiritualNeedsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Supplication Title
                     Row(
                       children: [
                         Container(
@@ -143,7 +139,6 @@ class SpiritualNeedsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Supplication Text
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(

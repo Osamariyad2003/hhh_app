@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../localization/app_localizations.dart';
 import '../services/track_service.dart';
 import '../widgets/lang_toggle_button.dart';
-import 'track_dashboard_screen.dart'; // For WeightsTab, FeedingsTab, OxygenTab
+import 'track_dashboard_screen.dart'; 
 
 String _formatTs(dynamic ts) {
   if (ts is String) {
@@ -117,7 +117,6 @@ class ChildDetailScreen extends StatelessWidget {
       try {
         dob = DateTime.parse(dobRaw);
       } catch (e) {
-        // Invalid date string
       }
     }
 
@@ -632,7 +631,6 @@ class _WeightsTab extends StatelessWidget {
                 final dt = DateTime.parse(ts);
                 spots.add(FlSpot(dt.millisecondsSinceEpoch.toDouble(), kg.toDouble()));
               } catch (e) {
-                // Invalid date, skip
               }
             }
           }
@@ -1241,7 +1239,6 @@ class _OxygenTab extends StatelessWidget {
                 final dt = DateTime.parse(ts);
                 spots.add(FlSpot(dt.millisecondsSinceEpoch.toDouble(), v.toDouble()));
               } catch (e) {
-                // Invalid date, skip
               }
             }
           }

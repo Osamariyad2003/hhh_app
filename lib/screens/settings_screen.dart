@@ -44,10 +44,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() => _busy = true);
 
       try {
-        // Sign out from Firebase
         await context.read<AuthCubit>().signOut();
         
-        // Navigate to login screen (router will handle this automatically)
         if (mounted) {
           context.go('/login');
         }

@@ -39,7 +39,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final loc = AppLocalizations.of(context);
     final currentPath = GoRouterState.of(context).uri.path;
 
-    // Determine current index based on path - only for main routes
     int selectedIndex = 0;
     if (currentPath == '/track') {
       selectedIndex = 2;
@@ -51,7 +50,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       selectedIndex = 0;
     }
 
-    // Only show bottom nav on main routes (exact matches)
     final showBottomNav = currentPath == '/' || 
                          currentPath == '/dashboard' ||
                          currentPath == '/track' || 

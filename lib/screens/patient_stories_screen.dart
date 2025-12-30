@@ -4,9 +4,6 @@ import '../widgets/lang_toggle_button.dart';
 import '../widgets/empty_state_widget.dart';
 import '../services/patient_story_service.dart';
 
-/// Patient Stories Screen
-/// Displays published patient stories from Firebase Firestore collection 'patient_stories'
-/// Stories are filtered by isPublished = true
 class PatientStoriesScreen extends StatelessWidget {
   const PatientStoriesScreen({super.key});
 
@@ -21,16 +18,11 @@ class PatientStoriesScreen extends StatelessWidget {
         actions: const [LangToggleButton()],
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        // Get published patient stories from Firebase Firestore
-        // Collection: 'patient_stories'
-        // Filter: isPublished = true
         stream: PatientStoryService.instance.streamPublishedStories().handleError((error) {
-          // Return empty list on error to prevent stream from closing
           debugPrint('Error loading patient stories from Firebase: $error');
           return <Map<String, dynamic>>[];
         }),
         builder: (context, snapshot) {
-          // Loading state
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const EmptyStateWidget(
               icon: Icons.book_outlined,
@@ -39,7 +31,6 @@ class PatientStoriesScreen extends StatelessWidget {
             );
           }
 
-          // Error state
           if (snapshot.hasError) {
             return EmptyStateWidget(
               icon: Icons.error_outline,
@@ -48,7 +39,6 @@ class PatientStoriesScreen extends StatelessWidget {
             );
           }
 
-          // No data state
           if (!snapshot.hasData) {
             return const EmptyStateWidget(
               icon: Icons.book_outlined,
@@ -59,7 +49,6 @@ class PatientStoriesScreen extends StatelessWidget {
 
           final stories = snapshot.data!;
           
-          // Empty state
           if (stories.isEmpty) {
             return EmptyStateWidget(
               icon: Icons.book_outlined,
@@ -68,7 +57,6 @@ class PatientStoriesScreen extends StatelessWidget {
             );
           }
 
-          // Stories list
           return ListView.builder(
             padding: const EdgeInsets.all(20),
             itemCount: stories.length,
@@ -87,8 +75,6 @@ class PatientStoriesScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 16),
                 child: InkWell(
                   onTap: () {
-                    // Navigate to story detail if needed
-                    // For now, show full content in a dialog or navigate to detail screen
                     _showStoryDetail(context, story, loc);
                   },
                   borderRadius: BorderRadius.circular(16),
@@ -97,7 +83,6 @@ class PatientStoriesScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Featured badge
                         if (isFeatured)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -115,7 +100,6 @@ class PatientStoriesScreen extends StatelessWidget {
                           ),
                         if (isFeatured) const SizedBox(height: 12),
 
-                        // Story image
                         if (imageUrl != null && imageUrl.isNotEmpty) ...[
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
@@ -130,7 +114,6 @@ class PatientStoriesScreen extends StatelessWidget {
                           const SizedBox(height: 16),
                         ],
 
-                        // Story title
                         Text(
                           title,
                           style: theme.textTheme.titleLarge?.copyWith(
@@ -141,7 +124,6 @@ class PatientStoriesScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
 
-                        // Author and category
                         if (author.isNotEmpty || category.isNotEmpty)
                           Row(
                             children: [
@@ -177,7 +159,6 @@ class PatientStoriesScreen extends StatelessWidget {
                           ),
                         const SizedBox(height: 12),
 
-                        // Story content preview
                         Text(
                           content,
                           style: theme.textTheme.bodyMedium?.copyWith(
@@ -188,7 +169,6 @@ class PatientStoriesScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
 
-                        // Read more indicator
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -243,7 +223,6 @@ class PatientStoriesScreen extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // Handle bar
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 width: 40,
@@ -253,7 +232,6 @@ class PatientStoriesScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              // Content
               Expanded(
                 child: SingleChildScrollView(
                   controller: scrollController,
@@ -261,7 +239,6 @@ class PatientStoriesScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Image
                       if (imageUrl != null && imageUrl.isNotEmpty) ...[
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
@@ -275,7 +252,6 @@ class PatientStoriesScreen extends StatelessWidget {
                         const SizedBox(height: 20),
                       ],
 
-                      // Title
                       Text(
                         title,
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -284,7 +260,6 @@ class PatientStoriesScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
 
-                      // Author and category
                       if (author.isNotEmpty || category.isNotEmpty)
                         Row(
                           children: [
@@ -320,7 +295,6 @@ class PatientStoriesScreen extends StatelessWidget {
                         ),
                       const SizedBox(height: 20),
 
-                      // Full content
                       Text(
                         content,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(

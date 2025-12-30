@@ -15,7 +15,6 @@ class TutorialDetailScreen extends StatelessWidget {
   String? _extractYouTubeVideoId(String? url) {
     if (url == null || url.isEmpty) return null;
 
-    // Handle various YouTube URL formats
     final patterns = [
       RegExp(r'(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})'),
       RegExp(r'youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})'),
@@ -48,12 +47,10 @@ class TutorialDetailScreen extends StatelessWidget {
     final title = loc.isArabic ? tutorial.titleAr : tutorial.titleEn;
     final description = loc.isArabic ? tutorial.descriptionAr : tutorial.descriptionEn;
 
-    // Resolve URL
     String? videoUrl;
     if (tutorial.type == 'url') {
       videoUrl = tutorial.url;
     } else if (tutorial.type == 'r2' && tutorial.r2Key != null) {
-      // For R2, we'll try to extract YouTube ID if it's a YouTube URL
       videoUrl = tutorial.r2Key;
     }
 
@@ -69,7 +66,6 @@ class TutorialDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Video Player Section
             if (isYouTube)
               Container(
                 width: double.infinity,
@@ -77,7 +73,6 @@ class TutorialDetailScreen extends StatelessWidget {
                 color: Colors.black,
                 child: Stack(
                   children: [
-                    // YouTube iframe embed using WebView-like approach
                     Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -137,13 +132,11 @@ class TutorialDetailScreen extends StatelessWidget {
                 ),
               ),
 
-            // Content Section
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title
                   Text(
                     title.isEmpty ? '(untitled)' : title,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -152,7 +145,6 @@ class TutorialDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // Description
                   if (description != null && description.isNotEmpty) ...[
                     Text(
                       description,
@@ -163,7 +155,6 @@ class TutorialDetailScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                   ],
 
-                  // Video Info
                   if (isYouTube) ...[
                     Card(
                       color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
@@ -189,7 +180,6 @@ class TutorialDetailScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                   ],
 
-                  // Open Video Button
                   if (videoUrl != null && videoUrl.isNotEmpty)
                     SizedBox(
                       width: double.infinity,

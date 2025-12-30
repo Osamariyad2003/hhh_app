@@ -1,7 +1,6 @@
-/// Tutorial model based on schema
 class TutorialModel {
   final String id;
-  final String category; // "formula_mixes", "medication", "post_op_care", "general"
+  final String category;
   final String title;
   final String contentEnglish;
   final String? contentArabic;

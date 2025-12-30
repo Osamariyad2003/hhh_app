@@ -53,10 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         email: _emailController.text.trim(),
       );
 
-      // Update password if provided
       if (password.isNotEmpty) {
-        // Note: Password update requires re-authentication in Firebase
-        // For now, we'll just show a message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -167,7 +164,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 20),
-                  // Profile Picture Placeholder
                   Center(
                     child: Container(
                       width: 120,
@@ -189,7 +185,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Username Field
                   Text('Username', style: theme.textTheme.labelLarge),
                   const SizedBox(height: 8),
                   TextFormField(
@@ -210,7 +205,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Email Field
                   Text('Email', style: theme.textTheme.labelLarge),
                   const SizedBox(height: 8),
                   TextFormField(
@@ -235,7 +229,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Password Field (Optional)
                   Text(
                     'New Password (Optional)',
                     style: theme.textTheme.labelLarge,
@@ -274,7 +267,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Save Changes Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -294,7 +286,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Logout Button
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(

@@ -11,7 +11,6 @@ class HomeScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    // Mock data - using localized keys
     final quoteKeys = [
       'quote1',
       'quote2',
@@ -38,7 +37,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Welcome Section
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -81,12 +79,11 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Spiritual Quote Card
             _HomeCard(
               title: loc.t('quoteOfTheDay'),
               icon: Icons.format_quote,
               color: theme.colorScheme.secondaryContainer,
-              onTap: () {}, // Could open a full list of quotes
+              onTap: () {}, 
               child: Text(
                 '"${loc.t(quoteKey)}"',
                 style: theme.textTheme.bodyLarge?.copyWith(
@@ -97,7 +94,6 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Quick Actions / Suggestions
             Row(
               children: [
                 Expanded(
@@ -108,7 +104,7 @@ class HomeScreen extends StatelessWidget {
                     showBorder: true,
                     onTap: () => context.go('/track'),
                     child: Text(
-                        loc.t('checkConnection'), // Using a placeholder for "Check status"
+                        loc.t('checkConnection'), 
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                     ), 
@@ -133,7 +129,6 @@ class HomeScreen extends StatelessWidget {
             ),
              const SizedBox(height: 16),
              
-             // Featured Tutorial or Story (Mock)
              _HomeCard(
                title: loc.t('tutorials'),
                icon: Icons.play_circle_fill,

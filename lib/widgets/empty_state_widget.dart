@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// A helpful empty state widget for loading or empty content screens
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
   final String title;

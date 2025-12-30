@@ -113,7 +113,6 @@ class AppLocalizations {
       'logoutConfirm': 'Are you sure you want to logout?',
       'loggingOut': 'Logging out...',
 
-      // Section Screen Messages
       'loadingHospitals': 'Loading hospitals...',
       'unableToLoadHospitals': 'Unable to load hospitals',
       'noHospitalsAvailable': 'No hospitals available',
@@ -139,7 +138,6 @@ class AppLocalizations {
       'sectionNoContent': 'This section has no content yet.',
       'error': 'Error',
 
-      // Track Dashboard
       'clothesOptional': 'Clothes (optional)',
       'notSet': 'Not set',
       'withDiaper': 'With diaper',
@@ -184,7 +182,6 @@ class AppLocalizations {
       'pulseOptional': 'Pulse (Optional)',
       'deviceOptional': 'Device (Optional)',
 
-      // Login/Signup
       'login': 'Login',
       'signUp': 'Sign Up',
       'continueAsGuest': 'Continue as Guest',
@@ -194,7 +191,6 @@ class AppLocalizations {
       'username': 'Username',
       'confirmPassword': 'Confirm Password',
 
-      // Profile
       'profile': 'Profile',
       'profileUpdated': 'Profile updated successfully',
       'failedToUpdateProfile': 'Failed to update profile',
@@ -203,16 +199,13 @@ class AppLocalizations {
       'currentPassword': 'Current Password',
       'newPassword': 'New Password',
 
-      // Tutorial
       'tutorialDetails': 'Tutorial Details',
       'openVideoLink': 'Open Video Link',
       'watchOnYouTube': 'Watch on YouTube',
       'openVideo': 'Open Video',
 
-      // Patient Stories
       'readMore': 'Read more',
 
-      // Home Screen
       'getPersonalizedTips': 'Get personalized health tips',
       'featuredCHD': 'Featured: Understanding CHD',
       'watchGuide': 'Watch our latest guide on managing heart health at home.',
@@ -222,7 +215,6 @@ class AppLocalizations {
       'quote4': 'You are stronger than you know.',
       'quote5': 'Faith is taking the first step even when you don\'t see the whole staircase.',
 
-      // General Childcare
       'all': 'All',
       'growth': 'Growth',
       'nutrition': 'Nutrition',
@@ -329,7 +321,6 @@ class AppLocalizations {
       'logoutConfirm': 'هل أنت متأكد أنك تريد تسجيل الخروج؟',
       'loggingOut': 'جارٍ تسجيل الخروج...',
 
-      // Section Screen Messages
       'loadingHospitals': 'جارٍ تحميل المستشفيات...',
       'unableToLoadHospitals': 'تعذر تحميل المستشفيات',
       'noHospitalsAvailable': 'لا توجد مستشفيات متاحة',
@@ -355,7 +346,6 @@ class AppLocalizations {
       'sectionNoContent': 'هذا القسم لا يحتوي على محتوى بعد.',
       'error': 'خطأ',
 
-      // Track Dashboard
       'clothesOptional': 'الملابس (اختياري)',
       'notSet': 'غير محدد',
       'withDiaper': 'مع حفاض',
@@ -400,7 +390,6 @@ class AppLocalizations {
       'pulseOptional': 'النبض (اختياري)',
       'deviceOptional': 'الجهاز (اختياري)',
 
-      // Login/Signup
       'login': 'تسجيل الدخول',
       'signUp': 'إنشاء حساب',
       'continueAsGuest': 'المتابعة كضيف',
@@ -410,7 +399,6 @@ class AppLocalizations {
       'username': 'اسم المستخدم',
       'confirmPassword': 'تأكيد كلمة المرور',
 
-      // Profile
       'profile': 'الملف الشخصي',
       'profileUpdated': 'تم تحديث الملف الشخصي بنجاح',
       'failedToUpdateProfile': 'فشل تحديث الملف الشخصي',
@@ -419,16 +407,13 @@ class AppLocalizations {
       'currentPassword': 'كلمة المرور الحالية',
       'newPassword': 'كلمة المرور الجديدة',
 
-      // Tutorial
       'tutorialDetails': 'تفاصيل الدرس',
       'openVideoLink': 'فتح رابط الفيديو',
       'watchOnYouTube': 'شاهد على YouTube',
       'openVideo': 'فتح الفيديو',
 
-      // Patient Stories
       'readMore': 'اقرأ المزيد',
 
-      // Home Screen
       'getPersonalizedTips': 'احصل على نصائح صحية مخصصة',
       'featuredCHD': 'مميز: فهم عيوب القلب الخلقية',
       'watchGuide': 'شاهد أحدث دليل لدينا حول إدارة صحة القلب في المنزل.',
@@ -438,7 +423,6 @@ class AppLocalizations {
       'quote4': 'أنت أقوى مما تعرف.',
       'quote5': 'الإيمان هو اتخاذ الخطوة الأولى حتى عندما لا ترى الدرج بالكامل.',
 
-      // General Childcare
       'all': 'الكل',
       'growth': 'النمو',
       'nutrition': 'التغذية',

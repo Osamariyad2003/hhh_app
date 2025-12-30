@@ -1,9 +1,8 @@
-/// Firebase User model based on schema
 class FirebaseUserModel {
   final String id;
   final String username;
   final String email;
-  final String role; // "parent" - all users are parents
+  final String role;
   final bool isActive;
   final DateTime? lastLogin;
 

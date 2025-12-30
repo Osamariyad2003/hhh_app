@@ -1,4 +1,3 @@
-/// Patient Story model based on schema
 class PatientStoryModel {
   final String id;
   final String title;

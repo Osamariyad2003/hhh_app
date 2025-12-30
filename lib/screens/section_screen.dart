@@ -69,7 +69,7 @@ class SectionScreen extends StatelessWidget {
           child: Text(
             _pickText(loc, block, 'text'),
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  height: 1.6, // Better line height for readability
+                  height: 1.6, 
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
           ),
@@ -199,14 +199,12 @@ class SectionScreen extends StatelessWidget {
     }
   }
 
-  /// Check if this section should use Firebase services
   bool _shouldUseFirebase() {
     return sectionId == 'hospital' || 
            sectionId == 'support' || 
            sectionId == 'patient-stories';
   }
 
-  /// Check if this is a special section with custom screen
   bool _isSpecialSection() {
     return sectionId == 'spiritual' || sectionId == 'about' || sectionId == 'contacts';
   }
@@ -215,7 +213,6 @@ class SectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
 
-    // Special sections with custom screens
     if (_isSpecialSection()) {
       if (sectionId == 'spiritual') {
         return const SpiritualNeedsScreen();
@@ -228,16 +225,13 @@ class SectionScreen extends StatelessWidget {
       }
     }
 
-    // Use Firebase services for specific sections
     if (_shouldUseFirebase()) {
       return _buildFirebaseSection(context, loc);
     }
 
-    // Use regular sections service for other sections
     return _buildRegularSection(context, loc);
   }
 
-  /// Build section using Firebase services
   Widget _buildFirebaseSection(BuildContext context, AppLocalizations loc) {
     if (sectionId == 'hospital') {
       return StreamBuilder<List<Map<String, dynamic>>>(
@@ -401,11 +395,9 @@ class SectionScreen extends StatelessWidget {
     if (sectionId == 'support') {
       return StreamBuilder<List<Map<String, dynamic>>>(
         stream: SupportGroupService.instance.streamSupportGroups().handleError((error) {
-          // Return empty list on error to prevent stream from closing
           return <Map<String, dynamic>>[];
         }),
         builder: (context, snapshot) {
-          // Check for connection state
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(
               appBar: AppBar(
@@ -531,7 +523,6 @@ class SectionScreen extends StatelessWidget {
                         ],
                           const SizedBox(height: 8),
                           if (group['contactInfo'] != null) ...[
-                            // Organizer
                             if (group['contactInfo']['organizer'] != null)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 4),
@@ -554,7 +545,6 @@ class SectionScreen extends StatelessWidget {
                                 ),
                               ),
                             
-                            // Phone
                             if (group['contactInfo']['phone'] != null)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 4),
@@ -577,7 +567,6 @@ class SectionScreen extends StatelessWidget {
                                 ),
                               ),
 
-                            // Email
                             if (group['contactInfo']['email'] != null)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 4),
@@ -614,11 +603,9 @@ class SectionScreen extends StatelessWidget {
     if (sectionId == 'patient-stories') {
       return StreamBuilder<List<Map<String, dynamic>>>(
         stream: PatientStoryService.instance.streamPublishedStories().handleError((error) {
-          // Return empty list on error to prevent stream from closing
           return <Map<String, dynamic>>[];
         }),
         builder: (context, snapshot) {
-          // Check for connection state
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(
               appBar: AppBar(
@@ -743,11 +730,9 @@ class SectionScreen extends StatelessWidget {
       );
     }
 
-    // Fallback to regular section
     return _buildRegularSection(context, loc);
   }
 
-  /// Build regular section using SectionsService
   Widget _buildRegularSection(BuildContext context, AppLocalizations loc) {
     return StreamBuilder<SectionContent?>(
       stream: SectionsService.instance.streamSection(sectionId),
@@ -805,8 +790,8 @@ class SectionScreen extends StatelessWidget {
             'label_ar': block.labelAr,
             'url': block.url,
             'r2Key': block.r2Key,
-            'items_en': null, // Add if needed
-            'items_ar': null, // Add if needed
+            'items_en': null, 
+            'items_ar': null, 
           };
         }).toList();
 
@@ -835,7 +820,6 @@ class SectionScreen extends StatelessWidget {
     );
   }
 
-  /// Build About CHD section with fixed content
   Widget _buildAboutChdSection(BuildContext context, AppLocalizations loc) {
     final content = loc.isArabic ? _aboutChdContentAr : _aboutChdContentEn;
 
@@ -853,7 +837,6 @@ class SectionScreen extends StatelessWidget {
     );
   }
 
-  /// Build Contacts section with fixed content
   Widget _buildContactsSection(BuildContext context, AppLocalizations loc) {
     final contacts = loc.isArabic ? _contactsContentAr : _contactsContentEn;
 
@@ -871,7 +854,6 @@ class SectionScreen extends StatelessWidget {
     );
   }
 
-  // Fixed content for About CHD (English)
   static const List<Map<String, dynamic>> _aboutChdContentEn = [
     {
       'type': 'h1',
@@ -992,7 +974,6 @@ class SectionScreen extends StatelessWidget {
     },
   ];
 
-  // Fixed content for About CHD (Arabic)
   static const List<Map<String, dynamic>> _aboutChdContentAr = [
     {
       'type': 'h1',
@@ -1113,7 +1094,6 @@ class SectionScreen extends StatelessWidget {
     },
   ];
 
-  // Fixed content for Contacts (English)
   static const List<Map<String, dynamic>> _contactsContentEn = [
     {
       'type': 'h1',
@@ -1189,7 +1169,6 @@ class SectionScreen extends StatelessWidget {
     },
   ];
 
-  // Fixed content for Contacts (Arabic)
   static const List<Map<String, dynamic>> _contactsContentAr = [
     {
       'type': 'h1',

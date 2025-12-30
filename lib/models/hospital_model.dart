@@ -1,4 +1,3 @@
-/// Hospital model based on schema
 class HospitalModel {
   final String id;
   final String name;

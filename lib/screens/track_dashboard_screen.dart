@@ -34,7 +34,6 @@ String _formatTsShort(dynamic ts) {
   return '';
 }
 
-  // Unused methods removed
 
 
 String _ageFromDob(dynamic dob) {
@@ -177,7 +176,6 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
           final firstId = docs.first['id'] ?? docs.first['_id'];
           _selectedChildId ??= firstId;
 
-          // Ensure selected ID is valid in current list
           if (!docs.any((d) => (d['id'] ?? d['_id']) == _selectedChildId)) {
              _selectedChildId = firstId;
           }
@@ -192,17 +190,15 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Avatar Carousel
               Container(
                 height: 110,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: docs.length + 1, // +1 for Add Child button
+                  itemCount: docs.length + 1,
                   itemBuilder: (context, index) {
                     if (index == docs.length) {
-                      // Add Child Button
                       return GestureDetector(
                         onTap: () => context.push('/track/add-child'),
                         child: Container(
@@ -305,7 +301,6 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
               
               const Divider(height: 1),
 
-              // Summary Card (Age & Quick Info)
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Row(
@@ -344,7 +339,6 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
                 ),
               ),
 
-              // Tabs content
               Expanded(child: _ChildTabs(childId: _selectedChildId!)),
             ],
           );
@@ -354,12 +348,10 @@ class _TrackDashboardScreenState extends State<TrackDashboardScreen> {
   }
 }
 
-// Helper function to get child ID from map
 String? _getChildId(Map<String, dynamic> child) {
   return child['id'] ?? child['_id'];
 }
 
-// Unused _buildChildDropdown removed
 
 class _ChildTabs extends StatelessWidget {
   final String childId;
@@ -389,7 +381,7 @@ class _ChildTabs extends StatelessWidget {
                 FeedingsTab(childId: childId),
                 OxygenTab(childId: childId),
                 const ChildTrackingMap(
-                  latitude: 24.7136, // Default to Riyadh, can be updated with actual location
+                  latitude: 24.7136, 
                   longitude: 46.6753,
                   locationName: 'Child Location',
                 ),
@@ -605,7 +597,6 @@ class WeightsTab extends StatelessWidget {
               );
             }
 
-            // Get last 7 entries for graph
             final last7Docs = ascDocs.length > 7 ? ascDocs.sublist(ascDocs.length - 7) : ascDocs;
             final spots = <FlSpot>[];
 
@@ -635,7 +626,6 @@ class WeightsTab extends StatelessWidget {
                     );
                   }
                 } catch (e) {
-                   // Skip invalid
                 }
               }
             }
@@ -667,7 +657,6 @@ class WeightsTab extends StatelessWidget {
 
             return CustomScrollView(
               slivers: [
-                // Chart Section
                  if (spots.length < 2)
                   SliverToBoxAdapter(
                     child: Card(
@@ -821,9 +810,8 @@ class WeightsTab extends StatelessWidget {
                 
                 const SliverToBoxAdapter(child: SizedBox(height: 8)),
 
-                // History List
                 SliverPadding(
-                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 80), // Padding for FAB
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 80), 
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, i) {
@@ -848,7 +836,6 @@ class WeightsTab extends StatelessWidget {
                               padding: const EdgeInsets.all(16),
                               child: Row(
                                 children: [
-                                  // Three dots menu
                                   PopupMenuButton<String>(
                                     icon: const Icon(Icons.more_vert, color: Colors.grey),
                                     onSelected: (value) {
@@ -883,12 +870,10 @@ class WeightsTab extends StatelessWidget {
                                     ],
                                   ),
                                   const SizedBox(width: 8),
-                                  // Content
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        // Weight value
                                         Text(
                                           'kg $kgValue',
                                           style: theme.textTheme.titleLarge?.copyWith(
@@ -896,7 +881,6 @@ class WeightsTab extends StatelessWidget {
                                           ),
                                         ),
                                         const SizedBox(height: 4),
-                                        // Date/time
                                         Text(
                                           whenText,
                                           style: theme.textTheme.bodyMedium?.copyWith(
@@ -906,7 +890,6 @@ class WeightsTab extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  // Small icon
                                   Container(
                                     width: 32,
                                     height: 32,
@@ -1161,7 +1144,7 @@ class FeedingsTab extends StatelessWidget {
             final spots = <FlSpot>[];
             for (final d in last7Docs) {
               final ts = d['ts'];
-              final rawMl = d['amountMl']; // Could be String or num
+              final rawMl = d['amountMl'];
 
               double? ml;
               if (rawMl is num) {
@@ -1185,7 +1168,6 @@ class FeedingsTab extends StatelessWidget {
                     );
                   }
                 } catch (e) {
-                   // Skip invalid
                 }
               }
             }
@@ -1201,7 +1183,6 @@ class FeedingsTab extends StatelessWidget {
 
             return CustomScrollView(
               slivers: [
-                // Chart Section
                 if (spots.length >= 2)
                   SliverToBoxAdapter(
                     child: Card(
@@ -1284,7 +1265,7 @@ class FeedingsTab extends StatelessWidget {
                                       spots: spots,
                                       isCurved: true,
                                       curveSmoothness: 0.35,
-                                      color: AppTheme.chartLineColor2, // Feeding color
+                                      color: AppTheme.chartLineColor2, 
                                       barWidth: 3,
                                       isStrokeCapRound: true,
                                       dotData: FlDotData(
@@ -1320,7 +1301,6 @@ class FeedingsTab extends StatelessWidget {
                     ),
                   ),
 
-                // History Header
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1459,7 +1439,6 @@ class FeedingsTab extends StatelessWidget {
             );
           },
         ),
-        // FAB in bottom-left
         Positioned(
           left: 16,
           bottom: 16,
@@ -1650,7 +1629,6 @@ class OxygenTab extends StatelessWidget {
               );
             }
 
-            // Prepare chart data (last 7 entries)
             final ascDocs = docs.reversed.toList();
             final last7Docs = ascDocs.length > 7 ? ascDocs.sublist(ascDocs.length - 7) : ascDocs;
             final spots = <FlSpot>[];
@@ -1679,7 +1657,6 @@ class OxygenTab extends StatelessWidget {
                     spots.add(FlSpot(dt.millisecondsSinceEpoch.toDouble(), spo2));
                   }
                 } catch (e) {
-                  // Skip invalid
                 }
               }
             }
@@ -1687,8 +1664,8 @@ class OxygenTab extends StatelessWidget {
 
             double minX = 0;
             double maxX = 0;
-            double minY = 80; // Typical SpO2 range starts around 80
-            double maxY = 100; // SpO2 max is 100%
+            double minY = 80; 
+            double maxY = 100; 
             
             if (spots.length >= 2) {
               minX = spots.first.x;
@@ -1705,7 +1682,6 @@ class OxygenTab extends StatelessWidget {
 
             return CustomScrollView(
               slivers: [
-                // Chart Section
                 if (spots.length >= 2)
                   SliverToBoxAdapter(
                     child: Card(
@@ -1788,7 +1764,7 @@ class OxygenTab extends StatelessWidget {
                                       spots: spots,
                                       isCurved: true,
                                       curveSmoothness: 0.35,
-                                      color: AppTheme.chartLineColor3, // Indigo for Oxygen
+                                      color: AppTheme.chartLineColor3, 
                                       barWidth: 3,
                                       isStrokeCapRound: true,
                                       dotData: FlDotData(
@@ -1824,7 +1800,6 @@ class OxygenTab extends StatelessWidget {
                     ),
                   ),
 
-                // History Header
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -1837,7 +1812,6 @@ class OxygenTab extends StatelessWidget {
                   ),
                 ),
 
-                // History List
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, i) {
@@ -1865,7 +1839,6 @@ class OxygenTab extends StatelessWidget {
                             padding: const EdgeInsets.all(16),
                             child: Row(
                               children: [
-                                // Three dots menu
                                 PopupMenuButton<String>(
                                   icon: const Icon(Icons.more_vert, color: Colors.grey),
                                   onSelected: (value) {
@@ -1901,12 +1874,10 @@ class OxygenTab extends StatelessWidget {
                                   ],
                                 ),
                                 const SizedBox(width: 8),
-                                // Content
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      // Percentage value
                                       Text(
                                         '$spo2Value%',
                                         style: theme.textTheme.headlineLarge?.copyWith(
@@ -1915,7 +1886,6 @@ class OxygenTab extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      // Date/time
                                       Text(
                                         whenText,
                                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -1923,7 +1893,6 @@ class OxygenTab extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      // Low saturation warning
                                       if (isLow)
                                         Text(
                                           loc.t('lowSaturationLevel'),
@@ -1935,7 +1904,6 @@ class OxygenTab extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                // Heart icon
                                 Container(
                                   width: 48,
                                   height: 48,
@@ -1962,7 +1930,6 @@ class OxygenTab extends StatelessWidget {
             );
           },
         ),
-        // FAB in bottom-left
         Positioned(
           left: 16,
           bottom: 16,
@@ -1976,7 +1943,3 @@ class OxygenTab extends StatelessWidget {
     );
   }
 }
-
-
-
-// exactly as you had them; they compile as-is once the helpers above are fixed.

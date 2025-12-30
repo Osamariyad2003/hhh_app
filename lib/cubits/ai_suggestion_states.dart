@@ -1,21 +1,17 @@
 import '../models/heart_healthy_meal.dart';
 
-/// Abstract base class for AI Suggestion states
 abstract class AISuggestionState {
   const AISuggestionState();
 }
 
-/// Initial state - no action has been taken yet
 class AISuggestionInitial extends AISuggestionState {
   const AISuggestionInitial();
 }
 
-/// Loading state - fetching suggestions
 class AISuggestionLoading extends AISuggestionState {
   const AISuggestionLoading();
 }
 
-/// Success state - suggestion has been loaded successfully
 class AISuggestionSuccess extends AISuggestionState {
   final HeartHealthyMeal suggestion;
 
@@ -32,7 +28,6 @@ class AISuggestionSuccess extends AISuggestionState {
   int get hashCode => suggestion.id.hashCode;
 }
 
-/// Saving state - saving suggestion to Firestore
 class AISuggestionSaving extends AISuggestionState {
   final HeartHealthyMeal suggestion;
 
@@ -49,7 +44,6 @@ class AISuggestionSaving extends AISuggestionState {
   int get hashCode => suggestion.id.hashCode;
 }
 
-/// Saved state - suggestion has been saved successfully
 class AISuggestionSaved extends AISuggestionState {
   final HeartHealthyMeal suggestion;
 
@@ -66,7 +60,6 @@ class AISuggestionSaved extends AISuggestionState {
   int get hashCode => suggestion.id.hashCode;
 }
 
-/// Error state - an error occurred
 class AISuggestionError extends AISuggestionState {
   final String message;
   final HeartHealthyMeal? previousSuggestion;

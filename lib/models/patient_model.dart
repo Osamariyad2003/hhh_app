@@ -1,4 +1,3 @@
-/// Patient model based on schema
 class PatientModel {
   final String id;
   final String firstName;
@@ -8,7 +7,7 @@ class PatientModel {
   final String parentPhone;
   final String? diagnoses;
   final String? healthTracking;
-  final String? userId; // Link to Firebase user ID (for parent/caregiver)
+  final String? userId;
 
   const PatientModel({
     required this.id,

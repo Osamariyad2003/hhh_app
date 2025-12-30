@@ -17,8 +17,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // The router will handle navigation based on auth state
-    // This screen just shows while app initializes
   }
 
   @override

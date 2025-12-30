@@ -37,26 +37,18 @@ class ApiConfig {
     return productionBaseUrl;
   }
   
-  /// Get localhost URL for current platform
-  /// 
-  /// Automatically detects the platform and returns the correct localhost URL
   static String getLocalhostUrl(int port) {
     if (Platform.isAndroid) {
-      // Android emulator uses 10.0.2.2 to access host machine's localhost
       return 'http://10.0.2.2:$port/api/';
     } else if (Platform.isIOS) {
-      // iOS simulator can use localhost
       return 'http://localhost:$port/api/';
     } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      // Desktop platforms use localhost
       return 'http://localhost:$port/api/';
     } else {
-      // Web or other platforms
       return 'http://localhost:$port/api/';
     }
   }
   
-  /// Development base URL (uses platform-specific localhost)
   static String get developmentBaseUrl {
     return getLocalhostUrl(localhostPort);
   }

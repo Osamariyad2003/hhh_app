@@ -17,7 +17,6 @@ class DioHelper {
       ),
     );
 
-    // Add interceptors for logging (optional)
     dio.interceptors.add(LogInterceptor(
       requestBody: true,
       responseBody: true,

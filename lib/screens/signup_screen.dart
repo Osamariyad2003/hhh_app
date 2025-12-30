@@ -37,7 +37,7 @@ class _SignupScreenState extends State<SignupScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text,
             name: _nameController.text.trim(),
-            role: 'parent', // All users are parents
+            role: 'parent', 
           );
     }
   }
@@ -54,12 +54,10 @@ class _SignupScreenState extends State<SignupScreen> {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            // Navigate to home on successful signup
             if (mounted) {
               context.go('/');
             }
           } else if (state is AuthError) {
-            // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -77,7 +75,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 20),
-                  // App Title
                   Text(
                     'Create Account',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -93,7 +90,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Name Field
                   TextFormField(
                     controller: _nameController,
                     textInputAction: TextInputAction.next,
@@ -112,7 +108,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Email Field
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -135,7 +130,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Password Field
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -170,7 +164,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Confirm Password Field
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
@@ -206,7 +199,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Sign Up Button
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       final isLoading = state is AuthLoading;
@@ -227,7 +219,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Login Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

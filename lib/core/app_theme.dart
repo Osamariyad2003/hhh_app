@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Modern Dark Red Color Palette
-  // Primary: Very deep, dark red - bold and professional
   static const Color primaryColor = Color(0xFF8B0000); // DarkRed - Very dark crimson
   static const Color primaryColorDark = Color(0xFF5A0000); // Even darker
   static const Color primaryColorLight = Color(0xFFD32F2F); // Red 700 - Lighter for dark mode

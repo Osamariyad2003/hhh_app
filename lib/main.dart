@@ -18,16 +18,12 @@ import 'services/recipe_remote_datasource.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set up BLoC Observer for debugging
   Bloc.observer = AppBlocObserver();
 
-  // Initialize Firebase
   await initializeFirebase();
 
-  // Initialize Generative AI service
   RecipeRemoteDatasource.instance.initialize();
 
-  // Initialize app cubit
   final appCubit = AppCubit();
   await appCubit.init();
 
@@ -52,7 +48,6 @@ class _CHDAppState extends State<CHDApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _authCubit = AuthCubit();
-    // Initialize router once to prevent recreation on rebuilds
     _router = createAppRouter(widget.appCubit, _authCubit);
   }
 
@@ -65,7 +60,6 @@ class _CHDAppState extends State<CHDApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Lock feature removed
   }
 
   @override

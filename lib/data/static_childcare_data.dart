@@ -1,10 +1,8 @@
 import '../models/general_childcare_model.dart';
 
-/// Static childcare data
-/// This replaces Firestore data with hardcoded content
+
 class StaticChildcareData {
   static List<GeneralChildcareModel> get allItems => [
-        // English Content
         ..._englishItems,
         ..._arabicItems,
       ];
@@ -732,23 +730,19 @@ Talk to your healthcare team if you have concerns about:
   }) {
     var items = allItems.where((item) => item.isActive).toList();
 
-    // Filter by language
     if (language != null && language.isNotEmpty) {
       items = items.where((item) => item.language == language).toList();
     }
 
-    // Filter by category
     if (category != null && category.isNotEmpty && category != 'all') {
       items = items.where((item) => item.category == category).toList();
     }
 
-    // Sort by order
     items.sort((a, b) => a.order.compareTo(b.order));
 
     return items;
   }
 
-  /// Get item by ID
   static GeneralChildcareModel? getItemById(String id) {
     try {
       return allItems.firstWhere((item) => item.id == id);

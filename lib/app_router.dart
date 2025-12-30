@@ -41,42 +41,34 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
     redirect: (context, state) {
       final appState = appCubit.state;
 
-      // Wait for app initialization
       if (!appState.initialized) {
         return '/splash';
       }
 
-      // Check authentication state
       final authState = authCubit.state;
       final isAuthenticated = authState is AuthAuthenticated;
       final isInitial = authState is AuthInitial;
       final isUnauthenticated = authState is AuthUnauthenticated;
 
-      // Get current route
       final currentPath = state.uri.toString();
       final isAuthRoute = currentPath == '/login' || currentPath == '/signup';
       final isSplashRoute = currentPath == '/splash';
 
-      // If still initializing auth (checking Firebase auth state), stay on splash
       if (isInitial) {
-        if (isSplashRoute) return null; // Allow staying on splash
-        return '/splash'; // Redirect to splash while checking auth
+        if (isSplashRoute) return null; 
+        return '/splash'; 
       }
 
-      // If not authenticated, redirect to login
       if (!isAuthenticated) {
-        if (isAuthRoute) return null; // Allow access to auth screens
+        if (isAuthRoute) return null; 
         if (isSplashRoute) {
-          // If on splash and not authenticated, go to login
           return '/login';
         }
         return '/login';
       }
 
-      // If authenticated, redirect away from auth screens and splash
       if (isAuthenticated) {
         if (isAuthRoute || isSplashRoute) {
-          // Redirect authenticated users away from auth screens
           return '/';
         }
 
@@ -98,7 +90,6 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
         builder: (context, state) => const SignupScreen(),
       ),
 
-      // Main navigation routes with bottom bar
       GoRoute(
         path: '/',
         builder: (context, state) => const MainNavigationScreen(
@@ -127,7 +118,6 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
         ),
       ),
 
-      // Nested routes (no bottom bar)
       GoRoute(
         path: '/section/:id',
         builder: (context, state) =>
@@ -147,7 +137,6 @@ GoRouter createAppRouter(AppCubit appCubit, AuthCubit authCubit) {
         builder: (context, state) {
           final tutorial = state.extra as TutorialItem?;
           if (tutorial == null) {
-            // Fallback - try to get from state if available
             return const TutorialsScreen();
           }
           return TutorialDetailScreen(tutorial: tutorial);

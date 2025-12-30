@@ -1,10 +1,9 @@
-/// Heart-healthy meal suggestion model for children with heart disease
 class HeartHealthyMeal {
   final String id;
   final String name;
-  final List<String> mealType; // ["breakfast", "lunch", "dinner"]
+  final List<String> mealType;
   final double rating;
-  final int cookTime; // minutes
+  final int cookTime;
   final int servingSize;
   final String summary;
   final List<MealIngredient> ingredients;

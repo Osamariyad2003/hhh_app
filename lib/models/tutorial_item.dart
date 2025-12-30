@@ -1,21 +1,18 @@
 class TutorialItem {
   final String id;
 
-  final String type; // 'url' | 'r2'
+  final String type;
 
   final String titleEn;
   final String titleAr;
   final String? descriptionEn;
   final String? descriptionAr;
 
-  // If type == 'url' => url is used
-  // If type == 'r2'  => r2Key is used
   final String? url;
   final String? r2Key;
 
   final int? order;
 
-  // New fields
   final bool enabled;
   final String? category;
   final DateTime? updatedAt;
@@ -35,7 +32,6 @@ class TutorialItem {
     this.updatedAt,
   });
 
-  // ---- helpers for JSON (API) ----
 
   static String _readString(
     Map<String, dynamic> data,
@@ -94,7 +90,7 @@ class TutorialItem {
     if (v is DateTime) return v;
     if (v is String && v.isNotEmpty) {
       try {
-        return DateTime.parse(v); // ISO‑8601 from API
+        return DateTime.parse(v); 
       } catch (_) {
         return null;
       }
@@ -102,10 +98,7 @@ class TutorialItem {
     return null;
   }
 
-  // ---- from API JSON ----
-
   factory TutorialItem.fromJson(Map<String, dynamic> data) {
-    // If your API includes `id`, read it here.
     final id = _readString(data, 'id', 'id');
 
     final type = _readString(data, 'type', 'type');
@@ -149,7 +142,6 @@ class TutorialItem {
     );
   }
 
-  // ---- to API JSON ----
 
   Map<String, dynamic> toJson() {
     return {
@@ -164,7 +156,6 @@ class TutorialItem {
       'order': order,
       'enabled': enabled,
       'category': category,
-      // send ISO‑8601 string if you need to update it via API
       'updated_at': updatedAt?.toIso8601String(),
     };
   }

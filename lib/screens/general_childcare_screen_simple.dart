@@ -5,7 +5,6 @@ import '../localization/app_localizations.dart';
 import '../models/general_childcare_model.dart';
 import 'childcare_detail_screen.dart';
 
-/// Simple General Childcare Screen - Loads static data directly
 class GeneralChildcareScreenSimple extends StatefulWidget {
   const GeneralChildcareScreenSimple({super.key});
 
@@ -75,7 +74,6 @@ class _GeneralChildcareScreenSimpleState extends State<GeneralChildcareScreenSim
     final loc = AppLocalizations.of(context);
     final language = loc.isArabic ? 'ar' : 'en';
 
-    // Get data directly from static source
     final items = StaticChildcareData.getItems(
       language: language,
       category: _selectedCategory == 'all' ? null : _selectedCategory,
@@ -90,7 +88,6 @@ class _GeneralChildcareScreenSimpleState extends State<GeneralChildcareScreenSim
       ),
       body: Column(
         children: [
-          // Category Filter
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -140,7 +137,6 @@ class _GeneralChildcareScreenSimpleState extends State<GeneralChildcareScreenSim
             ),
           ),
 
-          // Content List
           Expanded(
             child: items.isEmpty
                 ? Center(
@@ -188,7 +184,6 @@ class _GeneralChildcareScreenSimpleState extends State<GeneralChildcareScreenSim
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Category Icon
               Container(
                 width: 48,
                 height: 48,
@@ -204,12 +199,10 @@ class _GeneralChildcareScreenSimpleState extends State<GeneralChildcareScreenSim
               ),
               const SizedBox(width: 16),
 
-              // Content
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
                     Text(
                       item.title,
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -220,7 +213,6 @@ class _GeneralChildcareScreenSimpleState extends State<GeneralChildcareScreenSim
                     ),
                     const SizedBox(height: 8),
 
-                    // Description
                     Text(
                       item.description,
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -230,7 +222,6 @@ class _GeneralChildcareScreenSimpleState extends State<GeneralChildcareScreenSim
                       overflow: TextOverflow.ellipsis,
                     ),
 
-                    // Age Range (if available)
                     if (item.ageRange != null && item.ageRange!.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Row(
@@ -254,7 +245,6 @@ class _GeneralChildcareScreenSimpleState extends State<GeneralChildcareScreenSim
                 ),
               ),
 
-              // Arrow Icon
               Icon(
                 Icons.chevron_right,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.3),

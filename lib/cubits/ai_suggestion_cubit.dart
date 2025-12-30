@@ -8,7 +8,6 @@ class AISuggestionCubit extends Cubit<AISuggestionState> {
 
   AISuggestionCubit() : super(const AISuggestionInitial());
 
-  /// Get heart-healthy meal suggestions for children with heart disease
   Future<void> getSuggestions(String userInput) async {
     if (userInput.trim().isEmpty) {
       emit(AISuggestionError(
@@ -31,7 +30,6 @@ class AISuggestionCubit extends Cubit<AISuggestionState> {
     }
   }
 
-  /// Save the current suggestion to Firestore
   Future<void> saveSuggestionToFirestore(String userInput) async {
     final currentSuggestion = _getCurrentSuggestion();
     
@@ -64,12 +62,10 @@ class AISuggestionCubit extends Cubit<AISuggestionState> {
     }
   }
 
-  /// Clear the current suggestion and return to initial state
   void clearSuggestion() {
     emit(const AISuggestionInitial());
   }
 
-  /// Clear error and return to previous state if available, otherwise initial
   void clearError() {
     final currentState = state;
     if (currentState is AISuggestionError) {
@@ -82,12 +78,10 @@ class AISuggestionCubit extends Cubit<AISuggestionState> {
     }
   }
 
-  /// Reset all state to initial
   void reset() {
     emit(const AISuggestionInitial());
   }
 
-  /// Helper method to get current suggestion from any state
   HeartHealthyMeal? _getCurrentSuggestion() {
     final currentState = state;
     if (currentState is AISuggestionSuccess) {

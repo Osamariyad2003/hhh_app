@@ -51,12 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            // Navigate to home on successful login
             if (mounted) {
               context.go('/');
             }
           } else if (state is AuthError) {
-            // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -74,7 +72,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 40),
-                  // App Logo/Title
                   Text(
                     loc.t('appTitle'),
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -90,7 +87,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 48),
 
-                  // Email Field
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -113,7 +109,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Password Field
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -149,7 +144,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Login Button
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       final isLoading = state is AuthLoading;
@@ -170,7 +164,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Divider
                   Row(
                     children: [
                       Expanded(child: Divider(color: Colors.grey[400])),
@@ -186,7 +179,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Anonymous Login Button
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       final isLoading = state is AuthLoading;
@@ -201,7 +193,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Sign Up Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

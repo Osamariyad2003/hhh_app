@@ -64,7 +64,6 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Header Card
                   Card(
                     elevation: 2,
                     child: Padding(
@@ -103,7 +102,6 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Input Section
                   TextField(
                     controller: _ingredientsController,
                     decoration: InputDecoration(
@@ -125,7 +123,6 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Get Suggestions Button
                   ElevatedButton.icon(
                     onPressed: (isLoading || isSaving) ? null : _getSuggestions,
                     icon: isLoading
@@ -144,7 +141,6 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
                     ),
                   ),
 
-                  // Error Display
                   if (hasError) ...[
                     const SizedBox(height: 16),
                     Card(
@@ -180,7 +176,6 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
                     ),
                   ],
 
-                  // Results Display
                   if (hasSuggestion) ...[
                     const SizedBox(height: 24),
                     _buildSuggestionCard(_getSuggestionFromState(state)),
@@ -220,7 +215,6 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with gradient
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -306,13 +300,11 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
             ),
           ),
 
-          // Content
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Summary
                 if (result.summary.isNotEmpty) ...[
                   Text(
                     'Overview',
@@ -328,7 +320,6 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                // Ingredients/Recommendations
                 if (result.ingredients.isNotEmpty) ...[
                   Text(
                     'Ingredients',
@@ -341,7 +332,6 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                // Steps
                 if (result.mealSteps.isNotEmpty) ...[
                   Text(
                     'Cooking Steps',
@@ -356,7 +346,6 @@ class _AISuggestionScreenState extends State<AISuggestionScreen> {
             ),
           ),
 
-          // Save Button
           BlocBuilder<AISuggestionCubit, AISuggestionState>(
             builder: (context, cubitState) {
               final isSaving = cubitState is AISuggestionSaving;

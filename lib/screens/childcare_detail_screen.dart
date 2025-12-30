@@ -4,8 +4,6 @@ import '../models/general_childcare_model.dart';
 import '../localization/app_localizations.dart';
 import '../widgets/lang_toggle_button.dart';
 
-/// Childcare Detail Screen
-/// Displays full content of a childcare information item
 class ChildcareDetailScreen extends StatelessWidget {
   final GeneralChildcareModel item;
 
@@ -81,7 +79,6 @@ class ChildcareDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Category Badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -109,7 +106,6 @@ class ChildcareDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Title
             Text(
               item.title,
               style: theme.textTheme.headlineSmall?.copyWith(
@@ -119,7 +115,6 @@ class ChildcareDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Description
             Text(
               item.description,
               style: theme.textTheme.titleMedium?.copyWith(
@@ -128,7 +123,6 @@ class ChildcareDetailScreen extends StatelessWidget {
               textAlign: isArabic ? TextAlign.right : TextAlign.left,
             ),
 
-            // Age Range (if available)
             if (item.ageRange != null && item.ageRange!.isNotEmpty) ...[
               const SizedBox(height: 16),
               Row(
@@ -154,7 +148,6 @@ class ChildcareDetailScreen extends StatelessWidget {
             const Divider(),
             const SizedBox(height: 24),
 
-            // Content based on contentType
             _buildContent(context, theme, isArabic, loc),
           ],
         ),
@@ -267,7 +260,6 @@ class ChildcareDetailScreen extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                // Video thumbnail placeholder
                 Container(
                   height: 200,
                   width: double.infinity,
@@ -283,7 +275,6 @@ class ChildcareDetailScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Play button overlay
                 Positioned.fill(
                   child: Material(
                     color: Colors.transparent,

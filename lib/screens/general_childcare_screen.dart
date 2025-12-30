@@ -9,8 +9,6 @@ import '../cubits/app_cubit.dart';
 import 'childcare_detail_screen.dart';
 import '../models/general_childcare_model.dart';
 
-/// General Childcare Information Screen
-/// Displays static childcare information
 class GeneralChildcareScreen extends StatefulWidget {
   const GeneralChildcareScreen({super.key});
 
@@ -34,7 +32,6 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
   @override
   void initState() {
     super.initState();
-    // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
     });
@@ -101,7 +98,6 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
 
     return BlocListener<AppCubit, AppState>(
       listener: (context, appState) {
-        // Reload when language changes
         _loadData();
       },
       child: Scaffold(
@@ -111,7 +107,6 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
         ),
         body: Column(
           children: [
-            // Category Filter
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -166,7 +161,6 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
               ),
             ),
 
-            // Content List
             Expanded(
               child: BlocBuilder<GeneralChildcareCubit, GeneralChildcareState>(
                 builder: (context, state) {
@@ -248,7 +242,6 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Category Icon
               Container(
                 width: 48,
                 height: 48,
@@ -264,12 +257,10 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
               ),
               const SizedBox(width: 16),
 
-              // Content
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
                     Text(
                       item.title,
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -280,7 +271,6 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
                     ),
                     const SizedBox(height: 8),
 
-                    // Description
                     Text(
                       item.description,
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -290,7 +280,6 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
 
-                    // Age Range (if available)
                     if (item.ageRange != null && item.ageRange!.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Row(
@@ -314,7 +303,6 @@ class _GeneralChildcareScreenState extends State<GeneralChildcareScreen> {
                 ),
               ),
 
-              // Arrow Icon
               Icon(
                 Icons.chevron_right,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.3),

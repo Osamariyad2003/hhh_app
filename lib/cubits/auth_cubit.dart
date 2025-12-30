@@ -10,7 +10,6 @@ class AuthCubit extends Cubit<AuthState> {
     _listenToAuthChanges();
   }
 
-  /// Listen to Firebase auth state changes
   void _listenToAuthChanges() {
     _firebaseAuth.authStateChanges().listen((firebaseUser) async {
       if (firebaseUser != null) {
@@ -21,13 +20,11 @@ class AuthCubit extends Cubit<AuthState> {
     });
   }
 
-  /// Load user profile from Firestore
   Future<void> _loadUserProfile(String userId) async {
     emit(const AuthLoading());
     try {
       final userProfile = await _firebaseAuth.getCurrentUserProfile();
       if (userProfile != null) {
-        // Convert FirebaseUserModel to UserModel for compatibility
         final user = UserModel(
           id: userProfile.id,
           email: userProfile.email,
@@ -38,7 +35,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(
           AuthAuthenticated(
             user: user,
-            token: userId, // Using userId as token for compatibility
+            token: userId, 
           ),
         );
       } else {
@@ -54,13 +51,11 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Sign in anonymously
   Future<void> signInAnonymously() async {
     emit(const AuthLoading());
 
     try {
       await _firebaseAuth.signInAnonymously();
-      // State will be updated via _listenToAuthChanges
     } catch (e) {
       emit(
         AuthError(
@@ -71,7 +66,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Sign in with email and password
   Future<void> signInWithEmailPassword({
     required String email,
     required String password,
@@ -83,7 +77,6 @@ class AuthCubit extends Cubit<AuthState> {
         email: email.trim(),
         password: password,
       );
-      // State will be updated via _listenToAuthChanges
     } catch (e) {
       emit(
         AuthError(
@@ -94,12 +87,11 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Sign up with email and password
   Future<void> registerWithEmailPassword({
     required String email,
     required String password,
     String? name,
-    String role = 'parent', // Default role - all users are parents
+    String role = 'parent',
   }) async {
     emit(const AuthLoading());
 
@@ -110,7 +102,6 @@ class AuthCubit extends Cubit<AuthState> {
         username: name?.trim() ?? email.split('@').first,
         role: role,
       );
-      // State will be updated via _listenToAuthChanges
     } catch (e) {
       emit(
         AuthError(
@@ -121,7 +112,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Sign out
   Future<void> signOut() async {
     emit(const AuthLoading());
 
@@ -138,7 +128,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Update user profile
   Future<void> updateProfile({
     String? name,
     String? email,
@@ -163,7 +152,6 @@ class AuthCubit extends Cubit<AuthState> {
 
         await _firebaseAuth.updateUserProfile(updatedProfile);
 
-        // Reload profile
         await _loadUserProfile(userProfile.id);
       }
     } catch (e) {
@@ -176,7 +164,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Send password reset email
   Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email);
@@ -190,7 +177,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Clear error and return to previous state
   void clearError() {
     final currentState = state;
     if (currentState is AuthError) {
@@ -202,7 +188,6 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Get current user if authenticated
   UserModel? get currentUser {
     final currentState = state;
     if (currentState is AuthAuthenticated) {
@@ -211,13 +196,10 @@ class AuthCubit extends Cubit<AuthState> {
     return null;
   }
 
-  /// Check if user is authenticated
   bool get isAuthenticated => state is AuthAuthenticated;
 
-  /// Check if user is loading
   bool get isLoading => state is AuthLoading;
 
-  /// Check if user is admin
   Future<bool> isAdmin() async {
     return await _firebaseAuth.isAdmin();
   }

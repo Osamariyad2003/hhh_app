@@ -50,7 +50,6 @@ class ChildInfoScreen extends StatelessWidget {
               backgroundColor: Colors.orange.shade50,
               title: loc.isArabic ? 'المعدات' : 'Equipment',
               onTap: () {
-                // Navigate to equipment screen when implemented
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(loc.isArabic ? 'قريباً' : 'Coming soon')),
                 );

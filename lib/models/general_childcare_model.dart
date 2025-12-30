@@ -1,14 +1,12 @@
-/// Model for General Childcare Information
-/// Used for static childcare data and JSON serialization
 class GeneralChildcareModel {
   final String id;
   final String title;
   final String description;
-  final String category; // growth, nutrition, sleep, hygiene, safety, daily_care, development
+  final String category; 
   final String? ageRange;
-  final String contentType; // text, image, video, link
+  final String contentType; 
   final String body;
-  final String language; // "en" or "ar"
+  final String language;
   final String? mediaUrl;
   final int order;
   final bool isActive;
@@ -27,7 +25,6 @@ class GeneralChildcareModel {
     required this.isActive,
   });
 
-  /// Create from JSON data
   factory GeneralChildcareModel.fromJson(Map<String, dynamic> json) {
     return GeneralChildcareModel(
       id: json['id'] as String? ?? '',
@@ -44,7 +41,6 @@ class GeneralChildcareModel {
     );
   }
 
-  /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -61,7 +57,6 @@ class GeneralChildcareModel {
     };
   }
 
-  /// Create a copy with modified fields
   GeneralChildcareModel copyWith({
     String? id,
     String? title,
@@ -90,7 +85,6 @@ class GeneralChildcareModel {
     );
   }
 
-  /// Get icon based on category
   String get categoryIcon {
     switch (category) {
       case 'growth':

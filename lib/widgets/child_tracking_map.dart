@@ -22,8 +22,7 @@ class _ChildTrackingMapState extends State<ChildTrackingMap> {
   GoogleMapController? _mapController;
   static const String _googleMapsApiKey = 'AIzaSyCh4YWxrSQumlOpsNxSsdha8kMYwE1Hc50';
 
-  // Default location (can be set to hospital or home location)
-  static const double _defaultLatitude = 24.7136; // Riyadh, Saudi Arabia
+  static const double _defaultLatitude = 24.7136;
   static const double _defaultLongitude = 46.6753;
 
   @override

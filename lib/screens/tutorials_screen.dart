@@ -30,7 +30,6 @@ class TutorialsScreen extends StatelessWidget {
   }
 
   Future<void> _openTutorial(BuildContext context, TutorialItem item) async {
-    // Navigate to detail screen
     context.push('/tutorial/${item.id}', extra: item);
   }
 

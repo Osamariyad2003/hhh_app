@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Global BLoC Observer for debugging and logging
-/// Observes all BLoC/Cubit events, state changes, and errors
 class AppBlocObserver extends BlocObserver {
   @override
   void onCreate(BlocBase bloc) {

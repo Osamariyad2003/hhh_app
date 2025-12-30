@@ -1,12 +1,9 @@
-/// Support Group model based on schema
 class SupportGroupModel {
   final String id;
   final String name;
   final String description;
   final String meetingSchedule;
   final SupportGroupContactInfo contactInfo;
-  
-  // Bilingual fields (prefer English)
   final String? nameEn;
   final String? nameAr;
   final String? descriptionEn;
@@ -56,10 +53,7 @@ class SupportGroupModel {
     };
   }
 
-  /// Get English name (preferred)
   String get nameEnglish => nameEn ?? name;
-  
-  /// Get English description (preferred)
   String get descriptionEnglish => descriptionEn ?? description;
 
   SupportGroupModel copyWith({
@@ -109,16 +103,13 @@ class SupportGroupContactInfo {
     );
   }
 
-  /// Try to parse from a string if the data appears corrupted/stringified
   factory SupportGroupContactInfo.parse(String raw) {
     if (raw.isEmpty) return const SupportGroupContactInfo();
     
-    // Attempt basic parsing if it looks like {key: val}
     String? phone;
     String? email;
     String? organizer;
     
-    // Very basic regex scraping as fallback
     final phoneMatch = RegExp(r'phone:\s*([^,]+)').firstMatch(raw);
     if (phoneMatch != null) phone = phoneMatch.group(1)?.trim();
     
@@ -128,9 +119,7 @@ class SupportGroupContactInfo {
     final organizerMatch = RegExp(r'organizer:\s*([^,]+)').firstMatch(raw);
     if (organizerMatch != null) organizer = organizerMatch.group(1)?.trim();
 
-    // If essentially empty, return the raw string as organizer (fallback)
     if (phone == null && email == null && organizer == null && raw.length > 2) {
-      // If it doesn't look like json, maybe it's just a phone number or name
       return SupportGroupContactInfo(organizer: raw);
     }
 
