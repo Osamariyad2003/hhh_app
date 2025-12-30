@@ -22,7 +22,7 @@ samples, guidance on mobile development, and a full API reference.
 
 ## 📖 Overview
 
-[cite_start]**Health Hearts at Home** is a cross-platform mobile application designed to alleviate the overwhelming burden on caregivers of children with Congenital Heart Disease (CHD)[cite: 17]. [cite_start]By providing a centralized tool for medical tracking, educational resources, and hospital connectivity, the app empowers parents to manage their child's health effectively from home[cite: 17, 21].
+**Health Hearts at Home** is a cross-platform mobile application designed to alleviate the overwhelming burden on caregivers of children with Congenital Heart Disease (CHD). By providing a centralized tool for medical tracking, educational resources, and hospital connectivity, the app empowers parents to manage their child's health effectively from home.
 
 The project also includes a **Web Admin Panel (HeartHub)** for hospital staff and administrators to manage content, users, and hospital directories.
 
@@ -30,21 +30,21 @@ The project also includes a **Web Admin Panel (HeartHub)** for hospital staff an
 
 ### 📱 Mobile Application (Caregivers)
 * **Health Tracking & Visualization:**
-    * [cite_start]**Growth:** Log and track weight with visual charts[cite: 19].
-    * [cite_start]**Feeding:** Record bottle/breastfeeding sessions and amounts[cite: 19].
-    * [cite_start]**Vitals:** Monitor sensitive data like Oxygen Saturation (SpO2) levels[cite: 19, 63].
+    * **Growth:** Log and track weight with visual charts.
+    * **Feeding:** Record bottle/breastfeeding sessions and amounts.
+    * **Vitals:** Monitor sensitive data like Oxygen Saturation (SpO2) levels].
 * **AI-Powered Assistance:**
-    * [cite_start]Integrated **Gemini AI** to suggest heart-healthy recipes based on available ingredients[cite: 11].
+    * Integrated **Gemini AI** to suggest heart-healthy recipes based on available ingredients.
 * **Educational Resources:**
-    * [cite_start]Library of video tutorials (e.g., medication administration, wound care)[cite: 18].
-    * [cite_start]Detailed information on CHD types, treatments, and defects[cite: 26].
+    * Library of video tutorials (e.g., medication administration, wound care).
+    * Detailed information on CHD types, treatments, and defects.
 * **Caregiver Support:**
-    * [cite_start]**Spiritual Needs:** Access to supplications and spiritual guidance[cite: 20, 39].
-    * [cite_start]**Community:** Patient stories and support group information[cite: 20].
+    * **Spiritual Needs:** Access to supplications and spiritual guidance.
+    * **Community:** Patient stories and support group information.
 * **Localization:**
-    * [cite_start]Full support for **English and Arabic** with instant LTR/RTL layout switching[cite: 24, 44].
+    * Full support for **English and Arabic** with instant LTR/RTL layout switching.
 * **Hospital Directory:**
-    * [cite_start]Access contact info, emergency numbers, and location maps for hospitals[cite: 17, 38].
+    * Access contact info, emergency numbers, and location maps for hospitals.
 
 ### 💻 Web Admin Panel (Administrators)
 * **Dashboard Overview:** View statistics on users, hospitals, and published stories.
