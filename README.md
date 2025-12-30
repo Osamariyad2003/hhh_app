@@ -1,21 +1,3 @@
-# chd_app_new
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-
 # Health Hearts at Home (HeartHub) ❤️🏠
 
 **Comprehensive support for caregivers of children with Congenital Heart Disease (CHD).**
@@ -54,21 +36,21 @@ The project also includes a **Web Admin Panel (HeartHub)** for hospital staff an
 
 ## 🛠️ Tech Stack & Tools
 
-* [cite_start]**Frontend:** Flutter & Dart (Cross-platform for iOS/Android)[cite: 9, 28].
-* [cite_start]**State Management:** **Cubit (BLoC Pattern)** – Used for managing complex states like localization (RTL/LTR switching) and real-time data updates[cite: 59].
-* [cite_start]**Backend:** Firebase (Firestore, Authentication, Cloud Functions)[cite: 10, 22, 27].
-* [cite_start]**AI Integration:** Gemini AI Assistant[cite: 11].
+* **Frontend:** Flutter & Dart (Cross-platform for iOS/Android).
+* **State Management:** **Cubit (BLoC Pattern)** – Used for managing complex states like localization (RTL/LTR switching) and real-time data updates.
+* **Backend:** Firebase (Firestore, Authentication, Cloud Functions).
+* **AI Integration:** Gemini AI Assistant.
 * **Project Management:** **Trello** – Used for agile task tracking and team coordination.
 * **Architecture:** Model-View-ViewModel (MVVM) pattern with Clean Architecture principles.
 
 ## 🏗️ System Architecture
 
-[cite_start]The application follows a streamlined data flow[cite: 31]:
-1.  [cite_start]**User Input:** Caregivers input data (weight, feeding, oxygen) via the Flutter UI[cite: 32].
-2.  [cite_start]**State Management:** **Cubit** handles the business logic, ensuring immediate UI updates and validating forms[cite: 59].
-3.  [cite_start]**Authentication:** Firebase Auth handles secure user login/signup[cite: 30].
-4.  [cite_start]**Data Sync:** Dynamic data is synced immediately to **Cloud Firestore**[cite: 22, 37].
-5.  [cite_start]**Content Delivery:** Static data (tutorials, hospital info) is fetched from Firestore and streamed efficiently to the client[cite: 40, 62].
+The application follows a streamlined data flow:
+1.  **User Input:** Caregivers input data (weight, feeding, oxygen) via the Flutter UI.
+2.  **State Management:** **Cubit** handles the business logic, ensuring immediate UI updates and validating forms.
+3.  **Authentication:** Firebase Auth handles secure user login/signup.
+4.  **Data Sync:** Dynamic data is synced immediately to **Cloud Firestore**.
+5.  **Content Delivery:** Static data (tutorials, hospital info) is fetched from Firestore and streamed efficiently to the client.
 
 ## 🚀 Getting Started
 
@@ -95,18 +77,14 @@ The project also includes a **Web Admin Panel (HeartHub)** for hospital staff an
     flutter run
     ```
 
-## [cite_start]👥 The Apex Team [cite: 2]
+## 👥 The Apex Team 
 
-[cite_start]This project was built by the **Apex Team**[cite: 3]:
+This project was built by the **Apex Team**:
 
 * **Osama Riyad:** Project Manager & Software Engineer 
 * **Mohammad Al Ramahi:** AI Engineer 
 * **Ibrahim Shalakhti:** Backend Engineer (Firebase) 
 * **Laith Abu-Abbas:** UI/UX & Software Engineer 
 
-## 📄 License
 
-[Insert License Name, e.g., MIT License]
-
----
 *Developed for the support of CHD children and their families.*
