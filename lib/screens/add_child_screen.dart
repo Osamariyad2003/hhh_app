@@ -81,7 +81,6 @@ class _AddChildScreenState extends State<AddChildScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            // Avatar Placeholder
             Container(
               width: 100,
               height: 100,
