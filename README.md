@@ -99,10 +99,10 @@ The project also includes a **Web Admin Panel (HeartHub)** for hospital staff an
 
 [cite_start]This project was built by the **Apex Team**[cite: 3]:
 
-* [cite_start]**Osama Riyad:** Project Manager & Software Engineer [cite: 5]
-* [cite_start]**Mohammad Al Ramahi:** AI Engineer [cite: 6]
-* [cite_start]**Ibrahim Shalakhti:** Backend Engineer (Firebase) [cite: 7]
-* [cite_start]**Laith Abu-Abbas:** UI/UX & Software Engineer [cite: 8]
+* **Osama Riyad:** Project Manager & Software Engineer 
+* **Mohammad Al Ramahi:** AI Engineer 
+* **Ibrahim Shalakhti:** Backend Engineer (Firebase) 
+* **Laith Abu-Abbas:** UI/UX & Software Engineer 
 
 ## 📄 License
 
